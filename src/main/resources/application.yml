@@ -1,6 +1,11 @@
 spring:
+  
+  profiles:
+    include: jwt
+    
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -11,9 +16,9 @@ spring:
         datasource:
           p6spy:
             enable-logging: true
+  
   thymeleaf:
     cache: false
-  profiles:
-    active: dev
+    
 server:
   port: 7080
