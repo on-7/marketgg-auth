@@ -3,10 +3,7 @@ package com.nhnacademy.marketgg.auth.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "roles")
@@ -19,5 +16,6 @@ public class Role {
     private Long roleNo;
 
     @Column
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private Roles name;
 }

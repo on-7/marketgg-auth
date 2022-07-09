@@ -37,8 +37,7 @@ public class WebSecurityConfig {
             .sessionManagement().disable()
 
             .authorizeRequests()
-            .anyRequest()
-            .permitAll()
+            .antMatchers("/auth/**").permitAll()
             .and()
 
             .httpBasic().disable()

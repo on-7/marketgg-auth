@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@Entity
 @Table(name = "auth_roles")
+@Entity
 @Getter
 @NoArgsConstructor
 public class AuthRoles {
