@@ -1,16 +1,15 @@
 package com.nhnacademy.marketgg.auth.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
+import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.time.LocalDate;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Entity
 @Table(name = "auth")
+@Entity
 @Getter
 @NoArgsConstructor
 public class Auth {

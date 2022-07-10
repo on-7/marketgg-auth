@@ -1,5 +1,7 @@
 package com.nhnacademy.marketgg.auth.entity;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +20,7 @@ public class Role {
     @Column(name = "role_no")
     private Long roleNo;
 
+    @Enumerated(EnumType.STRING)
     @Column
-    private String name;
+    private Roles name;
 }
