@@ -1,13 +1,13 @@
 package com.nhnacademy.marketgg.auth.dto.response;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Getter
 public class UsernameResponse {
 
-    Boolean isExistUsername;
+    private final Boolean isExistUsername;
 
-    public UsernameResponse(Boolean existsByUsername) {
-        this.isExistUsername = existsByUsername;
-    }
 }
+
