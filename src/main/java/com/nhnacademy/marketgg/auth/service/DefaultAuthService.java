@@ -25,4 +25,14 @@ public class DefaultAuthService implements AuthService {
         authRepository.save(auth);
     }
 
+    @Override
+    public Boolean existsUsername(String username) {
+        return authRepository.existsByUsername(username);
+    }
+
+    @Override
+    public Boolean existsEmail(String email) {
+        return authRepository.existsByEmail(email);
+    }
+
 }

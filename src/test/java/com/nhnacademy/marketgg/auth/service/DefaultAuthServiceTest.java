@@ -53,4 +53,28 @@ class DefaultAuthServiceTest {
 
         verify(authRepository, times(1)).save(any());
     }
+
+    @Test
+    @DisplayName("회원 아이디 중복체크")
+    void testExistsUsername() {
+
+        given(authRepository.existsByUsername(any())).willReturn(true);
+
+        authService.existsUsername("testUsername");
+
+        verify(authRepository, times(1)).existsByUsername(any());
+    }
+
+
+    @Test
+    @DisplayName("회원 이메일 중복체크")
+    void testExistsEmail() {
+
+        given(authRepository.existsByEmail(any())).willReturn(true);
+
+        authService.existsEmail("test@test.com");
+
+        verify(authRepository, times(1)).existsByEmail(any());
+    }
+
 }
