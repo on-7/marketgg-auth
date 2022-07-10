@@ -1,6 +1,6 @@
 package com.nhnacademy.marketgg.auth.config;
 
-import com.nhnacademy.marketgg.auth.entity.Token;
+import com.nhnacademy.marketgg.auth.jwt.RefreshToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,7 +44,7 @@ public class RedisConfig {
 
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Token.class));
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(RefreshToken.class));
 
         return redisTemplate;
     }

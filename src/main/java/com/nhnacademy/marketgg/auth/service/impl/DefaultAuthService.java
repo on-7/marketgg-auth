@@ -4,6 +4,7 @@ import com.nhnacademy.marketgg.auth.dto.SignupRequestDto;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.exception.LoginFailException;
+import com.nhnacademy.marketgg.auth.jwt.RefreshToken;
 import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
 import com.nhnacademy.marketgg.auth.repository.AuthRepository;
 import com.nhnacademy.marketgg.auth.service.AuthService;
@@ -63,7 +64,8 @@ public class DefaultAuthService implements AuthService {
         String refreshToken = tokenGenerator.generateRefreshToken(authentication);
 
         redisTemplate.opsForHash()
-                     .put(loginRequest.getUsername(), REFRESH_TOKEN, refreshToken);
+                     .put(loginRequest.getUsername(), REFRESH_TOKEN,
+                         new RefreshToken(loginRequest.getUsername(), refreshToken));
 
         return jwt;
     }

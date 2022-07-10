@@ -47,6 +47,7 @@ public class WebSecurityConfig {
             .and()
 
             .build();
+
     }
 
     @Bean
@@ -54,4 +55,5 @@ public class WebSecurityConfig {
         return web -> web.ignoring()
                          .antMatchers("/h2-console/**");
     }
+
 }
