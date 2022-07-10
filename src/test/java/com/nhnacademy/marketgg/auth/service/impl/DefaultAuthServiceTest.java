@@ -8,7 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.nhnacademy.marketgg.auth.dto.SignupRequestDto;
+import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
@@ -52,18 +52,18 @@ class DefaultAuthServiceTest {
     @DisplayName("회원가입 테스트")
     void testSignup() {
 
-        SignupRequestDto testSignupRequestDto = new SignupRequestDto();
+        SignupRequest testSignupRequest = new SignupRequest();
 
-        ReflectionTestUtils.setField(testSignupRequestDto, "username", "testUsername");
-        ReflectionTestUtils.setField(testSignupRequestDto, "password", "1234");
-        ReflectionTestUtils.setField(testSignupRequestDto, "email", "test@test.com");
-        ReflectionTestUtils.setField(testSignupRequestDto, "name", "testName");
+        ReflectionTestUtils.setField(testSignupRequest, "username", "testUsername");
+        ReflectionTestUtils.setField(testSignupRequest, "password", "1234");
+        ReflectionTestUtils.setField(testSignupRequest, "email", "test@test.com");
+        ReflectionTestUtils.setField(testSignupRequest, "name", "testName");
 
-        Auth auth = new Auth(testSignupRequestDto);
+        Auth auth = new Auth(testSignupRequest);
 
         given(authRepository.save(any())).willReturn(auth);
 
-        authService.signup(testSignupRequestDto);
+        authService.signup(testSignupRequest);
 
         verify(authRepository, times(1)).save(any());
     }

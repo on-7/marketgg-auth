@@ -1,8 +1,8 @@
 package com.nhnacademy.marketgg.auth.repository;
 
-import com.nhnacademy.marketgg.auth.dto.EmailRequestDto;
-import com.nhnacademy.marketgg.auth.dto.SignupRequestDto;
-import com.nhnacademy.marketgg.auth.dto.UsernameRequestDto;
+import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
+import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
+import com.nhnacademy.marketgg.auth.dto.request.UsernameRequest;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,17 +19,17 @@ class AuthRepositoryTest {
     @Autowired
     private AuthRepository authRepository;
 
-    private SignupRequestDto testSignupRequestDto;
+    private SignupRequest testSignupRequest;
 
     @BeforeEach
     void setUp() {
 
-        testSignupRequestDto = new SignupRequestDto();
+        testSignupRequest = new SignupRequest();
 
-        ReflectionTestUtils.setField(testSignupRequestDto, "username", "testUsername");
-        ReflectionTestUtils.setField(testSignupRequestDto, "password", "1234");
-        ReflectionTestUtils.setField(testSignupRequestDto, "email", "test@test.com");
-        ReflectionTestUtils.setField(testSignupRequestDto, "name", "testName");
+        ReflectionTestUtils.setField(testSignupRequest, "username", "testUsername");
+        ReflectionTestUtils.setField(testSignupRequest, "password", "1234");
+        ReflectionTestUtils.setField(testSignupRequest, "email", "test@test.com");
+        ReflectionTestUtils.setField(testSignupRequest, "name", "testName");
 
     }
 
@@ -38,7 +38,7 @@ class AuthRepositoryTest {
     void testSignup() {
 
         //given
-        Auth testAuth = new Auth(testSignupRequestDto);
+        Auth testAuth = new Auth(testSignupRequest);
 
         //when
         Auth save = authRepository.save(testAuth);
@@ -52,14 +52,14 @@ class AuthRepositoryTest {
     void testExistsUsername() {
 
         //given
-        Auth testAuth = new Auth(testSignupRequestDto);
+        Auth testAuth = new Auth(testSignupRequest);
 
-        UsernameRequestDto testUsernameRequestDto = new UsernameRequestDto();
+        UsernameRequest testUsernameRequest = new UsernameRequest();
 
         //when
         Auth save = authRepository.save(testAuth);
 
-        ReflectionTestUtils.setField(testUsernameRequestDto, "username", "testUsername");
+        ReflectionTestUtils.setField(testUsernameRequest, "username", "testUsername");
 
         Boolean isExistsUsername = authRepository.existsByUsername("testUsername");
 
@@ -74,14 +74,14 @@ class AuthRepositoryTest {
     void testExistsEmail() {
 
         //given
-        Auth testAuth = new Auth(testSignupRequestDto);
+        Auth testAuth = new Auth(testSignupRequest);
 
-        EmailRequestDto testEmailRequestDto = new EmailRequestDto();
+        EmailRequest testEmailRequest = new EmailRequest();
 
         //when
         Auth save = authRepository.save(testAuth);
 
-        ReflectionTestUtils.setField(testEmailRequestDto, "email", "test@test.com");
+        ReflectionTestUtils.setField(testEmailRequest, "email", "test@test.com");
 
         Boolean isExistsEmail = authRepository.existsByEmail("test@test.com");
 

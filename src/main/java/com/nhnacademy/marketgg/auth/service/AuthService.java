@@ -1,15 +1,17 @@
 package com.nhnacademy.marketgg.auth.service;
 
-import com.nhnacademy.marketgg.auth.dto.SignupRequestDto;
+import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
+import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
+import com.nhnacademy.marketgg.auth.dto.response.UsernameResponse;
 
 public interface AuthService {
 
-    void signup(SignupRequestDto signupRequestDto);
+    void signup(SignupRequest signupRequest);
 
-    Boolean existsUsername(String username);
+    UsernameResponse existsUsername(String username);
 
-    Boolean existsEmail(String email);
+    EmailResponse existsEmail(String email);
 
     String login(LoginRequest loginRequest);
 

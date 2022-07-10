@@ -1,7 +1,9 @@
 package com.nhnacademy.marketgg.auth.service.impl;
 
-import com.nhnacademy.marketgg.auth.dto.SignupRequestDto;
+import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
+import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
+import com.nhnacademy.marketgg.auth.dto.response.UsernameResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.exception.LoginFailException;
 import com.nhnacademy.marketgg.auth.jwt.RefreshToken;
@@ -23,7 +25,6 @@ import org.springframework.stereotype.Service;
 public class DefaultAuthService implements AuthService {
 
     private static final String REFRESH_TOKEN = "refresh_token";
-
     private final AuthRepository authRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -32,21 +33,21 @@ public class DefaultAuthService implements AuthService {
 
     @Transactional
     @Override
-    public void signup(SignupRequestDto signupRequestDto) {
+    public void signup(SignupRequest signupRequest) {
 
-        signupRequestDto.encodingPassword(passwordEncoder.encode(signupRequestDto.getPassword()));
-        Auth auth = new Auth(signupRequestDto);
+        signupRequest.encodingPassword(passwordEncoder.encode(signupRequest.getPassword()));
+        Auth auth = new Auth(signupRequest);
         authRepository.save(auth);
     }
 
     @Override
-    public Boolean existsUsername(String username) {
-        return authRepository.existsByUsername(username);
+    public UsernameResponse existsUsername(String username) {
+        return new UsernameResponse(authRepository.existsByUsername(username));
     }
 
     @Override
-    public Boolean existsEmail(String email) {
-        return authRepository.existsByEmail(email);
+    public EmailResponse existsEmail(String email) {
+        return new EmailResponse(authRepository.existsByEmail(email));
     }
 
     @Override

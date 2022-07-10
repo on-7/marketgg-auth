@@ -1,6 +1,6 @@
 package com.nhnacademy.marketgg.auth.entity;
 
-import com.nhnacademy.marketgg.auth.dto.SignupRequestDto;
+import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
 import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -48,11 +48,11 @@ public class Auth {
     @Enumerated(EnumType.STRING)
     private Roles role;
 
-    public Auth(SignupRequestDto signupRequestDto) {
-        this.username = signupRequestDto.getUsername();
-        this.password = signupRequestDto.getPassword();
-        this.email = signupRequestDto.getEmail();
-        this.name = signupRequestDto.getName();
+    public Auth(SignupRequest signupRequest) {
+        this.username = signupRequest.getUsername();
+        this.password = signupRequest.getPassword();
+        this.email = signupRequest.getEmail();
+        this.name = signupRequest.getName();
         this.passwordUpdatedAt = LocalDate.now();
         this.provider = Provider.SELF;
         this.role = Roles.ROLE_USER;

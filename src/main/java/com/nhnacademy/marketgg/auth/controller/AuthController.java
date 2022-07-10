@@ -1,13 +1,15 @@
 package com.nhnacademy.marketgg.auth.controller;
 
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
+import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
+import com.nhnacademy.marketgg.auth.dto.response.UsernameResponse;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-import com.nhnacademy.marketgg.auth.dto.EmailRequestDto;
-import com.nhnacademy.marketgg.auth.dto.SignupRequestDto;
-import com.nhnacademy.marketgg.auth.dto.UsernameRequestDto;
+import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
+import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
+import com.nhnacademy.marketgg.auth.dto.request.UsernameRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,27 +37,24 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<Void> doSignup(@RequestBody SignupRequestDto signupRequestDto) {
-
-        authService.signup(signupRequestDto);
+    public ResponseEntity<Void> doSignup(@RequestBody SignupRequest signupRequest) {
+        authService.signup(signupRequest);
         return ResponseEntity.status(CREATED)
                              .build();
     }
 
     @PostMapping("/find/username")
-    public ResponseEntity<Boolean> existsUsername(@RequestBody UsernameRequestDto usernameRequestDto) {
-
+    public ResponseEntity<UsernameResponse> existsUsername(@RequestBody UsernameRequest usernameRequest) {
         return ResponseEntity.status(OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(authService.existsUsername(usernameRequestDto.getUsername()));
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(authService.existsUsername(usernameRequest.getUsername()));
     }
 
     @PostMapping("/find/email")
-    public ResponseEntity<Boolean> existsUsername(@RequestBody EmailRequestDto emailRequestDto) {
-
+    public ResponseEntity<EmailResponse> existsUsername(@RequestBody EmailRequest emailRequest) {
         return ResponseEntity.status(OK)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(authService.existsEmail(emailRequestDto.getEmail()));
+                             .body(authService.existsEmail(emailRequest.getEmail()));
     }
 
 }

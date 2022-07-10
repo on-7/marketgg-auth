@@ -1,4 +1,4 @@
-package com.nhnacademy.marketgg.auth.dto;
+package com.nhnacademy.marketgg.auth.dto.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Getter
-public class SignupRequestDto {
+public class SignupRequest {
 
     private String username;
 
