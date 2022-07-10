@@ -1,14 +1,20 @@
 package com.nhnacademy.marketgg.auth.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
+import com.nhnacademy.marketgg.auth.dto.EmailRequestDto;
+import com.nhnacademy.marketgg.auth.dto.SignupRequestDto;
+import com.nhnacademy.marketgg.auth.dto.UsernameRequestDto;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import org.junit.jupiter.api.DisplayName;
@@ -36,6 +42,63 @@ class AuthControllerTest {
 
     @MockBean
     private AuthService authService;
+
+
+    @Test
+    @DisplayName("회원가입 테스트")
+    void testDoSignup() throws Exception {
+
+        SignupRequestDto testSignupRequestDto = new SignupRequestDto();
+
+        ReflectionTestUtils.setField(testSignupRequestDto, "username", "testUsername");
+        ReflectionTestUtils.setField(testSignupRequestDto, "password", "1234");
+        ReflectionTestUtils.setField(testSignupRequestDto, "email", "test@test.com");
+        ReflectionTestUtils.setField(testSignupRequestDto, "name", "testName");
+
+        doNothing().when(authService).signup(testSignupRequestDto);
+
+        mockMvc.perform(post("/auth/signup")
+                   .contentType(APPLICATION_JSON)
+                   .content(mapper.writeValueAsString(testSignupRequestDto)))
+               .andExpect(status().isCreated())
+               .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("회원 아이디 중복 테스트")
+    void testExistsUsername() throws Exception {
+
+        UsernameRequestDto usernameRequestDto = new UsernameRequestDto();
+
+        ReflectionTestUtils.setField(usernameRequestDto, "username", "testUsername");
+
+        doReturn(true).when(authService).existsUsername(usernameRequestDto.getUsername());
+
+        mockMvc.perform(post("/auth/find/username")
+                   .contentType(APPLICATION_JSON)
+                   .content(mapper.writeValueAsString(usernameRequestDto)))
+               .andExpect(status().isOk())
+               .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("회원 이메일 중복 테스트")
+    void testExistsEmail() throws Exception {
+
+        EmailRequestDto emailRequestDto = new EmailRequestDto();
+
+        ReflectionTestUtils.setField(emailRequestDto, "email", "testUsername");
+
+        when(authService.existsEmail(emailRequestDto.getEmail())).thenReturn(true);
+
+        mockMvc.perform(post("/auth/find/email")
+                   .contentType(APPLICATION_JSON)
+                   .content(mapper.writeValueAsString(emailRequestDto)))
+               .andExpect(status().isOk())
+               .andDo(print());
+    }
 
     @DisplayName("로그인 시 헤더에 jwt 토큰 저장")
     @Test
