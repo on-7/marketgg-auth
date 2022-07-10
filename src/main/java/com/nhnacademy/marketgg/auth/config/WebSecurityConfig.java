@@ -31,28 +31,29 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf().disable()
+        return http
 
+            .csrf().disable()
             .sessionManagement().disable()
+            .httpBasic().disable()
+            .formLogin().disable()
 
             .authorizeRequests()
             .antMatchers("/auth/**").permitAll()
             .and()
 
-            .httpBasic().disable()
-            .formLogin().disable();
+            .headers()
+            .frameOptions().sameOrigin()
+            .and()
 
-        return http.build();
+            .build();
+
     }
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> {
-            web.ignoring()
-               .antMatchers(
-                   "/h2-console/**"
-               );
-        };
+        return web -> web.ignoring()
+                         .antMatchers("/h2-console/**");
     }
+
 }

@@ -1,18 +1,24 @@
 package com.nhnacademy.marketgg.auth.entity;
 
+import java.io.Serializable;
+import javax.persistence.Embeddable;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
+import javax.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import java.io.Serializable;
-
 @Table(name = "auth_roles")
 @Entity
 @Getter
-@NoArgsConstructor
-public class AuthRoles {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class AuthRole {
 
     @EmbeddedId
     private Pk id;
@@ -35,6 +41,5 @@ public class AuthRoles {
 
         private Long authNo;
         private Long roleNo;
-
     }
 }

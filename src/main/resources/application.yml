@@ -18,4 +18,4 @@ spring:
     cache: false
     
 server:
-  port: 7080
+  port: 7070

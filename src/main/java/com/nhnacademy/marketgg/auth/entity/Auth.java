@@ -1,12 +1,18 @@
 package com.nhnacademy.marketgg.auth.entity;
 
 import com.nhnacademy.marketgg.auth.dto.SignupRequestDto;
+import java.time.LocalDate;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
-import java.time.LocalDate;
 
 @Table(name = "auth")
 @Entity
@@ -43,7 +49,6 @@ public class Auth {
     private Roles role;
 
     public Auth(SignupRequestDto signupRequestDto) {
-
         this.username = signupRequestDto.getUsername();
         this.password = signupRequestDto.getPassword();
         this.email = signupRequestDto.getEmail();
