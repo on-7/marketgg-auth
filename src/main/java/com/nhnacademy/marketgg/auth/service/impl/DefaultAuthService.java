@@ -1,19 +1,16 @@
 package com.nhnacademy.marketgg.auth.service.impl;
 
 import com.nhnacademy.marketgg.auth.dto.SignupRequestDto;
-import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.entity.Auth;
-import com.nhnacademy.marketgg.auth.exception.LoginFailException;
 import com.nhnacademy.marketgg.auth.jwt.RefreshToken;
 import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
 import com.nhnacademy.marketgg.auth.repository.AuthRepository;
 import com.nhnacademy.marketgg.auth.service.AuthService;
-import java.util.Optional;
+import java.util.Date;
+import java.util.Objects;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,11 +19,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DefaultAuthService implements AuthService {
 
-    private static final String REFRESH_TOKEN = "refresh_token";
+    private static final String REFRESH_TOKEN = "REFRESH_TOKEN";
 
     private final AuthRepository authRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
     private final RedisTemplate<String, Object> redisTemplate;
     private final TokenGenerator tokenGenerator;
 
@@ -50,23 +46,33 @@ public class DefaultAuthService implements AuthService {
     }
 
     @Override
-    public String login(LoginRequest loginRequest) {
+    public String renewToken(String token) {
+        String username = tokenGenerator.getUsername(token);
 
-        UsernamePasswordAuthenticationToken token =
-            new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
-                loginRequest.getPassword());
+        RefreshToken refreshToken =
+            (RefreshToken) redisTemplate.opsForHash().get(username, REFRESH_TOKEN);
 
-        Authentication authentication =
-            Optional.ofNullable(authenticationManager.authenticate(token))
-                    .orElseThrow(LoginFailException::new);
+        if (isInvalidToken(username, refreshToken)) {
+            return null;
+        }
 
-        String jwt = tokenGenerator.generateJwt(authentication);
-        String refreshToken = tokenGenerator.generateRefreshToken(authentication);
+        Authentication authentication = tokenGenerator.getAuthentication(token, username);
 
-        redisTemplate.opsForHash()
-                     .put(loginRequest.getUsername(), REFRESH_TOKEN,
-                         new RefreshToken(loginRequest.getUsername(), refreshToken));
+        Date issueDate = new Date(System.currentTimeMillis());
 
-        return jwt;
+        String newJwt = tokenGenerator.generateJwt(authentication, issueDate);
+        String newRefreshToken = tokenGenerator.generateRefreshToken(authentication, issueDate);
+
+        redisTemplate.opsForHash().delete(username, REFRESH_TOKEN);
+        redisTemplate.opsForHash().put(username, REFRESH_TOKEN, newRefreshToken);
+
+        return newJwt;
     }
+
+    private boolean isInvalidToken(String username, RefreshToken refreshToken) {
+        return Objects.isNull(refreshToken) ||
+            !Objects.equals(username, refreshToken.getUsername()) ||
+            tokenGenerator.isInvalidToken(refreshToken.getToken());
+    }
+
 }

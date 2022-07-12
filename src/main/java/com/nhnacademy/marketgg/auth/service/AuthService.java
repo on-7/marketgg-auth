@@ -1,7 +1,6 @@
 package com.nhnacademy.marketgg.auth.service;
 
 import com.nhnacademy.marketgg.auth.dto.SignupRequestDto;
-import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 
 public interface AuthService {
 
@@ -11,6 +10,5 @@ public interface AuthService {
 
     Boolean existsEmail(String email);
 
-    String login(LoginRequest loginRequest);
-
+    String renewToken(String token);
 }

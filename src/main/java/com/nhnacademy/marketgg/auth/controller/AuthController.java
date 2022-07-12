@@ -1,22 +1,26 @@
 package com.nhnacademy.marketgg.auth.controller;
 
-import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
-import com.nhnacademy.marketgg.auth.service.AuthService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import com.nhnacademy.marketgg.auth.dto.EmailRequestDto;
 import com.nhnacademy.marketgg.auth.dto.SignupRequestDto;
 import com.nhnacademy.marketgg.auth.dto.UsernameRequestDto;
+import com.nhnacademy.marketgg.auth.service.AuthService;
+import java.util.Objects;
+import javax.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import static org.springframework.http.HttpStatus.*;
 
 @Slf4j
 @RestController
@@ -25,14 +29,6 @@ import static org.springframework.http.HttpStatus.*;
 public class AuthController {
 
     private final AuthService authService;
-
-    @PostMapping("/login")
-    public ResponseEntity<Void> doLogin(@RequestBody LoginRequest loginRequest) {
-        String token = authService.login(loginRequest);
-        return ResponseEntity.status(HttpStatus.OK)
-                             .headers(header -> header.setBearerAuth(token))
-                             .build();
-    }
 
     @PostMapping("/signup")
     public ResponseEntity<Void> doSignup(@RequestBody SignupRequestDto signupRequestDto) {
@@ -43,11 +39,12 @@ public class AuthController {
     }
 
     @PostMapping("/find/username")
-    public ResponseEntity<Boolean> existsUsername(@RequestBody UsernameRequestDto usernameRequestDto) {
+    public ResponseEntity<Boolean> existsUsername(
+        @RequestBody UsernameRequestDto usernameRequestDto) {
 
         return ResponseEntity.status(OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(authService.existsUsername(usernameRequestDto.getUsername()));
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(authService.existsUsername(usernameRequestDto.getUsername()));
     }
 
     @PostMapping("/find/email")
@@ -56,6 +53,28 @@ public class AuthController {
         return ResponseEntity.status(OK)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(authService.existsEmail(emailRequestDto.getEmail()));
+    }
+
+    @GetMapping("/refresh")
+    public ResponseEntity<Void> renewToken(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        HttpStatus httpStatus = OK;
+
+        String newToken = null;
+        if (Objects.isNull(authorizationHeader) ||
+            (newToken = authService.renewToken(authorizationHeader.substring(7))) == null) {
+            httpStatus = UNAUTHORIZED;
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+
+        if (Objects.nonNull(newToken)) {
+            headers.setBearerAuth(newToken);
+        }
+
+        return ResponseEntity.status(httpStatus)
+                             .headers(headers)
+                             .build();
     }
 
 }
