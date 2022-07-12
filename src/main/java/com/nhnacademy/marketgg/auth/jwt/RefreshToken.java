@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class RefreshToken {
 
-    private final String username;
+    private final String email;
     private final String token;
 
 }
