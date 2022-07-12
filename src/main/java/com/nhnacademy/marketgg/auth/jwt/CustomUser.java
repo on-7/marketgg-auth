@@ -13,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @AllArgsConstructor
 public class CustomUser implements UserDetails {
 
-    private final String username;
+    private final String email;
     private final String password;
     private final List<Role> authorities;
 
@@ -31,7 +31,7 @@ public class CustomUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override

@@ -26,9 +26,6 @@ public class Auth {
     private Long authNo;
 
     @Column
-    private String username;
-
-    @Column
     private String password;
 
     @Column
@@ -44,18 +41,12 @@ public class Auth {
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
-    @Column
-    @Enumerated(EnumType.STRING)
-    private Roles role;
-
     public Auth(SignupRequest signupRequest) {
-        this.username = signupRequest.getUsername();
         this.password = signupRequest.getPassword();
         this.email = signupRequest.getEmail();
         this.name = signupRequest.getName();
         this.passwordUpdatedAt = LocalDate.now();
         this.provider = Provider.SELF;
-        this.role = Roles.ROLE_USER;
     }
 
 }

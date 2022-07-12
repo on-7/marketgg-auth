@@ -13,10 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
-import com.nhnacademy.marketgg.auth.dto.request.UsernameRequest;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
-import com.nhnacademy.marketgg.auth.dto.response.UsernameResponse;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +25,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
+
+import javax.transaction.Transactional;
 
 @WebMvcTest(AuthController.class)
 @Import(WebSecurityConfig.class)
@@ -50,48 +50,30 @@ class AuthControllerTest {
     void testDoSignup() throws Exception {
         SignupRequest testSignupRequest = new SignupRequest();
 
-        ReflectionTestUtils.setField(testSignupRequest, "username", "testUsername");
-        ReflectionTestUtils.setField(testSignupRequest, "password", "1234");
         ReflectionTestUtils.setField(testSignupRequest, "email", "test@test.com");
+        ReflectionTestUtils.setField(testSignupRequest, "password", "1234");
         ReflectionTestUtils.setField(testSignupRequest, "name", "testName");
 
         doNothing().when(authService).signup(testSignupRequest);
 
         mockMvc.perform(post("/auth/signup")
-                   .contentType(APPLICATION_JSON)
-                   .content(mapper.writeValueAsString(testSignupRequest)))
+                       .contentType(APPLICATION_JSON)
+                       .content(mapper.writeValueAsString(testSignupRequest)))
                .andExpect(status().isCreated())
                .andDo(print());
 
     }
 
     @Test
-    @DisplayName("회원 아이디 중복 테스트")
-    void testExistsUsername() throws Exception {
-        UsernameRequest usernameRequest = new UsernameRequest();
-
-        ReflectionTestUtils.setField(usernameRequest, "username", "testUsername");
-
-        when(authService.existsUsername(usernameRequest.getUsername())).thenReturn(any(UsernameResponse.class));
-
-        mockMvc.perform(post("/auth/find/username")
-                   .contentType(APPLICATION_JSON)
-                   .content(mapper.writeValueAsString(usernameRequest)))
-               .andExpect(status().isOk())
-               .andDo(print());
-
-    }
-
-    @Test
     @DisplayName("회원 이메일 중복 테스트")
-    void testExistsEmail() throws Exception {
+    void testCheckEmail() throws Exception {
         EmailRequest emailRequest = new EmailRequest();
 
-        ReflectionTestUtils.setField(emailRequest, "email", "testUsername");
+        ReflectionTestUtils.setField(emailRequest, "email", "testEmail");
 
-        when(authService.existsEmail(emailRequest.getEmail())).thenReturn(any(EmailResponse.class));
+        when(authService.checkEmail(emailRequest.getEmail())).thenReturn(any(EmailResponse.class));
 
-        mockMvc.perform(post("/auth/find/email")
+        mockMvc.perform(post("/auth/check/email")
                    .contentType(APPLICATION_JSON)
                    .content(mapper.writeValueAsString(emailRequest)))
                .andExpect(status().isOk())
@@ -102,7 +84,7 @@ class AuthControllerTest {
     @Test
     void testDoLogin() throws Exception {
         LoginRequest loginRequest = new LoginRequest();
-        ReflectionTestUtils.setField(loginRequest, "username", "username");
+        ReflectionTestUtils.setField(loginRequest, "email", "email");
         ReflectionTestUtils.setField(loginRequest, "password", "password");
 
         String jsonLoginRequest = mapper.writeValueAsString(loginRequest);

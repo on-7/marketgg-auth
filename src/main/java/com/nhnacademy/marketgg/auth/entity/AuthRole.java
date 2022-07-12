@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class AuthRole {
 
     @EmbeddedId
@@ -42,4 +43,5 @@ public class AuthRole {
         private Long authNo;
         private Long roleNo;
     }
+
 }

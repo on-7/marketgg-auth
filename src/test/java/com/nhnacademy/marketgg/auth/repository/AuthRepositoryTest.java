@@ -2,7 +2,6 @@ package com.nhnacademy.marketgg.auth.repository;
 
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
-import com.nhnacademy.marketgg.auth.dto.request.UsernameRequest;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,9 +25,8 @@ class AuthRepositoryTest {
 
         testSignupRequest = new SignupRequest();
 
-        ReflectionTestUtils.setField(testSignupRequest, "username", "testUsername");
-        ReflectionTestUtils.setField(testSignupRequest, "password", "1234");
         ReflectionTestUtils.setField(testSignupRequest, "email", "test@test.com");
+        ReflectionTestUtils.setField(testSignupRequest, "password", "1234");
         ReflectionTestUtils.setField(testSignupRequest, "name", "testName");
 
     }
@@ -45,28 +43,6 @@ class AuthRepositoryTest {
 
         //then
         assertThat(save).isEqualTo(testAuth);
-    }
-
-    @DisplayName("회원 아이디 중복체크")
-    @Test
-    void testExistsUsername() {
-
-        //given
-        Auth testAuth = new Auth(testSignupRequest);
-
-        UsernameRequest testUsernameRequest = new UsernameRequest();
-
-        //when
-        Auth save = authRepository.save(testAuth);
-
-        ReflectionTestUtils.setField(testUsernameRequest, "username", "testUsername");
-
-        Boolean isExistsUsername = authRepository.existsByUsername("testUsername");
-
-        //then
-        assertThat(save).isEqualTo(testAuth);
-        assertThat(isExistsUsername).isTrue();
-
     }
 
     @DisplayName("회원 이메일 중복체크")
