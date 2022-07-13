@@ -47,7 +47,6 @@ public class WebSecurityConfig {
             .and()
 
             .build();
-
     }
 
     @Bean
