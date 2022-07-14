@@ -23,6 +23,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 인증 관련 요청을 처리하는 Controller 입니다.
+ */
+
 @Slf4j
 @RestController
 @RequestMapping("/auth")
@@ -40,33 +44,28 @@ public class AuthController {
     }
 
     @PostMapping("/check/email")
-    public ResponseEntity<EmailResponse> checkEmail(@RequestBody EmailRequest emailRequest) throws Exception {
-    }
-
-    @PostMapping("/find/username")
-    public ResponseEntity<Boolean> existsUsername(@RequestBody UsernameRequest usernameRequest) {
-
-        return ResponseEntity.status(OK)
-                             .contentType(MediaType.APPLICATION_JSON)
-                             .body(authService.existsUsername(usernameRequest.getUsername()));
-    }
-
-    @PostMapping("/find/email")
-    public ResponseEntity<Boolean> existsUsername(@RequestBody EmailRequest emailRequest) {
+    public ResponseEntity<EmailResponse> checkEmail(@RequestBody EmailRequest emailRequest)
+        throws Exception {
 
         return ResponseEntity.status(OK)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(authService.checkEmail(emailRequest.getEmail()));
     }
 
+    /**
+     * JWT 를 갱신 요청합니다.
+     *
+     * @param request - Http 헤더에 JWT 토큰을 담아 요청을 전달합니다.
+     * @return 요청 결과를 반환합니다.
+     */
     @GetMapping("/refresh")
     public ResponseEntity<Void> renewToken(HttpServletRequest request) {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         HttpStatus httpStatus = OK;
 
         String newToken = null;
-        if (Objects.isNull(authorizationHeader) ||
-            (newToken = authService.renewToken(authorizationHeader.substring(7))) == null) {
+        if (Objects.isNull(authorizationHeader)
+            || (newToken = authService.renewToken(authorizationHeader.substring(7))) == null) {
             httpStatus = UNAUTHORIZED;
         }
 

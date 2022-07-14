@@ -31,12 +31,12 @@ public class TokenGenerator {
     private final String authKey;
 
     /**
-     * 생성자
+     * 생성자입니다.
      *
-     * @param secret                        비밀키
-     * @param tokenExpirationDate           토큰 유효기간
-     * @param refreshTokenExpirationDate    Refresh Token 유효기간
-     * @param authKey
+     * @param secret - JWT Secret
+     * @param tokenExpirationDate - JWT 의 유효기간
+     * @param refreshTokenExpirationDate - Refresh Token 의 유효기간
+     * @param authKey - JWT 에 권한 정보를 담을 때 쓰는 키
      */
     public TokenGenerator(@Value("${jwt.secret}") String secret,
                           @Value("${jwt.expire-time}") long tokenExpirationDate,

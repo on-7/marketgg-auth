@@ -31,6 +31,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * 인증 관련 비즈니스 로직을 처리하는 클래스입니다.
+ */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -72,6 +76,12 @@ public class DefaultAuthService implements AuthService {
         authRoleRepository.save(authRole);
     }
 
+    /**
+     * 로그인을 처리합니다.
+     *
+     * @param loginRequest - 로그인 요청 정보를 담고 있습니다.
+     * @return JWT 를 반환합니다.
+     */
     @Override
     public String login(LoginRequest loginRequest) {
         UsernamePasswordAuthenticationToken token =
@@ -93,6 +103,12 @@ public class DefaultAuthService implements AuthService {
         return jwt;
     }
 
+    /**
+     * JWT 를 갱신합니다.
+     *
+     * @param token - 만료된 JWT 입니다.
+     * @return 새로운 JWT 를 반환합니다.
+     */
     @Override
     public String renewToken(String token) {
         String email = tokenGenerator.getEmail(token);
@@ -137,9 +153,9 @@ public class DefaultAuthService implements AuthService {
     }
 
     private boolean isInvalidToken(String username, RefreshToken refreshToken) {
-        return Objects.isNull(refreshToken) ||
-            !Objects.equals(username, refreshToken.getEmail()) ||
-            tokenGenerator.isInvalidToken(refreshToken.getToken());
+        return Objects.isNull(refreshToken)
+            || !Objects.equals(username, refreshToken.getEmail())
+            || tokenGenerator.isInvalidToken(refreshToken.getToken());
     }
 
 }
