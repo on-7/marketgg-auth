@@ -1,27 +1,29 @@
 package com.nhnacademy.marketgg.auth.service.impl;
 
+import com.nhnacademy.marketgg.auth.entity.Auth;
+import com.nhnacademy.marketgg.auth.exception.AuthNotFoundException;
+import com.nhnacademy.marketgg.auth.jwt.CustomUser;
+import com.nhnacademy.marketgg.auth.repository.AuthRepository;
+import com.nhnacademy.marketgg.auth.repository.RoleRepository;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.ArrayList;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import com.nhnacademy.marketgg.auth.entity.Auth;
-import com.nhnacademy.marketgg.auth.exception.AuthNotFoundException;
-import com.nhnacademy.marketgg.auth.jwt.CustomUser;
-import com.nhnacademy.marketgg.auth.repository.AuthRepository;
-import com.nhnacademy.marketgg.auth.repository.RoleRepository;
-import java.util.ArrayList;
-import java.util.Optional;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @SpringBootTest
 class DefaultUserDetailsServiceTest {
@@ -56,10 +58,12 @@ class DefaultUserDetailsServiceTest {
         String email = "email";
 
         when(authRepository.findByEmail(email))
-            .thenThrow(new AuthNotFoundException(email));
-        when(roleRepository.findRolesByAuthNo(anyLong())).thenReturn(new ArrayList<>());
+                .thenThrow(new AuthNotFoundException(email));
+        Mockito.when(roleRepository.findRolesByAuthNo(anyLong()))
+               .thenReturn(new ArrayList<>());
 
-        assertThatThrownBy(() -> defaultUserDetailsService.loadUserByUsername(email))
-            .isInstanceOf(AuthNotFoundException.class);
+        Assertions.assertThatThrownBy(() -> defaultUserDetailsService.loadUserByUsername(email))
+                  .isInstanceOf(AuthNotFoundException.class);
     }
+
 }

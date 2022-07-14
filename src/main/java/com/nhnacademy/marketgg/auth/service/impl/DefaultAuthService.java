@@ -1,6 +1,6 @@
 package com.nhnacademy.marketgg.auth.service.impl;
 
-import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
+import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
@@ -51,11 +51,11 @@ public class DefaultAuthService implements AuthService {
 
     @Transactional
     @Override
-    public void signup(final SignupRequest signupRequest) throws RoleNotFoundException {
+    public void signup(final SignUpRequest signUpRequest) throws RoleNotFoundException {
 
-        signupRequest.encodingPassword(passwordEncoder.encode(signupRequest.getPassword()));
+        signUpRequest.encodingPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
-        Auth auth = new Auth(signupRequest);
+        Auth auth = new Auth(signUpRequest);
 
         Auth savedAuth = authRepository.save(auth);
 

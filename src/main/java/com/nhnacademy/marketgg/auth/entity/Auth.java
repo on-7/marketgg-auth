@@ -1,7 +1,7 @@
 package com.nhnacademy.marketgg.auth.entity;
 
 import com.nhnacademy.marketgg.auth.constant.Provider;
-import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
+import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +25,6 @@ import java.time.LocalDate;
 @Getter
 public class Auth {
 
-    @NotNull
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "auth_no")
@@ -60,11 +59,11 @@ public class Auth {
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
-    public Auth(SignupRequest signupRequest) {
-        this.email = signupRequest.getEmail();
-        this.password = signupRequest.getPassword();
-        this.name = signupRequest.getName();
-        this.phoneNumber = signupRequest.getPhoneNumber();
+    public Auth(SignUpRequest signUpRequest) {
+        this.email = signUpRequest.getEmail();
+        this.password = signUpRequest.getPassword();
+        this.name = signUpRequest.getName();
+        this.phoneNumber = signUpRequest.getPhoneNumber();
         this.passwordUpdatedAt = LocalDate.now();
         this.provider = Provider.SELF;
     }
