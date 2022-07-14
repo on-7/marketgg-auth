@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 /**
  * Refresh Token 을 Redis 에 저장할 때 사용하는 클래스입니다.
  */
+
 @RequiredArgsConstructor
 @Getter
 public class RefreshToken implements Serializable {

@@ -1,7 +1,7 @@
 spring:
   
   profiles:
-    include: jwt, db, redis, mail
+    include: jwt, db, redis, mail, oauth2
 
   jpa:
     show-sql: true
@@ -11,6 +11,9 @@ spring:
         datasource:
           p6spy:
             enable-logging: true
+      hibernate:
+        hbm2ddl:
+          auto: create
   
   thymeleaf:
     cache: false

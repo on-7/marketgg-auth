@@ -32,7 +32,7 @@ public class DefaultUserDetailsService implements UserDetailsService {
      * @throws UsernameNotFoundException 해당 이메일과 일치하는 사용자가 존재하지 않을 때 발생합니다.
      */
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
         Auth auth = authRepository.findByEmail(email)
                                   .orElseThrow(() -> new AuthNotFoundException(email));
 

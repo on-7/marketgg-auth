@@ -3,7 +3,6 @@ package com.nhnacademy.marketgg.auth.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.exception.InvalidLoginRequestException;
-import com.nhnacademy.marketgg.auth.jwt.RefreshToken;
 import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
 import java.io.IOException;
 import java.util.Date;
@@ -50,7 +49,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 mapper.readValue(request.getInputStream(), LoginRequest.class);
 
             UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
                     loginRequest.getPassword());
 
             return getAuthenticationManager().authenticate(token);
@@ -63,17 +62,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
-                                            HttpServletResponse response, FilterChain chain,
-                                            Authentication authResult)
+                                            HttpServletResponse response,
+                                            FilterChain chain, Authentication authResult)
         throws IOException, ServletException {
 
         Date issueDate = new Date();
         String jwt = tokenGenerator.generateJwt(authResult, issueDate);
-        RefreshToken refreshToken =
-            new RefreshToken(authResult.getName(),
-                tokenGenerator.generateRefreshToken(authResult, issueDate));
 
-        redisTemplate.opsForHash().put(authResult.getName(), REFRESH_TOKEN, refreshToken);
+        redisTemplate.opsForHash().put(authResult.getName(), REFRESH_TOKEN,
+            tokenGenerator.generateRefreshToken(authResult, issueDate));
 
         response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
     }

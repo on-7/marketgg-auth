@@ -1,20 +1,35 @@
 package com.nhnacademy.marketgg.auth.service;
 
-import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
+import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
 import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
 import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
-
 import javax.management.relation.RoleNotFoundException;
+
+/**
+ * 인증 관련 비즈니스 로직을 처리하는 클래스입니다.
+ */
 
 public interface AuthService {
 
     void signup(final SignupRequest signupRequest) throws RoleNotFoundException;
 
-    String login(LoginRequest loginRequest);
+    /**
+     * 로그아웃을 진행합니다.
+     *
+     * @param token - 로그아웃하려는 사용자의 JWT 입니다.
+     */
+    void logout(final String token);
 
-    EmailResponse checkEmail(String email) throws EmailOverlapException;
+    EmailResponse checkEmail(final String email) throws EmailOverlapException;
 
-    String renewToken(String token);
+
+    /**
+     * JWT 를 갱신합니다.
+     *
+     * @param token - 만료된 JWT 입니다.
+     * @return 새로운 JWT 를 반환합니다.
+     */
+    String renewToken(final String token);
 
 }

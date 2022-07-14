@@ -33,6 +33,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
+    private static final int HEADER_BEARER = 7;
+
     private final AuthService authService;
 
     @PostMapping("/signup")
@@ -44,7 +46,7 @@ public class AuthController {
     }
 
     @PostMapping("/check/email")
-    public ResponseEntity<EmailResponse> checkEmail(@RequestBody EmailRequest emailRequest)
+    public ResponseEntity<EmailResponse> checkEmail(@RequestBody final EmailRequest emailRequest)
         throws Exception {
 
         return ResponseEntity.status(OK)
@@ -59,13 +61,13 @@ public class AuthController {
      * @return 요청 결과를 반환합니다.
      */
     @GetMapping("/refresh")
-    public ResponseEntity<Void> renewToken(HttpServletRequest request) {
+    public ResponseEntity<Void> renewToken(final HttpServletRequest request) {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         HttpStatus httpStatus = OK;
 
         String newToken = null;
         if (Objects.isNull(authorizationHeader)
-            || (newToken = authService.renewToken(authorizationHeader.substring(7))) == null) {
+            || (newToken = authService.renewToken(authorizationHeader.substring(HEADER_BEARER))) == null) {
             httpStatus = UNAUTHORIZED;
         }
 
@@ -77,6 +79,18 @@ public class AuthController {
 
         return ResponseEntity.status(httpStatus)
                              .headers(headers)
+                             .build();
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if (Objects.nonNull(authorizationHeader)) {
+            authService.logout(authorizationHeader.substring(HEADER_BEARER));
+        }
+
+        return ResponseEntity.status(OK)
                              .build();
     }
 
