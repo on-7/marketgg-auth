@@ -20,8 +20,8 @@ import java.util.Optional;
 import javax.management.relation.RoleNotFoundException;
 import javax.transaction.Transactional;
 
-import com.nhnacademy.marketgg.auth.util.MailUtil;
-import com.nhnacademy.marketgg.auth.util.RedisUtil;
+import com.nhnacademy.marketgg.auth.util.MailUtils;
+import com.nhnacademy.marketgg.auth.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -46,8 +46,8 @@ public class DefaultAuthService implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final RedisTemplate<String, Object> redisTemplate;
     private final TokenGenerator tokenGenerator;
-    private final MailUtil mailUtil;
-    private final RedisUtil redisUtil;
+    private final MailUtils mailUtils;
+    private final RedisUtils redisUtils;
 
     @Transactional
     @Override
@@ -99,14 +99,14 @@ public class DefaultAuthService implements AuthService {
             return new EmailResponse(Boolean.TRUE, "해당 이메일은 사용중 입니다.");
         }
 
-        if (!mailUtil.sendCheckMail(email)) {
+        if (!mailUtils.sendCheckMail(email)) {
             throw new EmailOverlapException(email, "해당 이메일은 중복 되었습니다.");
         }
 
         String key = email;
         String value = "emailRedisValue";
 
-        redisUtil.set(key, value);
+        redisUtils.set(key, value);
         return new EmailResponse(Boolean.FALSE, "해당 이메일은 사용 가능합니다.");
     }
 }
