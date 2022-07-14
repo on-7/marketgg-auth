@@ -17,39 +17,54 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
+    /**
+     * @param configuration
+     * @return
+     * @throws Exception
+     */
     @Bean
-    public AuthenticationManager authenticationManager(
-        AuthenticationConfiguration authenticationConfiguration) throws Exception {
-
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 
+    /**
+     * Blowfish 알고리즘을 기반으로 비밀번호를 암호화합니다.
+     *
+     * @return 암호화 가능한 단방향 해시 함수인 BCryptPasswordEncoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * 인증을 처리하는 여러 개의 SecurityFilter 를 담는 filter chain 입니다.
+     *
+     * @param http - 세부 보안 기능을 설정할 수 있는 API 제공 클래스
+     * @return 인증 처리와 관련된 SecurityFilterChain
+     * @throws Exception
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-
-            .csrf().disable()
+        http.csrf().disable()
             .sessionManagement().disable()
             .httpBasic().disable()
-            .formLogin().disable()
+            .formLogin().disable();
 
-            .authorizeRequests()
-            .antMatchers("/auth/**").permitAll()
-            .and()
+        http.authorizeRequests()
+            .antMatchers("/auth/**").permitAll();
 
-            .headers()
-            .frameOptions().sameOrigin()
-            .and()
+        http.headers()
+            .frameOptions().sameOrigin();
 
-            .build();
-
+        return http.build();
     }
 
+    /**
+     * WebSecurity 커스터마이징을 지원합니다.
+     *
+     * @return WebSecurity 커스터마이징이 적용된 WebSecurityCustomizer
+     */
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
