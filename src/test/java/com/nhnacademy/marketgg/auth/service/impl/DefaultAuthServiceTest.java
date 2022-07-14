@@ -1,13 +1,11 @@
 package com.nhnacademy.marketgg.auth.service.impl;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
 import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.entity.Auth;
@@ -19,12 +17,20 @@ import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
 import com.nhnacademy.marketgg.auth.repository.AuthRepository;
 import com.nhnacademy.marketgg.auth.repository.AuthRoleRepository;
 import com.nhnacademy.marketgg.auth.repository.RoleRepository;
+import com.nhnacademy.marketgg.auth.service.AuthService;
+import com.nhnacademy.marketgg.auth.util.MailUtil;
+import com.nhnacademy.marketgg.auth.util.RedisUtil;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,7 +42,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 import javax.management.relation.RoleNotFoundException;
 import java.util.Optional;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
+@Import({
+        WebSecurityConfig.class
+})
 class DefaultAuthServiceTest {
 
     @InjectMocks
@@ -52,7 +61,10 @@ class DefaultAuthServiceTest {
     private RoleRepository roleRepository;
 
     @Mock
-    private PasswordEncoder passwordEncoder;
+    private MailUtil mailUtil;
+
+    @Mock
+    private RedisUtil redisUtil;
 
     @Mock
     private AuthenticationManager authenticationManager;
@@ -62,6 +74,9 @@ class DefaultAuthServiceTest {
 
     @Mock
     private TokenGenerator tokenGenerator;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @Test
     @DisplayName("회원가입 테스트")
@@ -101,12 +116,25 @@ class DefaultAuthServiceTest {
     }
 
     @Test
-    @DisplayName("회원 이메일 중복체크")
+    @DisplayName("회원 이메일 중복체크 사용가능")
     void testExistsEmail() {
 
-        given(authRepository.existsByEmail(any())).willReturn(true);
+        given(authRepository.existsByEmail(any())).willReturn(false);
+        given(mailUtil.sendCheckMail(any())).willReturn(true);
+        doNothing().when(redisUtil).set(any(), any());
 
         authService.checkEmail("test@test.com");
+
+        verify(authRepository, times(1)).existsByEmail(any());
+    }
+
+    @Test
+    @DisplayName("회원 중복 이메일 예외처리")
+    void testExistsEmailThrownByEmailOverlapException() {
+        given(authRepository.existsByEmail(any(String.class))).willReturn(true);
+
+        assertThatThrownBy(() -> authService.checkEmail("test@test.com"))
+                .isInstanceOf(EmailOverlapException.class);
 
         verify(authRepository, times(1)).existsByEmail(any());
     }
@@ -121,7 +149,7 @@ class DefaultAuthServiceTest {
         Authentication authentication = mock(Authentication.class);
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-            .thenReturn(authentication);
+                .thenReturn(authentication);
 
         String jwt = "jwt";
         String refreshToken = "refreshToken";

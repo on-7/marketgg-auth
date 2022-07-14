@@ -43,6 +43,7 @@ public class MailUtil {
         });
     }
 
+    //TODO : 이메일 발송 후 처리를 비동기로 처리해야함.
     public boolean sendCheckMail(String email) {
 
         try {
@@ -54,7 +55,7 @@ public class MailUtil {
 
             message.setContent(
                     "<h1>[이메일 인증]</h1> <p>아래 버튼을 클릭하시면 이메일 인증이 완료됩니다.</p> " +
-                            "<form action=\"/auth\" method=\"post\">\n" +
+                            "<form action=\"http://localhost:7070/auth/use/email\" method=\"post\">\n" +
                             "    <button type=\"submit\">인증하기</button>\n" +
                             "</form>"
                     ,"text/html;charset=euc-kr"

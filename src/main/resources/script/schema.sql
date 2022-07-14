@@ -10,6 +10,7 @@ CREATE TABLE `auth`
     `password`            VARCHAR(255) NOT NULL,
     `email`               VARCHAR(30)  NOT NULL,
     `name`                VARCHAR(15)  NOT NULL,
+    `phone_number`        VARCHAR(15)  NOT NULL,
     `password_updated_at` DATE         NOT NULL,
     `provider`            VARCHAR(10)  NOT NULL
 );

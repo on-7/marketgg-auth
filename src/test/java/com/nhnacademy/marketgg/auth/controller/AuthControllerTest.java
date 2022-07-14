@@ -1,5 +1,6 @@
 package com.nhnacademy.marketgg.auth.controller;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -9,12 +10,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
+import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,12 +29,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.transaction.Transactional;
-
 @WebMvcTest(AuthController.class)
 @Import(WebSecurityConfig.class)
 @MockBean(
-    AuthenticationManager.class
+        AuthenticationManager.class
 )
 class AuthControllerTest {
 
@@ -65,7 +66,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("회원 이메일 중복 테스트")
+    @DisplayName("회원 이메일 중복체크 사용가능")
     void testCheckEmail() throws Exception {
         EmailRequest emailRequest = new EmailRequest();
 
@@ -74,11 +75,30 @@ class AuthControllerTest {
         when(authService.checkEmail(emailRequest.getEmail())).thenReturn(any(EmailResponse.class));
 
         mockMvc.perform(post("/auth/check/email")
-                   .contentType(APPLICATION_JSON)
-                   .content(mapper.writeValueAsString(emailRequest)))
+                       .contentType(APPLICATION_JSON)
+                       .content(mapper.writeValueAsString(emailRequest)))
                .andExpect(status().isOk())
                .andDo(print());
     }
+
+    @Test
+    @DisplayName("회원 이메일 중복체크 예외처리")
+    void testExistsEmailThrownByEmailOverlapException() throws Exception {
+        EmailRequest emailRequest = new EmailRequest();
+
+        ReflectionTestUtils.setField(emailRequest, "email", "testEmail");
+
+        when(authService.checkEmail(emailRequest.getEmail()))
+                .thenThrow(new EmailOverlapException(emailRequest.getEmail()
+                        , " 해당 이메일은 중복입니다."));
+
+        mockMvc.perform(post("/auth/check/email")
+                .contentType(APPLICATION_JSON)
+                .content(mapper.writeValueAsString(emailRequest)))
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof EmailOverlapException));
+
+    }
+
 
     @DisplayName("로그인 시 헤더에 jwt 토큰 저장")
     @Test
@@ -92,8 +112,8 @@ class AuthControllerTest {
         when(authService.login(any(loginRequest.getClass()))).thenReturn("jwt-token");
 
         mockMvc.perform(post("/auth/login")
-                   .contentType(APPLICATION_JSON)
-                   .content(jsonLoginRequest))
+                       .contentType(APPLICATION_JSON)
+                       .content(jsonLoginRequest))
                .andExpect(status().isOk())
                .andExpect(header().exists("Authorization"))
                .andExpect(header().string("Authorization", "Bearer jwt-token"));
