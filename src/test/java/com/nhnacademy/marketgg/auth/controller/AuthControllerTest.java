@@ -12,27 +12,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
-import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
+import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
 import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
+import com.nhnacademy.marketgg.auth.jwt.CustomUser;
+import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
 import com.nhnacademy.marketgg.auth.service.AuthService;
+import java.util.ArrayList;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.transaction.Transactional;
-
 @WebMvcTest(AuthController.class)
 @Import(WebSecurityConfig.class)
-@MockBean(
-    AuthenticationManager.class
-)
+@MockBean({
+    AuthenticationManager.class,
+    TokenGenerator.class,
+    RedisTemplate.class
+})
 class AuthControllerTest {
 
     @Autowired
@@ -44,6 +50,8 @@ class AuthControllerTest {
     @MockBean
     private AuthService authService;
 
+    @MockBean
+    private UserDetailsService userDetailsService;
 
     @Test
     @DisplayName("회원가입 테스트")
@@ -57,8 +65,8 @@ class AuthControllerTest {
         doNothing().when(authService).signup(testSignupRequest);
 
         mockMvc.perform(post("/auth/signup")
-                       .contentType(APPLICATION_JSON)
-                       .content(mapper.writeValueAsString(testSignupRequest)))
+                   .contentType(APPLICATION_JSON)
+                   .content(mapper.writeValueAsString(testSignupRequest)))
                .andExpect(status().isCreated())
                .andDo(print());
 
@@ -89,13 +97,14 @@ class AuthControllerTest {
 
         String jsonLoginRequest = mapper.writeValueAsString(loginRequest);
 
-        when(authService.login(any(loginRequest.getClass()))).thenReturn("jwt-token");
+        CustomUser customUser = new CustomUser("username", "password", new ArrayList<>());
+
+        when(userDetailsService.loadUserByUsername("username")).thenReturn(customUser);
 
         mockMvc.perform(post("/auth/login")
                    .contentType(APPLICATION_JSON)
                    .content(jsonLoginRequest))
                .andExpect(status().isOk())
-               .andExpect(header().exists("Authorization"))
-               .andExpect(header().string("Authorization", "Bearer jwt-token"));
+               .andExpect(header().string(HttpHeaders.AUTHORIZATION, "Bearer jwt-token"));
     }
 }
