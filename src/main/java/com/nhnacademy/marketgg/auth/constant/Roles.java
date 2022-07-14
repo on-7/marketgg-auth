@@ -1,4 +1,4 @@
-package com.nhnacademy.marketgg.auth.entity;
+package com.nhnacademy.marketgg.auth.constant;
 
 public enum Roles {
 
