@@ -17,6 +17,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
+/**
+ * JWT 토큰을 생성하고 필요한 정보를 제공하는 클래스입니다.
+ */
+
 @Slf4j
 @Component
 public class TokenGenerator {
@@ -26,6 +30,14 @@ public class TokenGenerator {
     private final long refreshTokenExpirationDate;
     private final String authKey;
 
+    /**
+     * 생성자
+     *
+     * @param secret                        비밀키
+     * @param tokenExpirationDate           토큰 유효기간
+     * @param refreshTokenExpirationDate    Refresh Token 유효기간
+     * @param authKey
+     */
     public TokenGenerator(@Value("${jwt.secret}") String secret,
                           @Value("${jwt.expire-time}") long tokenExpirationDate,
                           @Value("${jwt.refresh-expire-time}") long refreshTokenExpirationDate,
@@ -36,14 +48,36 @@ public class TokenGenerator {
         this.authKey = authKey;
     }
 
+    /**
+     * JWT 를 생성합니다.
+     *
+     * @param authentication 사용자 정보
+     * @param issueDate      토큰 발행일
+     * @return 생성된 JWT
+     */
     public String generateJwt(Authentication authentication, Date issueDate) {
         return createToken(authentication, issueDate, tokenExpirationDate);
     }
 
+    /**
+     * Refresh Token 을 생성합니다.
+     *
+     * @param authentication 사용자 정보
+     * @param issueDate      토큰 발행일자
+     * @return               생성된 Refresh 토큰
+     */
     public String generateRefreshToken(Authentication authentication, Date issueDate) {
         return createToken(authentication, issueDate, refreshTokenExpirationDate);
     }
 
+    /**
+     * 토큰을 생성합니다.
+     *
+     * @param authentication 사용자 정보
+     * @param issueDate      토큰 발행일자
+     * @param expirationDate 토큰 만료일자
+     * @return               JWT
+     */
     private String createToken(Authentication authentication, Date issueDate, long expirationDate) {
         return Jwts.builder()
                    .setSubject(authentication.getName())
@@ -54,10 +88,22 @@ public class TokenGenerator {
                    .compact();
     }
 
-    public String getUsername(String token) {
+    /**
+     * 토큰을 이용하여 사용자의 Email 정보를 얻습니다.
+     *
+     * @param token JWT
+     * @return 사용자의 이메일
+     */
+    public String getEmail(String token) {
         return getClaims(token).getSubject();
     }
 
+    /**
+     * 토큰에 저장된 클레임 전체 정보를 얻습니다.
+     *
+     * @param token JWT
+     * @return JWT 에 저장된 클레임
+     */
     private Claims getClaims(String token) {
         return Jwts.parserBuilder()
                    .setSigningKey(key)
@@ -66,6 +112,12 @@ public class TokenGenerator {
                    .getBody();
     }
 
+    /**
+     * 토큰의 유효성을 체크합니다.
+     *
+     * @param token JWT
+     * @return 유효성 검사 결과를 반환합니다.
+     */
     public boolean isInvalidToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -86,9 +138,17 @@ public class TokenGenerator {
         return false;
     }
 
-    public Authentication getAuthentication(String jwt, String username) {
-        Collection<? extends GrantedAuthority> roles = getClaims(jwt).get(authKey, Collection.class);
-        return new UsernamePasswordAuthenticationToken(username, "", roles);
+    /**
+     * JWT 를 파싱하여 Authentication 객체를 얻습니다.
+     *
+     * @param jwt    JWT
+     * @param email  사용자 Email
+     * @return       Authentication 객체
+     */
+    public Authentication getAuthentication(String jwt, String email) {
+        Collection<? extends GrantedAuthority> roles =
+            getClaims(jwt).get(authKey, Collection.class);
+        return new UsernamePasswordAuthenticationToken(email, "", roles);
     }
 
 }

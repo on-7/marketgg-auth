@@ -47,7 +47,7 @@ public class DefaultAuthService implements AuthService {
 
     @Override
     public String renewToken(String token) {
-        String username = tokenGenerator.getUsername(token);
+        String username = tokenGenerator.getEmail(token);
 
         RefreshToken refreshToken =
             (RefreshToken) redisTemplate.opsForHash().get(username, REFRESH_TOKEN);
