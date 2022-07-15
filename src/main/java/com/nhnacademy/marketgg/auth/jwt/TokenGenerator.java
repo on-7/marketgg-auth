@@ -1,5 +1,7 @@
 package com.nhnacademy.marketgg.auth.jwt;
 
+import static java.util.stream.Collectors.toList;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -7,6 +9,11 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import java.security.Key;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,14 +22,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
-import java.security.Key;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * JWT 토큰을 생성하고 필요한 정보를 제공하는 클래스입니다.
@@ -92,10 +91,10 @@ public class TokenGenerator {
         return Jwts.builder()
                    .setSubject(authentication.getName())
                    .claim(AUTHORITIES,
-                          authentication.getAuthorities()
-                                        .stream()
-                                        .map(GrantedAuthority::getAuthority)
-                                        .collect(toList()))
+                       authentication.getAuthorities()
+                                     .stream()
+                                     .map(GrantedAuthority::getAuthority)
+                                     .collect(toList()))
                    .setIssuedAt(issueDate)
                    .setExpiration(new Date(issueDate.getTime() + expirationDate))
                    .signWith(key)
@@ -133,10 +132,9 @@ public class TokenGenerator {
 
             return false;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            log.info("{}, {}", e, token);
-            log.error("잘못된 JWT 서명입니다.");
+            log.error("잘못된 JWT 서명입니다.", e);
         } catch (ExpiredJwtException e) {
-            log.error("만료된 JWT 토큰입니다.");
+            log.error("만료된 JWT 토큰입니다.", e);
         } catch (UnsupportedJwtException e) {
             log.error("지원되지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e) {
@@ -146,8 +144,8 @@ public class TokenGenerator {
     }
 
     private String getJwtSecret(String jwtSecretUrl) {
-        Map<String, Map<String, String>> response =
-                restTemplate.getForObject(jwtSecretUrl, Map.class);
+        Map<String, Map<String, String>> response
+            = restTemplate.getForObject(jwtSecretUrl, Map.class);
 
         return Optional.ofNullable(response)
                        .orElseThrow(IllegalArgumentException::new)
