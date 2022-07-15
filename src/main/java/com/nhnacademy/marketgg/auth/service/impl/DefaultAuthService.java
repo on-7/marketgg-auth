@@ -27,6 +27,13 @@ import javax.transaction.Transactional;
 
 import com.nhnacademy.marketgg.auth.util.MailUtils;
 import com.nhnacademy.marketgg.auth.util.RedisUtils;
+import com.nhnacademy.marketgg.auth.util.MailUtil;
+import com.nhnacademy.marketgg.auth.util.RedisUtil;
+import java.util.Date;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import javax.management.relation.RoleNotFoundException;
+import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -55,40 +62,43 @@ public class DefaultAuthService implements AuthService {
     public void signup(final SignUpRequest signUpRequest) throws RoleNotFoundException {
 
         signUpRequest.encodingPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-
         Auth auth = new Auth(signUpRequest);
-
         Auth savedAuth = authRepository.save(auth);
-
         Long authNo = savedAuth.getAuthNo();
-
         Role role = roleRepository.findByName(Roles.ROLE_USER)
                                   .orElseThrow(
                                       () -> new RoleNotFoundException("해당 권한은 존재 하지 않습니다."));
-
         AuthRole.Pk pk = new AuthRole.Pk(authNo, role.getRoleNo());
-
         AuthRole authRole = new AuthRole(pk, auth, role);
-
         authRoleRepository.save(authRole);
     }
 
     @Override
-    public String renewToken(String token) {
-        String username = tokenGenerator.getEmail(token);
+    public void logout(final String token) {
+        if (tokenGenerator.isInvalidToken(token)) {
+            return;
+        }
 
-        RefreshToken refreshToken =
-            (RefreshToken) redisTemplate.opsForHash().get(username, REFRESH_TOKEN);
+        String email = tokenGenerator.getEmailFromExpiredToken(token);
 
-        UsernamePasswordAuthenticationToken token =
-            new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
-                loginRequest.getPassword());
+        redisTemplate.opsForHash().delete(email, REFRESH_TOKEN);
+        long tokenExpireTime = tokenGenerator.getExpireDate(token) - System.currentTimeMillis();
+        redisTemplate.opsForValue().set(token, true, tokenExpireTime, TimeUnit.MILLISECONDS);
+    }
 
-        if (isInvalidToken(username, refreshToken)) {
+    @Override
+    public String renewToken(final String token) {
+        String email = tokenGenerator.getEmailFromExpiredToken(token);
+
+        String refreshToken =
+            (String) redisTemplate.opsForHash().get(email, REFRESH_TOKEN);
+
+        if (isInvalidToken(email, refreshToken)) {
             return null;
         }
 
-        Authentication authentication = tokenGenerator.getAuthentication(token, username);
+        Authentication authentication =
+            tokenGenerator.getAuthenticationFromExpiredToken(token, email);
 
         Date issueDate = new Date(System.currentTimeMillis());
         redisTemplate.opsForHash()
@@ -98,8 +108,8 @@ public class DefaultAuthService implements AuthService {
         String newJwt = tokenGenerator.generateJwt(authentication, issueDate);
         String newRefreshToken = tokenGenerator.generateRefreshToken(authentication, issueDate);
 
-        redisTemplate.opsForHash().delete(username, REFRESH_TOKEN);
-        redisTemplate.opsForHash().put(username, REFRESH_TOKEN, newRefreshToken);
+        redisTemplate.opsForHash().delete(email, REFRESH_TOKEN);
+        redisTemplate.opsForHash().put(email, REFRESH_TOKEN, newRefreshToken);
 
         return newJwt;
     }
@@ -111,7 +121,8 @@ public class DefaultAuthService implements AuthService {
     }
 
     @Override
-    public EmailResponse checkEmail(String email) throws EmailOverlapException {
+    public EmailResponse checkEmail(final String email) throws EmailOverlapException {
+
         if (Boolean.TRUE.equals(authRepository.existsByEmail(email))) {
             throw new EmailOverlapException(email);
         }
@@ -124,6 +135,12 @@ public class DefaultAuthService implements AuthService {
         }
 
         return new EmailResponse(Boolean.FALSE, "해당 이메일은 사용 가능합니다.");
+    }
+    
+    private boolean isInvalidToken(String email, String refreshToken) {
+        return Objects.isNull(refreshToken)
+            || tokenGenerator.isInvalidToken(refreshToken)
+            || !Objects.equals(email, tokenGenerator.getEmailFromExpiredToken(refreshToken));
     }
 
 }

@@ -11,6 +11,9 @@ spring:
         datasource:
           p6spy:
             enable-logging: true
+      hibernate:
+        hbm2ddl:
+          auto: create
   
   thymeleaf:
     cache: false

@@ -10,6 +10,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+/**
+ * UserDetailsService 에서 반환하는 UserDetails 를 상속받은 사용자 정보를 담고있는 클래스 입니다.
+ */
+
 @AllArgsConstructor
 public class CustomUser implements UserDetails {
 
@@ -17,6 +21,11 @@ public class CustomUser implements UserDetails {
     private final String password;
     private final List<Role> authorities;
 
+    /**
+     * 권한 정보를 반환합니다.
+     *
+     * @return 사용자의 권한 목록
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities.stream()
