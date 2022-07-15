@@ -1,8 +1,8 @@
 package com.nhnacademy.marketgg.auth.util;
 
-import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.connection.RedisInvalidSubscriptionException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisUtil {
 
     private final RedisTemplate<String, String> redisTemplate;
+    private static final long TIMEOUT = 3;
 
     public boolean delete(String key) {
         return Boolean.TRUE.equals(redisTemplate.delete(key));
@@ -23,12 +24,14 @@ public class RedisUtil {
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
 
-    public void set(String key, String value) throws EmailOverlapException {
+    public void set(String key, String value) throws RedisInvalidSubscriptionException {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         if(hasKey(key)) {
-            throw new EmailOverlapException(key, "해당 이메일은 중복입니다.");
+            throw new RedisInvalidSubscriptionException("해당 이메일은 메일 재발송 시간이 경과하지 않았습니다."
+                    , new IllegalArgumentException());
         }
-        valueOperations.set(key, value, 5, TimeUnit.MINUTES);
+
+        valueOperations.set(key, value, TIMEOUT, TimeUnit.MINUTES);
     }
 
     public void deleteAuth(String email) {
@@ -40,8 +43,8 @@ public class RedisUtil {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         String authK = valueOperations.getAndDelete(email);
         if (authK.equals(authKey)) {
+            return false;
+        }
             return true;
         }
-        return false;
-    }
 }
