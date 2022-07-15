@@ -11,6 +11,14 @@ import com.nhnacademy.marketgg.auth.service.AuthService;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
+import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
+import com.nhnacademy.marketgg.auth.service.AuthService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+
+import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
+import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,6 +30,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.management.relation.RoleNotFoundException;
+
+import static org.springframework.http.HttpStatus.*;
+
 @Slf4j
 @RestController
 @RequestMapping("/auth")
@@ -31,9 +43,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<Void> doSignup(@RequestBody SignupRequestDto signupRequestDto) {
-
-        authService.signup(signupRequestDto);
+    public ResponseEntity<Void> doSignup(@RequestBody final SignupRequest signupRequest) throws RoleNotFoundException {
+        authService.signup(signupRequest);
         return ResponseEntity.status(CREATED)
                              .build();
     }
@@ -47,12 +58,12 @@ public class AuthController {
                              .body(authService.existsUsername(usernameRequestDto.getUsername()));
     }
 
-    @PostMapping("/find/email")
-    public ResponseEntity<Boolean> existsUsername(@RequestBody EmailRequestDto emailRequestDto) {
+    @PostMapping("/check/email")
+    public ResponseEntity<EmailResponse> checkEmail(@RequestBody EmailRequest emailRequest) throws Exception {
 
         return ResponseEntity.status(OK)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(authService.existsEmail(emailRequestDto.getEmail()));
+                             .body(authService.checkEmail(emailRequest.getEmail()));
     }
 
     @GetMapping("/refresh")

@@ -1,25 +1,52 @@
 package com.nhnacademy.marketgg.auth.service.impl;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.nhnacademy.marketgg.auth.dto.SignupRequestDto;
+import static org.mockito.Mockito.*;
+
+import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
+import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
+import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
+import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
 import com.nhnacademy.marketgg.auth.entity.Auth;
+import com.nhnacademy.marketgg.auth.entity.AuthRole;
+import com.nhnacademy.marketgg.auth.entity.Role;
+import com.nhnacademy.marketgg.auth.entity.Roles;
 import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
 import com.nhnacademy.marketgg.auth.repository.AuthRepository;
+
+import com.nhnacademy.marketgg.auth.repository.AuthRoleRepository;
+import com.nhnacademy.marketgg.auth.repository.RoleRepository;
+
+import java.util.Optional;
+import javax.management.relation.RoleNotFoundException;
+import com.nhnacademy.marketgg.auth.util.MailUtil;
+import com.nhnacademy.marketgg.auth.util.RedisUtil;
+
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
+@Import({
+        WebSecurityConfig.class
+})
 class DefaultAuthServiceTest {
 
     @InjectMocks
@@ -29,7 +56,16 @@ class DefaultAuthServiceTest {
     private AuthRepository authRepository;
 
     @Mock
-    private PasswordEncoder passwordEncoder;
+    private AuthRoleRepository authRoleRepository;
+
+    @Mock
+    private RoleRepository roleRepository;
+
+    @Mock
+    private MailUtil mailUtil;
+
+    @Mock
+    private RedisUtil redisUtil;
 
     @Mock
     private AuthenticationManager authenticationManager;
@@ -40,47 +76,95 @@ class DefaultAuthServiceTest {
     @Mock
     private TokenGenerator tokenGenerator;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @Test
     @DisplayName("회원가입 테스트")
-    void testSignup() {
+    void testSignup() throws RoleNotFoundException {
 
-        SignupRequestDto testSignupRequestDto = new SignupRequestDto();
+        SignupRequest testSignupRequest = new SignupRequest();
 
-        ReflectionTestUtils.setField(testSignupRequestDto, "username", "testUsername");
-        ReflectionTestUtils.setField(testSignupRequestDto, "password", "1234");
-        ReflectionTestUtils.setField(testSignupRequestDto, "email", "test@test.com");
-        ReflectionTestUtils.setField(testSignupRequestDto, "name", "testName");
+        ReflectionTestUtils.setField(testSignupRequest, "email", "test@test.com");
+        ReflectionTestUtils.setField(testSignupRequest, "password", "1234");
+        ReflectionTestUtils.setField(testSignupRequest, "name", "testName");
 
-        Auth auth = new Auth(testSignupRequestDto);
+        Auth auth = new Auth(testSignupRequest);
 
-        given(authRepository.save(any())).willReturn(auth);
+        given(authRepository.save(any(Auth.class))).willReturn(auth);
 
-        authService.signup(testSignupRequestDto);
+        Long authNo = auth.getAuthNo();
 
-        verify(authRepository, times(1)).save(any());
+        Role role = new Role();
+
+        ReflectionTestUtils.setField(role, "roleNo", 0L);
+        ReflectionTestUtils.setField(role, "name", Roles.ROLE_USER);
+
+        given(roleRepository.findByName(Roles.ROLE_USER)).willReturn(Optional.of(role));
+
+        AuthRole.Pk pk = new AuthRole.Pk(authNo, role.getRoleNo());
+
+        AuthRole authRole = new AuthRole(pk, auth, role);
+
+        given(authRoleRepository.save(any(AuthRole.class))).willReturn(authRole);
+
+        authService.signup(testSignupRequest);
+
+        verify(authRepository, times(1)).save(any(auth.getClass()));
+        // getDeclaringClass() 메서드는 이 클래스의 선언 클래스를 가져오는 데 사용됨.
+        verify(roleRepository, times(1)).findByName(any(Roles.ROLE_USER.getDeclaringClass()));
+        verify(authRoleRepository, times(1)).save(any(authRole.getClass()));
     }
 
     @Test
-    @DisplayName("회원 아이디 중복체크")
-    void testExistsUsername() {
-
-        given(authRepository.existsByUsername(any())).willReturn(true);
-
-        authService.existsUsername("testUsername");
-
-        verify(authRepository, times(1)).existsByUsername(any());
-    }
-
-
-    @Test
-    @DisplayName("회원 이메일 중복체크")
+    @DisplayName("회원 이메일 중복체크 사용가능")
     void testExistsEmail() {
 
-        given(authRepository.existsByEmail(any())).willReturn(true);
+        given(authRepository.existsByEmail(any())).willReturn(false);
+        given(mailUtil.sendCheckMail(any())).willReturn(true);
+        doNothing().when(redisUtil).set(any(), any());
 
-        authService.existsEmail("test@test.com");
+        authService.checkEmail("test@test.com");
 
         verify(authRepository, times(1)).existsByEmail(any());
+    }
+
+    @Test
+    @DisplayName("회원 중복 이메일 예외처리")
+    void testExistsEmailThrownByEmailOverlapException() {
+        given(authRepository.existsByEmail(any(String.class))).willReturn(true);
+
+        assertThatThrownBy(() -> authService.checkEmail("test@test.com"))
+                .isInstanceOf(EmailOverlapException.class);
+
+        verify(authRepository, times(1)).existsByEmail(any());
+    }
+
+    @Test
+    @DisplayName("로그인 시 JWT 발급")
+    void testLogin() {
+        LoginRequest loginRequest = new LoginRequest();
+        ReflectionTestUtils.setField(loginRequest, "email", "email");
+        ReflectionTestUtils.setField(loginRequest, "password", "password");
+
+        Authentication authentication = mock(Authentication.class);
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authentication);
+
+        String jwt = "jwt";
+        String refreshToken = "refreshToken";
+
+        when(tokenGenerator.generateJwt(authentication)).thenReturn(jwt);
+        when(tokenGenerator.generateRefreshToken(authentication)).thenReturn(refreshToken);
+
+        HashOperations ho = mock(HashOperations.class);
+        when(redisTemplate.opsForHash()).thenReturn(ho);
+
+        doNothing().when(ho)
+                   .put(loginRequest.getEmail(), "refresh_token", refreshToken);
+
+        Assertions.assertThat(authService.login(loginRequest)).isEqualTo(jwt);
     }
 
 }

@@ -35,15 +35,15 @@ class DefaultUserDetailsServiceTest {
     @Mock
     private RoleRepository roleRepository;
 
-    @DisplayName("Username 으로 회원 찾기")
+    @DisplayName("Email 로 회원 찾기")
     @Test
     void testLoadUserByUsername() {
-        when(authRepository.findByUsername(anyString())).thenReturn(Optional.of(mock(Auth.class)));
+        when(authRepository.findByEmail(anyString())).thenReturn(Optional.of(mock(Auth.class)));
         when(roleRepository.findRolesByAuthNo(anyLong())).thenReturn(new ArrayList<>());
 
-        UserDetails userDetails = defaultUserDetailsService.loadUserByUsername("username");
+        UserDetails userDetails = defaultUserDetailsService.loadUserByUsername("email");
 
-        verify(authRepository, times(1)).findByUsername(anyString());
+        verify(authRepository, times(1)).findByEmail(anyString());
         verify(roleRepository, times(1)).findRolesByAuthNo(anyLong());
 
         assertThat(userDetails).isNotNull()
@@ -53,13 +53,13 @@ class DefaultUserDetailsServiceTest {
     @DisplayName("회원 찾기 실패")
     @Test
     void testLoadUserByUsername_fail() {
-        String username = "username";
+        String email = "email";
 
-        when(authRepository.findByUsername(username))
-            .thenThrow(new AuthNotFoundException(username));
+        when(authRepository.findByEmail(email))
+            .thenThrow(new AuthNotFoundException(email));
         when(roleRepository.findRolesByAuthNo(anyLong())).thenReturn(new ArrayList<>());
 
-        assertThatThrownBy(() -> defaultUserDetailsService.loadUserByUsername(username))
+        assertThatThrownBy(() -> defaultUserDetailsService.loadUserByUsername(email))
             .isInstanceOf(AuthNotFoundException.class);
     }
 }

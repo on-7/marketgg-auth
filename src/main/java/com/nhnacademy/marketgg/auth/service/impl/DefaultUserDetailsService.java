@@ -20,14 +20,14 @@ public class DefaultUserDetailsService implements UserDetailsService {
     private final RoleRepository roleRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Auth auth = authRepository.findByUsername(username)
-                                  .orElseThrow(() -> new UsernameNotFoundException(username));
 
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Auth auth = authRepository.findByEmail(email)
+                                  .orElseThrow(() -> new AuthNotFoundException(email));
+                                  
         List<Role> roles = roleRepository.findRolesByAuthNo(auth.getAuthNo());
 
-        return new CustomUser(auth.getUsername(), auth.getPassword(), roles);
+        return new CustomUser(auth.getEmail(), auth.getPassword(), roles);
     }
-
 
 }

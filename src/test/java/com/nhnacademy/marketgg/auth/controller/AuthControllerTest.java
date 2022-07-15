@@ -1,7 +1,8 @@
 package com.nhnacademy.marketgg.auth.controller;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -9,14 +10,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
-import com.nhnacademy.marketgg.auth.dto.EmailRequestDto;
-import com.nhnacademy.marketgg.auth.dto.SignupRequestDto;
-import com.nhnacademy.marketgg.auth.dto.UsernameRequestDto;
+import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.jwt.CustomUser;
 import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
+import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
+import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
+import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import java.util.ArrayList;
 import org.junit.jupiter.api.DisplayName;
@@ -53,67 +56,63 @@ class AuthControllerTest {
     @MockBean
     private UserDetailsService userDetailsService;
 
-    @Test
     @DisplayName("회원가입 테스트")
+    @Test
     void testDoSignup() throws Exception {
+        SignupRequest testSignupRequest = new SignupRequest();
 
-        SignupRequestDto testSignupRequestDto = new SignupRequestDto();
+        ReflectionTestUtils.setField(testSignupRequest, "email", "test@test.com");
+        ReflectionTestUtils.setField(testSignupRequest, "password", "1234");
+        ReflectionTestUtils.setField(testSignupRequest, "name", "testName");
 
-        ReflectionTestUtils.setField(testSignupRequestDto, "username", "testUsername");
-        ReflectionTestUtils.setField(testSignupRequestDto, "password", "1234");
-        ReflectionTestUtils.setField(testSignupRequestDto, "email", "test@test.com");
-        ReflectionTestUtils.setField(testSignupRequestDto, "name", "testName");
-
-        doNothing().when(authService).signup(testSignupRequestDto);
+        doNothing().when(authService).signup(testSignupRequest);
 
         mockMvc.perform(post("/auth/signup")
                    .contentType(APPLICATION_JSON)
-                   .content(mapper.writeValueAsString(testSignupRequestDto)))
+                   .content(mapper.writeValueAsString(testSignupRequest)))
                .andExpect(status().isCreated())
                .andDo(print());
 
     }
 
+    @DisplayName("회원 이메일 중복체크 사용가능")
     @Test
-    @DisplayName("회원 아이디 중복 테스트")
-    void testExistsUsername() throws Exception {
+    void testCheckEmail() throws Exception {
+        EmailRequest emailRequest = new EmailRequest();
 
-        UsernameRequestDto usernameRequestDto = new UsernameRequestDto();
+        ReflectionTestUtils.setField(emailRequest, "email", "testEmail");
 
-        ReflectionTestUtils.setField(usernameRequestDto, "username", "testUsername");
+        when(authService.checkEmail(emailRequest.getEmail())).thenReturn(any(EmailResponse.class));
 
-        doReturn(true).when(authService).existsUsername(usernameRequestDto.getUsername());
-
-        mockMvc.perform(post("/auth/find/username")
-                   .contentType(APPLICATION_JSON)
-                   .content(mapper.writeValueAsString(usernameRequestDto)))
-               .andExpect(status().isOk())
-               .andDo(print());
-
-    }
-
-    @Test
-    @DisplayName("회원 이메일 중복 테스트")
-    void testExistsEmail() throws Exception {
-
-        EmailRequestDto emailRequestDto = new EmailRequestDto();
-
-        ReflectionTestUtils.setField(emailRequestDto, "email", "testUsername");
-
-        when(authService.existsEmail(emailRequestDto.getEmail())).thenReturn(true);
-
-        mockMvc.perform(post("/auth/find/email")
-                   .contentType(APPLICATION_JSON)
-                   .content(mapper.writeValueAsString(emailRequestDto)))
+        mockMvc.perform(post("/auth/check/email")
+                       .contentType(APPLICATION_JSON)
+                       .content(mapper.writeValueAsString(emailRequest)))
                .andExpect(status().isOk())
                .andDo(print());
     }
+    @DisplayName("회원 이메일 중복체크 예외처리")
+    @Test
+    void testExistsEmailThrownByEmailOverlapException() throws Exception {
+        EmailRequest emailRequest = new EmailRequest();
+
+        ReflectionTestUtils.setField(emailRequest, "email", "testEmail");
+
+        when(authService.checkEmail(emailRequest.getEmail()))
+                .thenThrow(new EmailOverlapException(emailRequest.getEmail()));
+
+        mockMvc.perform(post("/auth/check/email")
+                .contentType(APPLICATION_JSON)
+                .content(mapper.writeValueAsString(emailRequest)))
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof EmailOverlapException));
+
+    }
+
 
     @DisplayName("로그인 시 헤더에 jwt 토큰 저장")
     @Test
     void testDoLogin() throws Exception {
         LoginRequest loginRequest = new LoginRequest();
-        ReflectionTestUtils.setField(loginRequest, "username", "username");
+        ReflectionTestUtils.setField(loginRequest, "email", "email");
         ReflectionTestUtils.setField(loginRequest, "password", "password");
 
         String jsonLoginRequest = mapper.writeValueAsString(loginRequest);
@@ -123,9 +122,10 @@ class AuthControllerTest {
         when(userDetailsService.loadUserByUsername("username")).thenReturn(customUser);
 
         mockMvc.perform(post("/auth/login")
-                   .contentType(APPLICATION_JSON)
-                   .content(jsonLoginRequest))
+                       .contentType(APPLICATION_JSON)
+                       .content(jsonLoginRequest))
                .andExpect(status().isOk())
                .andExpect(header().string(HttpHeaders.AUTHORIZATION, "Bearer jwt-token"));
     }
+
 }
