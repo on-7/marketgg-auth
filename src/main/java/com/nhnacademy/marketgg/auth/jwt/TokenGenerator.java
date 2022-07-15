@@ -87,8 +87,6 @@ public class TokenGenerator {
      * @return JWT
      */
     private String createToken(Authentication authentication, Date issueDate, long expirationDate) {
-        System.out.println("====a=="+(issueDate.getTime()));
-        System.out.println("====b==" + new Date(issueDate.getTime() + expirationDate).getTime());
 
         return Jwts.builder()
                    .setSubject(authentication.getName())
