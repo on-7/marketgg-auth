@@ -1,56 +1,25 @@
 package com.nhnacademy.marketgg.auth.service.impl;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import com.nhnacademy.marketgg.auth.dto.SignupRequestDto;
-import static org.mockito.Mockito.*;
-
 import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
-import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
-import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
-import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
-import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
-import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
-import com.nhnacademy.marketgg.auth.entity.Auth;
-import com.nhnacademy.marketgg.auth.entity.AuthRole;
-import com.nhnacademy.marketgg.auth.entity.Role;
-import com.nhnacademy.marketgg.auth.entity.Roles;
 import com.nhnacademy.marketgg.auth.constant.Roles;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.entity.AuthRole;
 import com.nhnacademy.marketgg.auth.entity.Role;
-import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
-import com.nhnacademy.marketgg.auth.repository.AuthRepository;
-
-import com.nhnacademy.marketgg.auth.repository.AuthRoleRepository;
-import com.nhnacademy.marketgg.auth.repository.RoleRepository;
-
-import java.util.Optional;
-import javax.management.relation.RoleNotFoundException;
-import com.nhnacademy.marketgg.auth.util.MailUtil;
-import com.nhnacademy.marketgg.auth.util.RedisUtil;
-
+import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
 import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
 import com.nhnacademy.marketgg.auth.repository.AuthRepository;
 import com.nhnacademy.marketgg.auth.repository.AuthRoleRepository;
 import com.nhnacademy.marketgg.auth.repository.RoleRepository;
-import java.util.Date;
+import com.nhnacademy.marketgg.auth.util.MailUtils;
+import com.nhnacademy.marketgg.auth.util.RedisUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.HashOperations;
@@ -64,6 +33,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import javax.management.relation.RoleNotFoundException;
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -126,12 +96,12 @@ class DefaultAuthServiceTest {
 
         Role role = new Role();
 
-        ReflectionTestUtils.setField(role, "roleNo", 0L);
+        ReflectionTestUtils.setField(role, "id", 0L);
         ReflectionTestUtils.setField(role, "name", Roles.ROLE_USER);
 
         given(roleRepository.findByName(Roles.ROLE_USER)).willReturn(Optional.of(role));
 
-        AuthRole.Pk pk = new AuthRole.Pk(authNo, role.getRoleNo());
+        AuthRole.Pk pk = new AuthRole.Pk(authNo, role.getId());
 
         AuthRole authRole = new AuthRole(pk, auth, role);
 
@@ -149,8 +119,8 @@ class DefaultAuthServiceTest {
     @DisplayName("회원 이메일 중복체크 사용가능")
     void testExistsEmail() {
         given(authRepository.existsByEmail(any())).willReturn(false);
-        given(mailUtil.sendCheckMail(any())).willReturn(true);
-        doNothing().when(redisUtil).set(any(), any());
+        given(mailUtils.sendCheckMail(any())).willReturn(true);
+        doNothing().when(redisUtils).set(any(), any());
 
         authService.checkEmail("test@test.com");
 
@@ -166,33 +136,6 @@ class DefaultAuthServiceTest {
                 .isInstanceOf(EmailOverlapException.class);
 
         verify(authRepository, times(1)).existsByEmail(any());
-    }
-
-    @Test
-    @DisplayName("로그인 시 JWT 발급")
-    void testLogin() {
-        LoginRequest loginRequest = new LoginRequest();
-        ReflectionTestUtils.setField(loginRequest, "email", "email");
-        ReflectionTestUtils.setField(loginRequest, "password", "password");
-
-        Authentication authentication = mock(Authentication.class);
-
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(authentication);
-
-        String jwt = "jwt";
-        String refreshToken = "refreshToken";
-
-        when(tokenGenerator.generateJwt(authentication)).thenReturn(jwt);
-        when(tokenGenerator.generateRefreshToken(authentication)).thenReturn(refreshToken);
-
-        HashOperations ho = mock(HashOperations.class);
-        when(redisTemplate.opsForHash()).thenReturn(ho);
-
-        doNothing().when(ho)
-                   .put(loginRequest.getEmail(), "refresh_token", refreshToken);
-
-        Assertions.assertThat(authService.login(loginRequest)).isEqualTo(jwt);
     }
 
 }

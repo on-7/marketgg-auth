@@ -1,30 +1,13 @@
 package com.nhnacademy.marketgg.auth.controller;
 
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-
-import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
-import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
-import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
-import com.nhnacademy.marketgg.auth.service.AuthService;
-import java.util.Objects;
-import javax.management.relation.RoleNotFoundException;
-import javax.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
-import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
+import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-
-import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
-import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,9 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.management.relation.RoleNotFoundException;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 /**
  * 인증 관련 요청을 처리하는 Controller 입니다.
@@ -55,21 +41,6 @@ public class AuthController {
     private final AuthService authService;
 
     /**
-     * 로그인 요청을 받아 로그인을 진행합니다.
-     *
-     * @param loginRequest - 로그인에 필요한 요청 정보 객체
-     * @return 로그인 성공/실패 여부가 담긴 ResponseEntity
-     */
-    @PostMapping("/login")
-    public ResponseEntity<Void> doLogin(@RequestBody LoginRequest loginRequest) {
-        String token = authService.login(loginRequest);
-
-        return ResponseEntity.status(HttpStatus.OK)
-                             .headers(header -> header.setBearerAuth(token))
-                             .build();
-    }
-
-    /**
      * 회원가입 요청을 받아 회원가입을 진행합니다.
      *
      * @param signUpRequest - 회원가입에 필요한 요청 정보 객체
@@ -77,10 +48,10 @@ public class AuthController {
      * @throws RoleNotFoundException - 역할을 부여받지 않거나, 읽을 수 없는 경우 예외 발생
      */
     @PostMapping("/signup")
-    public ResponseEntity<Void> doSignup(@RequestBody final SignupRequest signupRequest)
-        throws RoleNotFoundException {
+    public ResponseEntity<Void> doSignup(@RequestBody final SignUpRequest signUpRequest)
+            throws RoleNotFoundException {
 
-        authService.signup(signupRequest);
+        authService.signup(signUpRequest);
         return ResponseEntity.status(CREATED)
                              .build();
     }
@@ -111,8 +82,8 @@ public class AuthController {
 
         String newToken = null;
         if (Objects.isNull(authorizationHeader)
-            || (newToken = authService.renewToken(authorizationHeader.substring(HEADER_BEARER)))
-            == null) {
+                || (newToken = authService.renewToken(authorizationHeader.substring(HEADER_BEARER)))
+                == null) {
             httpStatus = UNAUTHORIZED;
         }
 

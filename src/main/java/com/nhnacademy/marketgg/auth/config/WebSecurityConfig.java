@@ -63,8 +63,9 @@ public class WebSecurityConfig {
             .antMatchers("/auth/**").permitAll();
 
         http.csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .httpBasic().disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        http.httpBasic().disable()
             .formLogin().disable();
 
         http.authorizeRequests()
@@ -78,9 +79,9 @@ public class WebSecurityConfig {
 
     private JwtAuthenticationFilter getJwtAuthenticationFilter() throws Exception {
         JwtAuthenticationFilter jwtAuthenticationFilter =
-            new JwtAuthenticationFilter(authenticationManager(null),
-                mapper, tokenGenerator, redisTemplate);
-        
+                new JwtAuthenticationFilter(authenticationManager(null),
+                                            mapper, tokenGenerator, redisTemplate);
+
         jwtAuthenticationFilter.setFilterProcessesUrl("/auth/login");
 
         return jwtAuthenticationFilter;

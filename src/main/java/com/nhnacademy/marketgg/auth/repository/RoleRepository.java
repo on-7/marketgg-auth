@@ -9,13 +9,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-@Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
 
     @Query("SELECT r "
          + "FROM AuthRole ar "
          + "    JOIN ar.role r "
-         + "        ON ar.id.roleNo = r.roleNo "
+         + "        ON ar.id.roleNo = r.id "
          + "WHERE ar.id.authNo = :authNo")
     List<Role> findRolesByAuthNo(Long authNo);
 
