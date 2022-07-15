@@ -132,30 +132,15 @@ public class TokenGenerator {
 
             return false;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            log.info("{}, {}", e, token);
-            log.error("잘못된 JWT 서명입니다.");
+            log.error("잘못된 JWT 서명입니다.", e);
         } catch (ExpiredJwtException e) {
-            log.error("만료된 JWT 토큰입니다.");
+            log.error("만료된 JWT 토큰입니다.", e);
         } catch (UnsupportedJwtException e) {
-            log.error("지원되지 않는 JWT 토큰입니다.");
+            log.error("지원되지 않는 JWT 토큰입니다.", e);
         } catch (IllegalArgumentException e) {
-            log.error("JWT 토큰이 잘못되었습니다.");
+            log.error("JWT 토큰이 잘못되었습니다.", e);
         }
         return true;
-    }
-
-    private String getJwtSecret(String jwtSecretUrl) {
-        Map<String, Map<String, String>> response =
-            restTemplate.getForObject(jwtSecretUrl, Map.class);
-
-        return Optional.ofNullable(response)
-                       .orElseThrow(IllegalArgumentException::new)
-                       .get("body")
-                       .get("secret");
-    }
-
-    public long getExpireDate(String token) {
-        return getClaims(token).getExpiration().getTime();
     }
 
     /**

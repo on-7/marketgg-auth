@@ -81,9 +81,8 @@ public class AuthController {
         HttpStatus httpStatus = OK;
 
         String newToken = null;
-        if (Objects.isNull(authorizationHeader)
-                || (newToken = authService.renewToken(authorizationHeader.substring(HEADER_BEARER)))
-                == null) {
+        if (authorizationHeader.isBlank()
+            || (newToken = authService.renewToken(authorizationHeader.substring(7))) == null) {
             httpStatus = UNAUTHORIZED;
         }
 
