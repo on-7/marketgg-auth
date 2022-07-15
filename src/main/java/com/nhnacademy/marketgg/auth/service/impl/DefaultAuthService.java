@@ -9,7 +9,6 @@ import com.nhnacademy.marketgg.auth.entity.Role;
 import com.nhnacademy.marketgg.auth.entity.Roles;
 import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
 import com.nhnacademy.marketgg.auth.exception.LoginFailException;
-import com.nhnacademy.marketgg.auth.jwt.RefreshToken;
 import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
 import com.nhnacademy.marketgg.auth.repository.AuthRepository;
 import com.nhnacademy.marketgg.auth.repository.AuthRoleRepository;

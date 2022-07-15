@@ -33,10 +33,9 @@ public class TokenGenerator {
     /**
      * 생성자
      *
-     * @param secret                        비밀키
-     * @param tokenExpirationDate           토큰 유효기간
-     * @param refreshTokenExpirationDate    Refresh Token 유효기간
-     * @param authKey
+     * @param secret                     비밀키
+     * @param tokenExpirationDate        토큰 유효기간
+     * @param refreshTokenExpirationDate Refresh Token 유효기간
      */
     public TokenGenerator(@Value("${jwt.secret}") String secret,
                           @Value("${jwt.expire-time}") long tokenExpirationDate,
@@ -64,7 +63,7 @@ public class TokenGenerator {
      *
      * @param authentication 사용자 정보
      * @param issueDate      토큰 발행일자
-     * @return               생성된 Refresh 토큰
+     * @return 생성된 Refresh 토큰
      */
     public String generateRefreshToken(Authentication authentication, Date issueDate) {
         return createToken(authentication, issueDate, refreshTokenExpirationDate);
@@ -76,7 +75,7 @@ public class TokenGenerator {
      * @param authentication 사용자 정보
      * @param issueDate      토큰 발행일자
      * @param expirationDate 토큰 만료일자
-     * @return               JWT
+     * @return JWT
      */
     private String createToken(Authentication authentication, Date issueDate, long expirationDate) {
         return Jwts.builder()
@@ -127,23 +126,23 @@ public class TokenGenerator {
 
             return false;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            log.error("잘못된 JWT 서명입니다.");
+            log.error("잘못된 JWT 서명입니다.", e);
         } catch (ExpiredJwtException e) {
-            log.error("만료된 JWT 토큰입니다.");
+            log.error("만료된 JWT 토큰입니다.", e);
         } catch (UnsupportedJwtException e) {
-            log.error("지원되지 않는 JWT 토큰입니다.");
+            log.error("지원되지 않는 JWT 토큰입니다.", e);
         } catch (IllegalArgumentException e) {
-            log.error("JWT 토큰이 잘못되었습니다.");
+            log.error("JWT 토큰이 잘못되었습니다.", e);
         }
-        return false;
+        return true;
     }
 
     /**
      * JWT 를 파싱하여 Authentication 객체를 얻습니다.
      *
-     * @param jwt    JWT
-     * @param email  사용자 Email
-     * @return       Authentication 객체
+     * @param jwt   JWT
+     * @param email 사용자 Email
+     * @return Authentication 객체
      */
     public Authentication getAuthentication(String jwt, String email) {
         Collection<? extends GrantedAuthority> roles =

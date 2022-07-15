@@ -40,20 +40,7 @@ public class AuthController {
     }
 
     @PostMapping("/check/email")
-    public ResponseEntity<EmailResponse> checkEmail(@RequestBody EmailRequest emailRequest) throws Exception {
-    }
-
-    @PostMapping("/find/username")
-    public ResponseEntity<Boolean> existsUsername(@RequestBody UsernameRequest usernameRequest) {
-
-        return ResponseEntity.status(OK)
-                             .contentType(MediaType.APPLICATION_JSON)
-                             .body(authService.existsUsername(usernameRequest.getUsername()));
-    }
-
-    @PostMapping("/find/email")
-    public ResponseEntity<Boolean> existsUsername(@RequestBody EmailRequest emailRequest) {
-
+    public ResponseEntity<EmailResponse> checkEmail(@RequestBody EmailRequest emailRequest) {
         return ResponseEntity.status(OK)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(authService.checkEmail(emailRequest.getEmail()));
@@ -65,8 +52,8 @@ public class AuthController {
         HttpStatus httpStatus = OK;
 
         String newToken = null;
-        if (Objects.isNull(authorizationHeader) ||
-            (newToken = authService.renewToken(authorizationHeader.substring(7))) == null) {
+        if (authorizationHeader.isBlank()
+            || (newToken = authService.renewToken(authorizationHeader.substring(7))) == null) {
             httpStatus = UNAUTHORIZED;
         }
 
