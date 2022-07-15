@@ -45,8 +45,10 @@ public class AuthController {
 
     @PostMapping("/check/email")
     public ResponseEntity<EmailResponse> checkEmail(@RequestBody EmailRequest emailRequest) throws Exception {
+
         return ResponseEntity.status(OK)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(authService.checkEmail(emailRequest.getEmail()));
     }
+
 }

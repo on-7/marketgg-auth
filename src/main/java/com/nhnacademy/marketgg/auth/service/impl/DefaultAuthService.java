@@ -46,6 +46,7 @@ public class DefaultAuthService implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final RedisTemplate<String, Object> redisTemplate;
     private final TokenGenerator tokenGenerator;
+
     private final MailUtil mailUtil;
     private final RedisUtil redisUtil;
 
@@ -95,18 +96,18 @@ public class DefaultAuthService implements AuthService {
     @Override
     public EmailResponse checkEmail(String email) throws EmailOverlapException {
 
+        log.info(email);
         if (Boolean.TRUE.equals(authRepository.existsByEmail(email))) {
-            return new EmailResponse(Boolean.TRUE, "해당 이메일은 사용중 입니다.");
-        }
-
-        if (!mailUtil.sendCheckMail(email)) {
-            throw new EmailOverlapException(email, "해당 이메일은 중복 되었습니다.");
+            throw new EmailOverlapException(email);
         }
 
         String key = email;
         String value = "emailRedisValue";
 
-        redisUtil.set(key, value);
+        if (mailUtil.sendCheckMail(email)) {
+            redisUtil.set(key, value);
+        }
+
         return new EmailResponse(Boolean.FALSE, "해당 이메일은 사용 가능합니다.");
     }
 }
