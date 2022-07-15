@@ -17,6 +17,12 @@ import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.entity.AuthRole;
 import com.nhnacademy.marketgg.auth.entity.Role;
 import com.nhnacademy.marketgg.auth.entity.Roles;
+import com.nhnacademy.marketgg.auth.constant.Roles;
+import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
+import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
+import com.nhnacademy.marketgg.auth.entity.Auth;
+import com.nhnacademy.marketgg.auth.entity.AuthRole;
+import com.nhnacademy.marketgg.auth.entity.Role;
 import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
 import com.nhnacademy.marketgg.auth.repository.AuthRepository;
 
@@ -43,6 +49,17 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.management.relation.RoleNotFoundException;
+import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 @Import({
         WebSecurityConfig.class
@@ -50,46 +67,46 @@ import org.springframework.test.util.ReflectionTestUtils;
 class DefaultAuthServiceTest {
 
     @InjectMocks
-    private DefaultAuthService authService;
+    DefaultAuthService authService;
 
     @Mock
-    private AuthRepository authRepository;
+    AuthRepository authRepository;
 
     @Mock
-    private AuthRoleRepository authRoleRepository;
+    AuthRoleRepository authRoleRepository;
 
     @Mock
-    private RoleRepository roleRepository;
+    RoleRepository roleRepository;
 
     @Mock
-    private MailUtil mailUtil;
+    MailUtils mailUtils;
 
     @Mock
-    private RedisUtil redisUtil;
+    RedisUtils redisUtils;
 
     @Mock
-    private AuthenticationManager authenticationManager;
+    PasswordEncoder passwordEncoder;
 
     @Mock
-    private RedisTemplate<String, Object> redisTemplate;
+    AuthenticationManager authenticationManager;
 
     @Mock
-    private TokenGenerator tokenGenerator;
+    RedisTemplate<String, Object> redisTemplate;
 
     @Mock
-    private PasswordEncoder passwordEncoder;
+    TokenGenerator tokenGenerator;
 
     @Test
     @DisplayName("회원가입 테스트")
     void testSignup() throws RoleNotFoundException {
+        SignUpRequest testSignUpRequest = new SignUpRequest();
 
-        SignupRequest testSignupRequest = new SignupRequest();
+        ReflectionTestUtils.setField(testSignUpRequest, "email", "test@test.com");
+        ReflectionTestUtils.setField(testSignUpRequest, "password", "1234");
+        ReflectionTestUtils.setField(testSignUpRequest, "name", "testName");
+        ReflectionTestUtils.setField(testSignUpRequest, "phoneNumber", "01087654321");
 
-        ReflectionTestUtils.setField(testSignupRequest, "email", "test@test.com");
-        ReflectionTestUtils.setField(testSignupRequest, "password", "1234");
-        ReflectionTestUtils.setField(testSignupRequest, "name", "testName");
-
-        Auth auth = new Auth(testSignupRequest);
+        Auth auth = new Auth(testSignUpRequest);
 
         given(authRepository.save(any(Auth.class))).willReturn(auth);
 
@@ -108,7 +125,7 @@ class DefaultAuthServiceTest {
 
         given(authRoleRepository.save(any(AuthRole.class))).willReturn(authRole);
 
-        authService.signup(testSignupRequest);
+        authService.signup(testSignUpRequest);
 
         verify(authRepository, times(1)).save(any(auth.getClass()));
         // getDeclaringClass() 메서드는 이 클래스의 선언 클래스를 가져오는 데 사용됨.
@@ -119,7 +136,6 @@ class DefaultAuthServiceTest {
     @Test
     @DisplayName("회원 이메일 중복체크 사용가능")
     void testExistsEmail() {
-
         given(authRepository.existsByEmail(any())).willReturn(false);
         given(mailUtil.sendCheckMail(any())).willReturn(true);
         doNothing().when(redisUtil).set(any(), any());

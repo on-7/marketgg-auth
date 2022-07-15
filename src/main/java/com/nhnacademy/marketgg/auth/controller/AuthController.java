@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
-import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
+import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -43,8 +43,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<Void> doSignup(@RequestBody final SignupRequest signupRequest) throws RoleNotFoundException {
-        authService.signup(signupRequest);
+    public ResponseEntity<Void> doSignup(@RequestBody final SignUpRequest signUpRequest) throws RoleNotFoundException {
+        authService.signup(signUpRequest);
         return ResponseEntity.status(CREATED)
                              .build();
     }

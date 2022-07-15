@@ -1,13 +1,14 @@
 package com.nhnacademy.marketgg.auth.service.impl;
 
 import com.nhnacademy.marketgg.auth.entity.Auth;
+import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
 import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.entity.AuthRole;
 import com.nhnacademy.marketgg.auth.entity.Role;
-import com.nhnacademy.marketgg.auth.entity.Roles;
+import com.nhnacademy.marketgg.auth.constant.Roles;
 import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
 import com.nhnacademy.marketgg.auth.exception.LoginFailException;
 import com.nhnacademy.marketgg.auth.jwt.RefreshToken;
@@ -23,6 +24,9 @@ import com.nhnacademy.marketgg.auth.util.RedisUtil;
 import java.util.Optional;
 import javax.management.relation.RoleNotFoundException;
 import javax.transaction.Transactional;
+
+import com.nhnacademy.marketgg.auth.util.MailUtils;
+import com.nhnacademy.marketgg.auth.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -43,17 +47,16 @@ public class DefaultAuthService implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<String, Object> redisTemplate;
     private final TokenGenerator tokenGenerator;
-
-    private final MailUtil mailUtil;
-    private final RedisUtil redisUtil;
+    private final MailUtils mailUtils;
+    private final RedisUtils redisUtils;
 
     @Transactional
     @Override
-    public void signup(final SignupRequest signupRequest) throws RoleNotFoundException {
+    public void signup(final SignUpRequest signUpRequest) throws RoleNotFoundException {
 
-        signupRequest.encodingPassword(passwordEncoder.encode(signupRequest.getPassword()));
+        signUpRequest.encodingPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
-        Auth auth = new Auth(signupRequest);
+        Auth auth = new Auth(signUpRequest);
 
         Auth savedAuth = authRepository.save(auth);
 
@@ -109,8 +112,6 @@ public class DefaultAuthService implements AuthService {
 
     @Override
     public EmailResponse checkEmail(String email) throws EmailOverlapException {
-
-        log.info(email);
         if (Boolean.TRUE.equals(authRepository.existsByEmail(email))) {
             throw new EmailOverlapException(email);
         }
@@ -118,8 +119,8 @@ public class DefaultAuthService implements AuthService {
         String key = email;
         String value = "emailRedisValue";
 
-        if (mailUtil.sendCheckMail(email)) {
-            redisUtil.set(key, value);
+        if (mailUtils.sendCheckMail(email)) {
+            redisUtils.set(key, value);
         }
 
         return new EmailResponse(Boolean.FALSE, "해당 이메일은 사용 가능합니다.");
