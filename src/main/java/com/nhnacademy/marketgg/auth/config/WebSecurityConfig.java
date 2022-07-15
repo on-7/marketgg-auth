@@ -26,50 +26,71 @@ public class WebSecurityConfig {
     private final TokenGenerator tokenGenerator;
     private final RedisTemplate<String, Object> redisTemplate;
 
+    /**
+     * @param configuration
+     * @return
+     * @throws Exception
+     */
     @Bean
-    public AuthenticationManager authenticationManager(
-        AuthenticationConfiguration authenticationConfiguration) throws Exception {
-
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 
+    /**
+     * Blowfish 알고리즘을 기반으로 비밀번호를 암호화합니다.
+     *
+     * @return 암호화 가능한 단방향 해시 함수인 BCryptPasswordEncoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * 인증을 처리하는 여러 개의 SecurityFilter 를 담는 filter chain 입니다.
+     *
+     * @param http - 세부 보안 기능을 설정할 수 있는 API 제공 클래스
+     * @return 인증 처리와 관련된 SecurityFilterChain
+     * @throws Exception
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-
-            .csrf().disable()
+        http.csrf().disable()
             .httpBasic().disable()
             .formLogin().disable()
-
             .addFilter(getJwtAuthenticationFilter())
-
             .authorizeRequests()
-            .antMatchers("/auth/**").permitAll()
-            .and()
+            .antMatchers("/auth/**").permitAll();
 
-            .headers()
-            .frameOptions().sameOrigin()
-            .and()
+        http.csrf().disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .httpBasic().disable()
+            .formLogin().disable();
 
-            .build();
+        http.authorizeRequests()
+            .antMatchers("/auth/**").permitAll();
+
+        http.headers()
+            .frameOptions().sameOrigin();
+
+        return http.build();
     }
 
     private JwtAuthenticationFilter getJwtAuthenticationFilter() throws Exception {
         JwtAuthenticationFilter jwtAuthenticationFilter =
             new JwtAuthenticationFilter(authenticationManager(null),
                 mapper, tokenGenerator, redisTemplate);
+        
         jwtAuthenticationFilter.setFilterProcessesUrl("/auth/login");
+
         return jwtAuthenticationFilter;
     }
 
+    /**
+     * WebSecurity 커스터마이징을 지원합니다.
+     *
+     * @return WebSecurity 커스터마이징이 적용된 WebSecurityCustomizer
+     */
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()

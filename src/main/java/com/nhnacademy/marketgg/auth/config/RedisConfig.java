@@ -26,6 +26,12 @@ public class RedisConfig {
     @Value("${redis.database}")
     private int database;
 
+    /**
+     * key-value 형 데이터베이스를 사용하여 프로젝트를 데이터베이스에 연결하도록 지원하는 팩토리
+     *
+     * @return Thread-safe 한 Lettuce 기반의 커넥션 팩토리 (LettuceConnectionFactory)
+     * @see <a href="https://lettuce.io/core/release/api">Lettuce 6.x Documentation</a>
+     */
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
@@ -38,6 +44,13 @@ public class RedisConfig {
         return new LettuceConnectionFactory(configuration);
     }
 
+    /**
+     * Redis 서버에 명령어를 수행하기 위한 높은 수준의 추상화를 제공하는 클래스
+     *
+     * @param redisConnectionFactory - 프로젝트를 데이터베이스에 연결하도록 지원하는 팩토리
+     * @return key-value 구조의 RedisTemplate
+     * @see RedisConfig#redisConnectionFactory
+     */
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
