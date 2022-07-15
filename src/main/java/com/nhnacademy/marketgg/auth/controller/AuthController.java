@@ -1,7 +1,6 @@
 package com.nhnacademy.marketgg.auth.controller;
 
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
-import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
 import com.nhnacademy.marketgg.auth.service.AuthService;
@@ -82,7 +81,7 @@ public class AuthController {
 
         String newToken = null;
         if (authorizationHeader.isBlank()
-            || (newToken = authService.renewToken(authorizationHeader.substring(7))) == null) {
+                || (newToken = authService.renewToken(authorizationHeader.substring(HEADER_BEARER))) == null) {
             httpStatus = UNAUTHORIZED;
         }
 
