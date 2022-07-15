@@ -111,32 +111,4 @@ class DefaultAuthServiceTest {
         verify(authRepository, times(1)).existsByEmail(any());
     }
 
-    @DisplayName("로그인 시 JWT 발급")
-    @Test
-    void testLogin() {
-        LoginRequest loginRequest = new LoginRequest();
-        ReflectionTestUtils.setField(loginRequest, "email", "email");
-        ReflectionTestUtils.setField(loginRequest, "password", "password");
-
-        Authentication authentication = mock(Authentication.class);
-
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-            .thenReturn(authentication);
-
-        String jwt = "jwt";
-        String refreshToken = "refreshToken";
-        Date date = new Date(System.currentTimeMillis());
-
-        when(tokenGenerator.generateJwt(authentication, date)).thenReturn(jwt);
-        when(tokenGenerator.generateRefreshToken(authentication, date)).thenReturn(refreshToken);
-
-        HashOperations ho = mock(HashOperations.class);
-        when(redisTemplate.opsForHash()).thenReturn(ho);
-
-        doNothing().when(ho)
-                   .put(loginRequest.getEmail(), "refresh_token", refreshToken);
-
-        Assertions.assertThat(authService.login(loginRequest)).isEqualTo(jwt);
-    }
-
 }
