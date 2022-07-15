@@ -42,6 +42,7 @@ public class AuthRole {
 
         private Long authNo;
         private Long roleNo;
+    
     }
 
 }

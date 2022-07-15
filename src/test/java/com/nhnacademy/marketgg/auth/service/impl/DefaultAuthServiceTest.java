@@ -3,6 +3,10 @@ package com.nhnacademy.marketgg.auth.service.impl;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import com.nhnacademy.marketgg.auth.dto.SignupRequestDto;
 import static org.mockito.Mockito.*;
 
 import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
@@ -15,6 +19,7 @@ import com.nhnacademy.marketgg.auth.entity.Role;
 import com.nhnacademy.marketgg.auth.entity.Roles;
 import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
 import com.nhnacademy.marketgg.auth.repository.AuthRepository;
+
 import com.nhnacademy.marketgg.auth.repository.AuthRoleRepository;
 import com.nhnacademy.marketgg.auth.repository.RoleRepository;
 
@@ -29,13 +34,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -136,8 +140,8 @@ class DefaultAuthServiceTest {
         verify(authRepository, times(1)).existsByEmail(any());
     }
 
-    @DisplayName("로그인 시 JWT 발급")
     @Test
+    @DisplayName("로그인 시 JWT 발급")
     void testLogin() {
         LoginRequest loginRequest = new LoginRequest();
         ReflectionTestUtils.setField(loginRequest, "email", "email");

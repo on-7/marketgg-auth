@@ -1,5 +1,6 @@
 package com.nhnacademy.marketgg.auth.service.impl;
 
+import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
 import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
@@ -15,6 +16,8 @@ import com.nhnacademy.marketgg.auth.repository.AuthRepository;
 import com.nhnacademy.marketgg.auth.repository.AuthRoleRepository;
 import com.nhnacademy.marketgg.auth.repository.RoleRepository;
 import com.nhnacademy.marketgg.auth.service.AuthService;
+import java.util.Date;
+import java.util.Objects;
 import com.nhnacademy.marketgg.auth.util.MailUtil;
 import com.nhnacademy.marketgg.auth.util.RedisUtil;
 import java.util.Optional;
@@ -23,8 +26,6 @@ import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,11 +36,11 @@ import org.springframework.stereotype.Service;
 public class DefaultAuthService implements AuthService {
 
     private static final String REFRESH_TOKEN = "REFRESH_TOKEN";
+
     private final AuthRepository authRepository;
     private final RoleRepository roleRepository;
     private final AuthRoleRepository authRoleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
     private final RedisTemplate<String, Object> redisTemplate;
     private final TokenGenerator tokenGenerator;
 
@@ -70,24 +71,40 @@ public class DefaultAuthService implements AuthService {
     }
 
     @Override
-    public String login(LoginRequest loginRequest) {
+    public String renewToken(String token) {
+        String username = tokenGenerator.getEmail(token);
+
+        RefreshToken refreshToken =
+            (RefreshToken) redisTemplate.opsForHash().get(username, REFRESH_TOKEN);
 
         UsernamePasswordAuthenticationToken token =
             new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
                 loginRequest.getPassword());
 
-        Authentication authentication =
-            Optional.ofNullable(authenticationManager.authenticate(token))
-                    .orElseThrow(LoginFailException::new);
+        if (isInvalidToken(username, refreshToken)) {
+            return null;
+        }
 
-        String jwt = tokenGenerator.generateJwt(authentication);
-        String refreshToken = tokenGenerator.generateRefreshToken(authentication);
+        Authentication authentication = tokenGenerator.getAuthentication(token, username);
 
+        Date issueDate = new Date(System.currentTimeMillis());
         redisTemplate.opsForHash()
                      .put(loginRequest.getEmail(), REFRESH_TOKEN,
                          new RefreshToken(loginRequest.getEmail(), refreshToken));
 
-        return jwt;
+        String newJwt = tokenGenerator.generateJwt(authentication, issueDate);
+        String newRefreshToken = tokenGenerator.generateRefreshToken(authentication, issueDate);
+
+        redisTemplate.opsForHash().delete(username, REFRESH_TOKEN);
+        redisTemplate.opsForHash().put(username, REFRESH_TOKEN, newRefreshToken);
+
+        return newJwt;
+    }
+
+    private boolean isInvalidToken(String username, RefreshToken refreshToken) {
+        return Objects.isNull(refreshToken) ||
+            !Objects.equals(username, refreshToken.getUsername()) ||
+            tokenGenerator.isInvalidToken(refreshToken.getToken());
     }
 
     @Override
@@ -107,4 +124,5 @@ public class DefaultAuthService implements AuthService {
 
         return new EmailResponse(Boolean.FALSE, "해당 이메일은 사용 가능합니다.");
     }
+
 }

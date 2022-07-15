@@ -11,6 +11,8 @@ public interface AuthService {
 
     void signup(final SignupRequest signupRequest) throws RoleNotFoundException;
 
+    String renewToken(String token);
+    
     String login(LoginRequest loginRequest);
 
     EmailResponse checkEmail(String email) throws EmailOverlapException;
