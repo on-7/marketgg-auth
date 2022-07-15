@@ -26,7 +26,6 @@ import org.springframework.web.client.RestTemplate;
 /**
  * JWT 토큰을 생성하고 필요한 정보를 제공하는 클래스입니다.
  */
-
 @Slf4j
 @Component
 public class TokenGenerator {
@@ -101,16 +100,6 @@ public class TokenGenerator {
                    .compact();
     }
 
-    /**
-     * 토큰을 이용하여 사용자의 Email 정보를 얻습니다.
-     *
-     * @param token JWT
-     * @return 사용자의 이메일
-     */
-    public String getEmail(String token) {
-        return getClaims(token).getSubject();
-    }
-
     private Claims getClaims(String token) {
 
         return Jwts.parserBuilder()
@@ -136,9 +125,9 @@ public class TokenGenerator {
         } catch (ExpiredJwtException e) {
             log.error("만료된 JWT 토큰입니다.", e);
         } catch (UnsupportedJwtException e) {
-            log.error("지원되지 않는 JWT 토큰입니다.");
+            log.error("지원되지 않는 JWT 토큰입니다.", e);
         } catch (IllegalArgumentException e) {
-            log.error("JWT 토큰이 잘못되었습니다.");
+            log.error("JWT 토큰이 잘못되었습니다.", e);
         }
         return true;
     }
@@ -163,7 +152,7 @@ public class TokenGenerator {
      * @param token - 만료된 JWT
      * @return 사용자의 Email 을 반환받는다.
      */
-    public String getEmailFromExpiredToken(String token) {
+    public String getUuidFromExpiredToken(String token) {
         try {
             return getClaims(token).getSubject();
         } catch (ExpiredJwtException e) {
@@ -175,10 +164,10 @@ public class TokenGenerator {
      * 만료된 JWT 를 파싱하여 Authentication 객체를 얻습니다.
      *
      * @param jwt   JWT
-     * @param email 사용자 Email
+     * @param uuid 사용자 UUID
      * @return Authentication 객체
      */
-    public Authentication getAuthenticationFromExpiredToken(String jwt, String email) {
+    public Authentication getAuthenticationFromExpiredToken(String jwt, String uuid) {
         Collection<String> roles;
 
         try {
@@ -191,7 +180,7 @@ public class TokenGenerator {
                                                         .map(SimpleGrantedAuthority::new)
                                                         .collect(toList());
 
-        return new UsernamePasswordAuthenticationToken(email, "", authorities);
+        return new UsernamePasswordAuthenticationToken(uuid, "", authorities);
     }
 
 }

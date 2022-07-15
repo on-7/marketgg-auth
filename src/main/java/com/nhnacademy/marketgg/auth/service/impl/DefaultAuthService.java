@@ -64,34 +64,34 @@ public class DefaultAuthService implements AuthService {
             return;
         }
 
-        String email = tokenGenerator.getEmailFromExpiredToken(token);
+        String uuid = tokenGenerator.getUuidFromExpiredToken(token);
 
-        redisTemplate.opsForHash().delete(email, REFRESH_TOKEN);
+        redisTemplate.opsForHash().delete(uuid, REFRESH_TOKEN);
         long tokenExpireTime = tokenGenerator.getExpireDate(token) - System.currentTimeMillis();
         redisTemplate.opsForValue().set(token, true, tokenExpireTime, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public String renewToken(final String token) {
-        String email = tokenGenerator.getEmailFromExpiredToken(token);
+        String uuid = tokenGenerator.getUuidFromExpiredToken(token);
 
         String refreshToken =
-            (String) redisTemplate.opsForHash().get(email, REFRESH_TOKEN);
+            (String) redisTemplate.opsForHash().get(uuid, REFRESH_TOKEN);
 
-        if (isInvalidToken(email, refreshToken)) {
+        if (isInvalidToken(uuid, refreshToken)) {
             return null;
         }
 
         Authentication authentication =
-            tokenGenerator.getAuthenticationFromExpiredToken(token, email);
+            tokenGenerator.getAuthenticationFromExpiredToken(token, uuid);
 
         Date issueDate = new Date(System.currentTimeMillis());
 
         String newJwt = tokenGenerator.generateJwt(authentication, issueDate);
         String newRefreshToken = tokenGenerator.generateRefreshToken(authentication, issueDate);
 
-        redisTemplate.opsForHash().delete(email, REFRESH_TOKEN);
-        redisTemplate.opsForHash().put(email, REFRESH_TOKEN, newRefreshToken);
+        redisTemplate.opsForHash().delete(uuid, REFRESH_TOKEN);
+        redisTemplate.opsForHash().put(uuid, REFRESH_TOKEN, newRefreshToken);
 
         return newJwt;
     }
@@ -113,10 +113,10 @@ public class DefaultAuthService implements AuthService {
         return new EmailResponse(Boolean.FALSE, "해당 이메일은 사용 가능합니다.");
     }
 
-    private boolean isInvalidToken(String email, String refreshToken) {
+    private boolean isInvalidToken(String uuid, String refreshToken) {
         return Objects.isNull(refreshToken)
             || tokenGenerator.isInvalidToken(refreshToken)
-            || !Objects.equals(email, tokenGenerator.getEmailFromExpiredToken(refreshToken));
+            || !Objects.equals(uuid, tokenGenerator.getUuidFromExpiredToken(refreshToken));
     }
 
 }
