@@ -14,4 +14,5 @@ public interface AuthService {
     String login(LoginRequest loginRequest);
 
     EmailResponse checkEmail(String email) throws EmailOverlapException;
+
 }

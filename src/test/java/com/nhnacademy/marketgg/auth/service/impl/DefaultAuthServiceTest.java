@@ -8,17 +8,21 @@ import static org.mockito.Mockito.*;
 import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
 import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
+import com.nhnacademy.marketgg.auth.dto.request.SignupRequest;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.entity.AuthRole;
 import com.nhnacademy.marketgg.auth.entity.Role;
 import com.nhnacademy.marketgg.auth.entity.Roles;
-import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
 import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
 import com.nhnacademy.marketgg.auth.repository.AuthRepository;
 import com.nhnacademy.marketgg.auth.repository.AuthRoleRepository;
 import com.nhnacademy.marketgg.auth.repository.RoleRepository;
+
+import java.util.Optional;
+import javax.management.relation.RoleNotFoundException;
 import com.nhnacademy.marketgg.auth.util.MailUtil;
 import com.nhnacademy.marketgg.auth.util.RedisUtil;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,9 +38,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import javax.management.relation.RoleNotFoundException;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 @Import({
