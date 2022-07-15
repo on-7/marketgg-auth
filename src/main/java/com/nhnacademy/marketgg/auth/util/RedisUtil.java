@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisUtil {
 
     private final RedisTemplate<String, String> redisTemplate;
+    private static final long TIMEOUT = 3;
 
     public boolean delete(String key) {
         return Boolean.TRUE.equals(redisTemplate.delete(key));
@@ -29,7 +30,8 @@ public class RedisUtil {
             throw new RedisInvalidSubscriptionException("해당 이메일은 메일 재발송 시간이 경과하지 않았습니다."
                     , new IllegalArgumentException());
         }
-        valueOperations.set(key, value, 3, TimeUnit.MINUTES);
+
+        valueOperations.set(key, value, TIMEOUT, TimeUnit.MINUTES);
     }
 
     public void deleteAuth(String email) {
