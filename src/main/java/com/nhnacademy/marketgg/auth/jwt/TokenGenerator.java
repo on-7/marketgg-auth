@@ -112,13 +112,12 @@ public class TokenGenerator {
     }
 
     private Claims getClaims(String token) {
-        Claims claims = Jwts.parserBuilder()
+
+        return Jwts.parserBuilder()
                             .setSigningKey(key)
                             .build()
                             .parseClaimsJws(token)
                             .getBody();
-
-        return claims;
     }
 
     /**
@@ -173,7 +172,6 @@ public class TokenGenerator {
         }
     }
 
-
     /**
      * 만료된 JWT 를 파싱하여 Authentication 객체를 얻습니다.
      *
@@ -196,4 +194,5 @@ public class TokenGenerator {
 
         return new UsernamePasswordAuthenticationToken(email, "", authorities);
     }
+
 }

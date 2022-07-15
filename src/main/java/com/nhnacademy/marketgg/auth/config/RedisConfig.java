@@ -13,6 +13,8 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
  * Redis 기본 설정을 담당합니다.
+ *
+ * @version 1.0.0
  */
 
 @Configuration
@@ -34,6 +36,7 @@ public class RedisConfig {
      * Redis 연결과 관련된 설정을 하는 RedisConnectionFactory 를 스프링 빈으로 등록한다.
      *
      * @return RedisConnectionFactory
+     * @since 1.0.0
      */
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
@@ -52,6 +55,7 @@ public class RedisConfig {
      *
      * @param redisConnectionFactory - 스프링 빈으로 등록된 RedisConnectionFactory
      * @return RedisTemplate
+     * @since 1.0.0
      */
     @Bean
     public RedisTemplate<String, Object> redisTemplate(

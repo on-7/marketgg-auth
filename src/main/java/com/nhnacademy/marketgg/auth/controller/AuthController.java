@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 인증 관련 요청을 처리하는 Controller 입니다.
+ *
+ * @version 1.0.0
  */
 
 @Slf4j
@@ -46,8 +48,7 @@ public class AuthController {
     }
 
     @PostMapping("/check/email")
-    public ResponseEntity<EmailResponse> checkEmail(@RequestBody final EmailRequest emailRequest)
-        throws Exception {
+    public ResponseEntity<EmailResponse> checkEmail(@RequestBody final EmailRequest emailRequest) {
 
         return ResponseEntity.status(OK)
                              .contentType(MediaType.APPLICATION_JSON)
@@ -67,7 +68,8 @@ public class AuthController {
 
         String newToken = null;
         if (Objects.isNull(authorizationHeader)
-            || (newToken = authService.renewToken(authorizationHeader.substring(HEADER_BEARER))) == null) {
+            || (newToken = authService.renewToken(authorizationHeader.substring(HEADER_BEARER)))
+            == null) {
             httpStatus = UNAUTHORIZED;
         }
 
