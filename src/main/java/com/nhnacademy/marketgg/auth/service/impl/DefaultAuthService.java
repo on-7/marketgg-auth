@@ -98,7 +98,7 @@ public class DefaultAuthService implements AuthService {
 
         log.info(email);
         if (Boolean.TRUE.equals(authRepository.existsByEmail(email))) {
-            throw new EmailOverlapException(email, "해당 이메일은 중복 되었습니다.");
+            throw new EmailOverlapException(email);
         }
 
         String key = email;
@@ -107,7 +107,6 @@ public class DefaultAuthService implements AuthService {
         if (mailUtil.sendCheckMail(email)) {
             redisUtil.set(key, value);
         }
-
 
         return new EmailResponse(Boolean.FALSE, "해당 이메일은 사용 가능합니다.");
     }

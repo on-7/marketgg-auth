@@ -45,9 +45,8 @@ class AuthControllerTest {
     @MockBean
     private AuthService authService;
 
-
-    @Test
     @DisplayName("회원가입 테스트")
+    @Test
     void testDoSignup() throws Exception {
         SignupRequest testSignupRequest = new SignupRequest();
 
@@ -65,8 +64,8 @@ class AuthControllerTest {
 
     }
 
-    @Test
     @DisplayName("회원 이메일 중복체크 사용가능")
+    @Test
     void testCheckEmail() throws Exception {
         EmailRequest emailRequest = new EmailRequest();
 
@@ -80,17 +79,15 @@ class AuthControllerTest {
                .andExpect(status().isOk())
                .andDo(print());
     }
-
-    @Test
     @DisplayName("회원 이메일 중복체크 예외처리")
+    @Test
     void testExistsEmailThrownByEmailOverlapException() throws Exception {
         EmailRequest emailRequest = new EmailRequest();
 
         ReflectionTestUtils.setField(emailRequest, "email", "testEmail");
 
         when(authService.checkEmail(emailRequest.getEmail()))
-                .thenThrow(new EmailOverlapException(emailRequest.getEmail()
-                        , " 해당 이메일은 중복입니다."));
+                .thenThrow(new EmailOverlapException(emailRequest.getEmail()));
 
         mockMvc.perform(post("/auth/check/email")
                 .contentType(APPLICATION_JSON)
