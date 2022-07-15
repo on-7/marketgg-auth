@@ -3,11 +3,9 @@ package com.nhnacademy.marketgg.auth.oauth2;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
-@Getter
 @NoArgsConstructor
-@ToString
+@Getter
 public class OAuthToken {
 
     @JsonProperty("access_token")
@@ -23,4 +21,5 @@ public class OAuthToken {
 
     @JsonProperty("id_token")
     private String idToken;
+
 }

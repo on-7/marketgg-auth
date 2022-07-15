@@ -97,4 +97,5 @@ class AuthControllerTest {
                .andExpect(header().string("Authorization", "Bearer jwt-token"))
                .andDo(print());
     }
+
 }

@@ -37,7 +37,6 @@ public class OAuth2Service {
     private final RestTemplate restTemplate;
 
     public GoogleProfile requestProfile(String code) {
-
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("code", code);
         parameters.add("client_id", googleClientId);
@@ -48,11 +47,11 @@ public class OAuth2Service {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        HttpEntity<MultiValueMap<String, String>> tokenRequest =
-            new HttpEntity<>(parameters, headers);
+        HttpEntity<MultiValueMap<String, String>> tokenRequest
+            = new HttpEntity<>(parameters, headers);
 
-        ResponseEntity<OAuthToken> response =
-            restTemplate.postForEntity(GOOGLE_TOKEN_REQUEST_URL, tokenRequest, OAuthToken.class);
+        ResponseEntity<OAuthToken> response
+            = restTemplate.postForEntity(GOOGLE_TOKEN_REQUEST_URL, tokenRequest, OAuthToken.class);
 
         String accessToken = Optional.ofNullable(response.getBody())
                                      .orElseThrow(OAuthRequestFailException::new)

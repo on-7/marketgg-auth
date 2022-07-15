@@ -25,4 +25,5 @@ public class OAuth2Controller {
         return ResponseEntity.status(HttpStatus.OK)
                              .body(code);
     }
+
 }
