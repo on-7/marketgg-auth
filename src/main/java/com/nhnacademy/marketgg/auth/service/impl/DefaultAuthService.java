@@ -20,13 +20,11 @@ import java.util.concurrent.TimeUnit;
 import javax.management.relation.RoleNotFoundException;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultAuthService implements AuthService {
@@ -47,14 +45,14 @@ public class DefaultAuthService implements AuthService {
     public void signup(final SignUpRequest signUpRequest) throws RoleNotFoundException {
 
         signUpRequest.encodingPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-        Auth savedAuth = authRepository.save(new Auth(signUpRequest));
-
+        Auth auth = new Auth(signUpRequest);
+        Auth savedAuth = authRepository.save(auth);
         Long authNo = savedAuth.getId();
         Role role = roleRepository.findByName(Roles.ROLE_USER)
                                   .orElseThrow(
                                       () -> new RoleNotFoundException("해당 권한은 존재 하지 않습니다."));
-
-        AuthRole authRole = new AuthRole(new AuthRole.Pk(authNo, role.getId()), savedAuth, role);
+        AuthRole.Pk pk = new AuthRole.Pk(authNo, role.getId());
+        AuthRole authRole = new AuthRole(pk, savedAuth, role);
         authRoleRepository.save(authRole);
     }
 
@@ -64,9 +62,9 @@ public class DefaultAuthService implements AuthService {
             return;
         }
 
-        String uuid = tokenGenerator.getUuidFromExpiredToken(token);
+        String email = tokenGenerator.getUuidFromExpiredToken(token);
 
-        redisTemplate.opsForHash().delete(uuid, REFRESH_TOKEN);
+        redisTemplate.opsForHash().delete(email, REFRESH_TOKEN);
         long tokenExpireTime = tokenGenerator.getExpireDate(token) - System.currentTimeMillis();
         redisTemplate.opsForValue().set(token, true, tokenExpireTime, TimeUnit.MILLISECONDS);
     }
@@ -87,13 +85,14 @@ public class DefaultAuthService implements AuthService {
 
         Date issueDate = new Date(System.currentTimeMillis());
 
-        String newJwt = tokenGenerator.generateJwt(authentication, issueDate);
         String newRefreshToken = tokenGenerator.generateRefreshToken(authentication, issueDate);
 
         redisTemplate.opsForHash().delete(uuid, REFRESH_TOKEN);
         redisTemplate.opsForHash().put(uuid, REFRESH_TOKEN, newRefreshToken);
+        redisTemplate.expireAt(uuid,
+            new Date(issueDate.getTime() + tokenGenerator.getRefreshTokenExpirationDate()));
 
-        return newJwt;
+        return tokenGenerator.generateJwt(authentication, issueDate);
     }
 
     @Override
@@ -113,10 +112,10 @@ public class DefaultAuthService implements AuthService {
         return new EmailResponse(Boolean.FALSE, "해당 이메일은 사용 가능합니다.");
     }
 
-    private boolean isInvalidToken(String uuid, String refreshToken) {
+    private boolean isInvalidToken(String email, String refreshToken) {
         return Objects.isNull(refreshToken)
             || tokenGenerator.isInvalidToken(refreshToken)
-            || !Objects.equals(uuid, tokenGenerator.getUuidFromExpiredToken(refreshToken));
+            || !Objects.equals(email, tokenGenerator.getUuidFromExpiredToken(refreshToken));
     }
 
 }
