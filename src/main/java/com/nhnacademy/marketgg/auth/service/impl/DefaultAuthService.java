@@ -14,20 +14,17 @@ import com.nhnacademy.marketgg.auth.repository.RoleRepository;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import com.nhnacademy.marketgg.auth.util.MailUtils;
 import com.nhnacademy.marketgg.auth.util.RedisUtils;
+import java.util.Date;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import javax.management.relation.RoleNotFoundException;
+import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.RoleNotFoundException;
-import javax.transaction.Transactional;
-import java.util.Date;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultAuthService implements AuthService {
@@ -50,12 +47,12 @@ public class DefaultAuthService implements AuthService {
         signUpRequest.encodingPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         Auth auth = new Auth(signUpRequest);
         Auth savedAuth = authRepository.save(auth);
-        Long authNo = savedAuth.getAuthNo();
+        Long authNo = savedAuth.getId();
         Role role = roleRepository.findByName(Roles.ROLE_USER)
                                   .orElseThrow(
-                                          () -> new RoleNotFoundException("해당 권한은 존재 하지 않습니다."));
+                                      () -> new RoleNotFoundException("해당 권한은 존재 하지 않습니다."));
         AuthRole.Pk pk = new AuthRole.Pk(authNo, role.getId());
-        AuthRole authRole = new AuthRole(pk, auth, role);
+        AuthRole authRole = new AuthRole(pk, savedAuth, role);
         authRoleRepository.save(authRole);
     }
 
@@ -65,7 +62,7 @@ public class DefaultAuthService implements AuthService {
             return;
         }
 
-        String email = tokenGenerator.getEmailFromExpiredToken(token);
+        String email = tokenGenerator.getUuidFromExpiredToken(token);
 
         redisTemplate.opsForHash().delete(email, REFRESH_TOKEN);
         long tokenExpireTime = tokenGenerator.getExpireDate(token) - System.currentTimeMillis();
@@ -74,27 +71,28 @@ public class DefaultAuthService implements AuthService {
 
     @Override
     public String renewToken(final String token) {
-        String email = tokenGenerator.getEmailFromExpiredToken(token);
+        String uuid = tokenGenerator.getUuidFromExpiredToken(token);
 
         String refreshToken =
-                (String) redisTemplate.opsForHash().get(email, REFRESH_TOKEN);
+            (String) redisTemplate.opsForHash().get(uuid, REFRESH_TOKEN);
 
-        if (isInvalidToken(email, refreshToken)) {
+        if (isInvalidToken(uuid, refreshToken)) {
             return null;
         }
 
         Authentication authentication =
-                tokenGenerator.getAuthenticationFromExpiredToken(token, email);
+            tokenGenerator.getAuthenticationFromExpiredToken(token, uuid);
 
         Date issueDate = new Date(System.currentTimeMillis());
 
-        String newJwt = tokenGenerator.generateJwt(authentication, issueDate);
         String newRefreshToken = tokenGenerator.generateRefreshToken(authentication, issueDate);
 
-        redisTemplate.opsForHash().delete(email, REFRESH_TOKEN);
-        redisTemplate.opsForHash().put(email, REFRESH_TOKEN, newRefreshToken);
+        redisTemplate.opsForHash().delete(uuid, REFRESH_TOKEN);
+        redisTemplate.opsForHash().put(uuid, REFRESH_TOKEN, newRefreshToken);
+        redisTemplate.expireAt(uuid,
+            new Date(issueDate.getTime() + tokenGenerator.getRefreshTokenExpirationDate()));
 
-        return newJwt;
+        return tokenGenerator.generateJwt(authentication, issueDate);
     }
 
     @Override
@@ -116,8 +114,8 @@ public class DefaultAuthService implements AuthService {
 
     private boolean isInvalidToken(String email, String refreshToken) {
         return Objects.isNull(refreshToken)
-                || tokenGenerator.isInvalidToken(refreshToken)
-                || !Objects.equals(email, tokenGenerator.getEmailFromExpiredToken(refreshToken));
+            || tokenGenerator.isInvalidToken(refreshToken)
+            || !Objects.equals(email, tokenGenerator.getUuidFromExpiredToken(refreshToken));
     }
 
 }

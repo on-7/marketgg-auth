@@ -4,6 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.exception.InvalidLoginRequestException;
 import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
+import java.io.IOException;
+import java.util.Date;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
@@ -13,13 +19,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Date;
-
+/**
+ * 로그인 시 실행되는 필터입니다.
+ *
+ * @version 1.0.0
+ */
 @Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -42,16 +46,16 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response)
-            throws AuthenticationException {
+        throws AuthenticationException {
         try {
             log.info("start login");
 
             LoginRequest loginRequest =
-                    mapper.readValue(request.getInputStream(), LoginRequest.class);
+                mapper.readValue(request.getInputStream(), LoginRequest.class);
 
             UsernamePasswordAuthenticationToken token =
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
-                                                            loginRequest.getPassword());
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
+                    loginRequest.getPassword());
 
             return getAuthenticationManager().authenticate(token);
 
@@ -65,14 +69,18 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request,
                                             HttpServletResponse response,
                                             FilterChain chain, Authentication authResult)
-            throws IOException, ServletException {
+        throws IOException, ServletException {
 
         Date issueDate = new Date();
         String jwt = tokenGenerator.generateJwt(authResult, issueDate);
 
         redisTemplate.opsForHash().put(authResult.getName(), REFRESH_TOKEN,
-                                       tokenGenerator.generateRefreshToken(authResult, issueDate));
+            tokenGenerator.generateRefreshToken(authResult, issueDate));
+
+        redisTemplate.expireAt(authResult.getName(),
+            new Date(issueDate.getTime() + tokenGenerator.getRefreshTokenExpirationDate()));
 
         response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
     }
+
 }

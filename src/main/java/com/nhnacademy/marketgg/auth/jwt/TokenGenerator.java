@@ -1,5 +1,7 @@
 package com.nhnacademy.marketgg.auth.jwt;
 
+import static java.util.stream.Collectors.toList;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -7,6 +9,12 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import java.security.Key;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,18 +24,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.security.Key;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
-
-import static java.util.stream.Collectors.toList;
-
 /**
  * JWT 토큰을 생성하고 필요한 정보를 제공하는 클래스입니다.
  */
-
 @Slf4j
 @Component
 public class TokenGenerator {
@@ -36,7 +35,11 @@ public class TokenGenerator {
 
     private final RestTemplate restTemplate;
     private final Key key;
+
+    @Getter
     private final long tokenExpirationDate;
+
+    @Getter
     private final long refreshTokenExpirationDate;
 
     /**
@@ -60,8 +63,8 @@ public class TokenGenerator {
     /**
      * JWT 를 생성합니다.
      *
-     * @param authentication 사용자 정보
-     * @param issueDate      토큰 발행일
+     * @param authentication - 사용자 정보
+     * @param issueDate      - 토큰 발행일
      * @return 생성된 JWT
      */
     public String generateJwt(Authentication authentication, Date issueDate) {
@@ -71,8 +74,8 @@ public class TokenGenerator {
     /**
      * Refresh Token 을 생성합니다.
      *
-     * @param authentication 사용자 정보
-     * @param issueDate      토큰 발행일자
+     * @param authentication - 사용자 정보
+     * @param issueDate      - 토큰 발행일자
      * @return 생성된 Refresh 토큰
      */
     public String generateRefreshToken(Authentication authentication, Date issueDate) {
@@ -92,10 +95,10 @@ public class TokenGenerator {
         return Jwts.builder()
                    .setSubject(authentication.getName())
                    .claim(AUTHORITIES,
-                          authentication.getAuthorities()
-                                        .stream()
-                                        .map(GrantedAuthority::getAuthority)
-                                        .collect(toList()))
+                       authentication.getAuthorities()
+                                     .stream()
+                                     .map(GrantedAuthority::getAuthority)
+                                     .collect(toList()))
                    .setIssuedAt(issueDate)
                    .setExpiration(new Date(issueDate.getTime() + expirationDate))
                    .signWith(key)
@@ -108,7 +111,7 @@ public class TokenGenerator {
      * @param token JWT
      * @return 사용자의 이메일
      */
-    public String getEmail(String token) {
+    public String getUuid(String token) {
         return getClaims(token).getSubject();
     }
 
@@ -145,16 +148,6 @@ public class TokenGenerator {
         return true;
     }
 
-    private String getJwtSecret(String jwtSecretUrl) {
-        Map<String, Map<String, String>> response =
-                restTemplate.getForObject(jwtSecretUrl, Map.class);
-
-        return Optional.ofNullable(response)
-                       .orElseThrow(IllegalArgumentException::new)
-                       .get("body")
-                       .get("secret");
-    }
-
     public long getExpireDate(String token) {
         return getClaims(token).getExpiration().getTime();
     }
@@ -163,9 +156,9 @@ public class TokenGenerator {
      * 만료된 토큰에서 사용자의 Email 정보를 얻습니다.
      *
      * @param token - 만료된 JWT
-     * @return 사용자의 Email 을 반환받는다.
+     * @return 사용자의 UUID 를 반환받는다.
      */
-    public String getEmailFromExpiredToken(String token) {
+    public String getUuidFromExpiredToken(String token) {
         try {
             return getClaims(token).getSubject();
         } catch (ExpiredJwtException e) {
@@ -176,11 +169,11 @@ public class TokenGenerator {
     /**
      * 만료된 JWT 를 파싱하여 Authentication 객체를 얻습니다.
      *
-     * @param jwt   JWT
-     * @param email 사용자 Email
+     * @param jwt  - JWT
+     * @param uuid - 사용자 uuid
      * @return Authentication 객체
      */
-    public Authentication getAuthenticationFromExpiredToken(String jwt, String email) {
+    public Authentication getAuthenticationFromExpiredToken(String jwt, String uuid) {
         Collection<String> roles;
 
         try {
@@ -193,7 +186,17 @@ public class TokenGenerator {
                                                         .map(SimpleGrantedAuthority::new)
                                                         .collect(toList());
 
-        return new UsernamePasswordAuthenticationToken(email, "", authorities);
+        return new UsernamePasswordAuthenticationToken(uuid, "", authorities);
+    }
+
+    private String getJwtSecret(String jwtSecretUrl) {
+        Map<String, Map<String, String>> response =
+            restTemplate.getForObject(jwtSecretUrl, Map.class);
+
+        return Optional.ofNullable(response)
+                       .orElseThrow(IllegalArgumentException::new)
+                       .get("body")
+                       .get("secret");
     }
 
 }
