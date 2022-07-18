@@ -1,6 +1,6 @@
 package com.nhnacademy.marketgg.auth.jwt;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toUnmodifiableList;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -93,7 +93,7 @@ public class TokenGenerator {
                        authentication.getAuthorities()
                                      .stream()
                                      .map(GrantedAuthority::getAuthority)
-                                     .collect(toList()))
+                                     .collect(toUnmodifiableList()))
                    .setIssuedAt(issueDate)
                    .setExpiration(new Date(issueDate.getTime() + expirationDate))
                    .signWith(key)
@@ -163,7 +163,7 @@ public class TokenGenerator {
     /**
      * 만료된 JWT 를 파싱하여 Authentication 객체를 얻습니다.
      *
-     * @param jwt   JWT
+     * @param jwt  JWT
      * @param uuid 사용자 UUID
      * @return Authentication 객체
      */
@@ -178,7 +178,7 @@ public class TokenGenerator {
 
         Collection<GrantedAuthority> authorities = roles.stream()
                                                         .map(SimpleGrantedAuthority::new)
-                                                        .collect(toList());
+                                                        .collect(toUnmodifiableList());
 
         return new UsernamePasswordAuthenticationToken(uuid, "", authorities);
     }

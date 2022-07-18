@@ -1,11 +1,6 @@
 package com.nhnacademy.marketgg.auth.entity;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
+import java.io.Serializable;
 import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -14,8 +9,17 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+/**
+ * 회원과 권한의 관계를 맺는 클래스입니다.
+ *
+ * @version 1.0.0
+ */
 @Table(name = "auth_roles")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
