@@ -66,9 +66,7 @@ public class WebSecurityConfig {
         http.csrf().disable()
             .httpBasic().disable()
             .formLogin().disable()
-            .addFilter(getJwtAuthenticationFilter())
-            .authorizeRequests()
-            .antMatchers("/auth/**").permitAll();
+            .addFilter(getJwtAuthenticationFilter());
 
         http.csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

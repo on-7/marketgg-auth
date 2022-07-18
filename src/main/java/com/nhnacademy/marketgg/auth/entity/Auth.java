@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.Length;
 
 /**
@@ -37,9 +37,8 @@ public class Auth {
     @Column(name = "auth_no")
     private Long id;
 
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    @Column(columnDefinition = "BINARY(16)")
+    @Column(unique = true)
+    @Type(type = "uuid-char")
     private UUID uuid;
 
     @NotBlank
@@ -72,6 +71,7 @@ public class Auth {
     private Provider provider;
 
     public Auth(SignUpRequest signUpRequest) {
+        this.uuid = UUID.randomUUID();
         this.email = signUpRequest.getEmail();
         this.password = signUpRequest.getPassword();
         this.name = signUpRequest.getName();

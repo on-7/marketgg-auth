@@ -38,7 +38,7 @@ public class DefaultUserDetailsService implements UserDetailsService {
         Auth auth = authRepository.findByEmail(email)
                                   .orElseThrow(() -> new AuthNotFoundException(email));
 
-        List<Role> roles = roleRepository.findRolesByAuthNo(auth.getId());
+        List<Role> roles = roleRepository.findRolesByAuthId(auth.getId());
 
         return new CustomUser(auth.getUuid(), auth.getPassword(), roles);
     }

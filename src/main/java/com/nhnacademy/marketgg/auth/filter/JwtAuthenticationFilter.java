@@ -3,9 +3,12 @@ package com.nhnacademy.marketgg.auth.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.exception.InvalidLoginRequestException;
+import com.nhnacademy.marketgg.auth.exception.LoginFailException;
 import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -13,11 +16,13 @@ import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.server.MethodNotAllowedException;
 
 /**
  * 사용자의 인증 요청 시 작동하는 Filter 입니다.
@@ -57,12 +62,16 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                                 HttpServletResponse response)
         throws AuthenticationException {
 
+        if (Objects.equals(request.getMethod(), HttpMethod.GET.name())) {
+            throw new MethodNotAllowedException(HttpMethod.GET, List.of(HttpMethod.POST));
+        }
+
         try {
             LoginRequest loginRequest =
                 mapper.readValue(request.getInputStream(), LoginRequest.class);
 
-            UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
+            UsernamePasswordAuthenticationToken token
+                = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
                     loginRequest.getPassword());
 
             return getAuthenticationManager().authenticate(token);
@@ -86,5 +95,16 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             tokenGenerator.generateRefreshToken(authResult, issueDate));
 
         response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
+    }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request,
+                                              HttpServletResponse response,
+                                              AuthenticationException failed)
+        throws IOException, ServletException {
+
+        log.error("로그인 실패", failed);
+
+        throw new LoginFailException();
     }
 }
