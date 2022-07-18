@@ -1,5 +1,6 @@
 package com.nhnacademy.marketgg.auth.entity;
 
+import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -13,7 +14,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Table(name = "auth_roles")
@@ -46,7 +46,7 @@ public class AuthRole {
 
         private Long authNo;
         private Long roleNo;
-
+    
     }
 
 }

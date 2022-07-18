@@ -6,13 +6,12 @@ import com.nhnacademy.marketgg.auth.exception.AuthNotFoundException;
 import com.nhnacademy.marketgg.auth.jwt.CustomUser;
 import com.nhnacademy.marketgg.auth.repository.AuthRepository;
 import com.nhnacademy.marketgg.auth.repository.RoleRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * email 을 이용하여 사용자를 찾습니다.

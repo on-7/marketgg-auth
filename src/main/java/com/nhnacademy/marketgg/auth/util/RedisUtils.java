@@ -20,14 +20,13 @@ public class RedisUtils {
     public boolean delete(String key) {
         return Boolean.TRUE.equals(redisTemplate.delete(key));
     }
-
     public boolean hasKey(String key) {
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
 
     public void set(String key, String value) throws RedisInvalidSubscriptionException {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        if (hasKey(key)) {
+        if(hasKey(key)) {
             throw new RedisInvalidSubscriptionException("해당 이메일은 메일 재발송 시간이 경과하지 않았습니다."
                     , new IllegalArgumentException());
         }
@@ -46,6 +45,6 @@ public class RedisUtils {
         if (authK.equals(authKey)) {
             return false;
         }
-        return true;
-    }
+            return true;
+        }
 }

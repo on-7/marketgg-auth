@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,20 +34,16 @@ public class TokenGenerator {
 
     private final RestTemplate restTemplate;
     private final Key key;
-
-    @Getter
     private final long tokenExpirationDate;
-
-    @Getter
     private final long refreshTokenExpirationDate;
 
     /**
      * 생성자입니다.
      *
-     * @param secretUrl                  - JWT Secret 키를 요청하는 URL
-     * @param tokenExpirationDate        - JWT 의 유효기간
+     * @param secretUrl - JWT Secret 키를 요청하는 URL
+     * @param tokenExpirationDate - JWT 의 유효기간
      * @param refreshTokenExpirationDate - Refresh Token 의 유효기간
-     * @param restTemplate               - restTemplate 스프링 빈을 주입받습니다.
+     * @param restTemplate - restTemplate 스프링 빈을 주입받습니다.
      */
     public TokenGenerator(RestTemplate restTemplate,
                           @Value("${jwt.secret-url}") String secretUrl,
@@ -86,7 +81,7 @@ public class TokenGenerator {
      * 토큰을 생성합니다.
      *
      * @param authentication - 사용자 정보
-     * @param issueDate      - 토큰 발행일자
+     * @param issueDate - 토큰 발행일자
      * @param expirationDate - 토큰 만료일자
      * @return JWT
      */
@@ -118,10 +113,10 @@ public class TokenGenerator {
     private Claims getClaims(String token) {
 
         return Jwts.parserBuilder()
-                   .setSigningKey(key)
-                   .build()
-                   .parseClaimsJws(token)
-                   .getBody();
+                            .setSigningKey(key)
+                            .build()
+                            .parseClaimsJws(token)
+                            .getBody();
     }
 
     /**
@@ -136,14 +131,13 @@ public class TokenGenerator {
 
             return false;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            log.info("{}, {}", e, token);
-            log.error("잘못된 JWT 서명입니다.");
+            log.error("잘못된 JWT 서명입니다.", e);
         } catch (ExpiredJwtException e) {
-            log.error("만료된 JWT 토큰입니다.");
+            log.error("만료된 JWT 토큰입니다.", e);
         } catch (UnsupportedJwtException e) {
-            log.error("지원되지 않는 JWT 토큰입니다.");
+            log.error("지원되지 않는 JWT 토큰입니다.", e);
         } catch (IllegalArgumentException e) {
-            log.error("JWT 토큰이 잘못되었습니다.");
+            log.error("JWT 토큰이 잘못되었습니다.", e);
         }
         return true;
     }

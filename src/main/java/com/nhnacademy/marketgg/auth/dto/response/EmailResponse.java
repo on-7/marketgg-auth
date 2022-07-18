@@ -10,6 +10,7 @@ import lombok.Setter;
 public class EmailResponse {
 
     private final Boolean isExistEmail;
+
     private final String message;
 
 }

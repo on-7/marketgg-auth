@@ -19,11 +19,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * 로그인 시 실행되는 필터입니다.
- *
- * @version 1.0.0
- */
 @Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -76,9 +71,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         redisTemplate.opsForHash().put(authResult.getName(), REFRESH_TOKEN,
             tokenGenerator.generateRefreshToken(authResult, issueDate));
-
-        redisTemplate.expireAt(authResult.getName(),
-            new Date(issueDate.getTime() + tokenGenerator.getRefreshTokenExpirationDate()));
 
         response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
     }

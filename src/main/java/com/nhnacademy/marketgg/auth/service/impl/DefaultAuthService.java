@@ -7,6 +7,8 @@ import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.entity.AuthRole;
 import com.nhnacademy.marketgg.auth.entity.Role;
 import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
+import com.nhnacademy.marketgg.auth.jwt.RefreshToken;
+import com.nhnacademy.marketgg.auth.exception.LoginFailException;
 import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
 import com.nhnacademy.marketgg.auth.repository.AuthRepository;
 import com.nhnacademy.marketgg.auth.repository.AuthRoleRepository;
@@ -93,6 +95,11 @@ public class DefaultAuthService implements AuthService {
             new Date(issueDate.getTime() + tokenGenerator.getRefreshTokenExpirationDate()));
 
         return tokenGenerator.generateJwt(authentication, issueDate);
+    }
+
+    private boolean isInvalidToken(String username, RefreshToken refreshToken) {
+        return Objects.isNull(refreshToken) || !Objects.equals(username, refreshToken.getEmail()) ||
+                tokenGenerator.isInvalidToken(refreshToken.getToken());
     }
 
     @Override
