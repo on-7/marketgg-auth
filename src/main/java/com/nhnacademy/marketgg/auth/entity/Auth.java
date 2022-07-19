@@ -17,7 +17,6 @@ import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.Length;
 
 @Table(name = "auth")
@@ -32,8 +31,7 @@ public class Auth {
     private Long id;
 
     @Column(unique = true)
-    @Type(type = "uuid-char")
-    private UUID uuid;
+    private String uuid;
 
     @NotBlank
     @Length(max = 30)
@@ -65,7 +63,7 @@ public class Auth {
     private Provider provider;
 
     public Auth(SignUpRequest signUpRequest) {
-        this.uuid = UUID.randomUUID();
+        this.uuid = UUID.randomUUID().toString();
         this.email = signUpRequest.getEmail();
         this.password = signUpRequest.getPassword();
         this.name = signUpRequest.getName();
