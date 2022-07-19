@@ -80,7 +80,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         redisTemplate.expireAt(authResult.getName(),
             new Date(issueDate.getTime() + tokenGenerator.getRefreshTokenExpirationDate()));
 
+        Date tokenExpireDate =
+            new Date(issueDate.getTime() + tokenGenerator.getTokenExpirationDate());
         response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
+        response.addHeader("JWT-Expire", tokenExpireDate.toString());
     }
 
 }
