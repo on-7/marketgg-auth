@@ -3,6 +3,7 @@ package com.nhnacademy.marketgg.auth.entity;
 import com.nhnacademy.marketgg.auth.constant.Provider;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import java.time.LocalDate;
+import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -16,6 +17,7 @@ import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.Length;
 
 @Table(name = "auth")
@@ -28,6 +30,10 @@ public class Auth {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "auth_no")
     private Long id;
+
+    @Column(unique = true)
+    @Type(type = "uuid-char")
+    private UUID uuid;
 
     @NotBlank
     @Length(max = 30)
@@ -59,6 +65,7 @@ public class Auth {
     private Provider provider;
 
     public Auth(SignUpRequest signUpRequest) {
+        this.uuid = UUID.randomUUID();
         this.email = signUpRequest.getEmail();
         this.password = signUpRequest.getPassword();
         this.name = signUpRequest.getName();

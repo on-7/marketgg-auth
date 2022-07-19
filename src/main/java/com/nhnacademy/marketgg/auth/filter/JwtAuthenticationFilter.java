@@ -3,8 +3,11 @@ package com.nhnacademy.marketgg.auth.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.exception.InvalidLoginRequestException;
+import com.nhnacademy.marketgg.auth.exception.LoginFailException;
 import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -82,8 +85,24 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         Date tokenExpireDate =
             new Date(issueDate.getTime() + tokenGenerator.getTokenExpirationDate());
+        LocalDateTime ldt = tokenExpireDate.toInstant()
+                                           .atZone(ZoneId.systemDefault())
+                                           .toLocalDateTime()
+                                           .withNano(0);
+
         response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
-        response.addHeader("JWT-Expire", tokenExpireDate.toString());
+        response.addHeader("JWT-Expire", ldt.toString());
+    }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request,
+                                              HttpServletResponse response,
+                                              AuthenticationException failed)
+        throws IOException, ServletException {
+
+        log.error("로그인 실패", failed);
+
+        throw new LoginFailException();
     }
 
 }
