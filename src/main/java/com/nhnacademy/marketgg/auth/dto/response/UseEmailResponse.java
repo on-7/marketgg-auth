@@ -3,13 +3,11 @@ package com.nhnacademy.marketgg.auth.dto.response;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-
 @RequiredArgsConstructor
 @Getter
 @Setter
-public class EmailResponse {
+public class UseEmailResponse {
 
-    private final Boolean isExistEmail;
-    private final String message;
+    private Boolean isUseEmail;
 
 }

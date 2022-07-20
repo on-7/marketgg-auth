@@ -18,6 +18,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Table(name = "auth")
 @Entity
@@ -29,6 +30,9 @@ public class Auth {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "auth_no")
     private Long authNo;
+
+    @Column(unique = true)
+    private String uuid;
 
     @NotBlank
     @Length(max = 30)
@@ -60,6 +64,7 @@ public class Auth {
     private Provider provider;
 
     public Auth(SignUpRequest signUpRequest) {
+        this.uuid = UUID.randomUUID().toString();
         this.email = signUpRequest.getEmail();
         this.password = signUpRequest.getPassword();
         this.name = signUpRequest.getName();

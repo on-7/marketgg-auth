@@ -2,6 +2,7 @@ package com.nhnacademy.marketgg.auth.service.impl;
 
 import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
 import com.nhnacademy.marketgg.auth.constant.Roles;
+import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.entity.AuthRole;
@@ -112,10 +113,16 @@ class DefaultAuthServiceTest {
     @DisplayName("회원 이메일 중복체크 사용가능")
     void testExistsEmail() {
         given(authRepository.existsByEmail(any())).willReturn(false);
-        given(mailUtils.sendCheckMail(any())).willReturn(true);
+        given(mailUtils.sendMail(any())).willReturn(true);
+
         doNothing().when(redisUtils).set(any(), any());
 
-        authService.checkEmail("test@test.com");
+        EmailRequest testEmailRequest = new EmailRequest();
+
+        ReflectionTestUtils.setField(testEmailRequest, "email", "test@test.com");
+        ReflectionTestUtils.setField(testEmailRequest, "isReferrer", false);
+
+        authService.checkEmail(testEmailRequest);
 
         verify(authRepository, times(1)).existsByEmail(any());
     }
@@ -125,7 +132,13 @@ class DefaultAuthServiceTest {
     void testExistsEmailThrownByEmailOverlapException() {
         given(authRepository.existsByEmail(any(String.class))).willReturn(true);
 
-        assertThatThrownBy(() -> authService.checkEmail("test@test.com"))
+        EmailRequest testEmailRequest = new EmailRequest();
+
+        ReflectionTestUtils.setField(testEmailRequest, "email", "test@test.com");
+        ReflectionTestUtils.setField(testEmailRequest, "isReferrer", false);
+
+
+        assertThatThrownBy(() -> authService.checkEmail(testEmailRequest))
                 .isInstanceOf(EmailOverlapException.class);
 
         verify(authRepository, times(1)).existsByEmail(any());

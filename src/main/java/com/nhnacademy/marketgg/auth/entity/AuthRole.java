@@ -27,13 +27,13 @@ public class AuthRole {
     private Pk id;
 
     @NotNull
-    @MapsId("authNo")
+    @MapsId("authId")
     @ManyToOne
     @JoinColumn(name = "auth_no")
     private Auth auth;
 
     @NotNull
-    @MapsId("roleNo")
+    @MapsId("roleId")
     @ManyToOne
     @JoinColumn(name = "role_no")
     private Role role;
@@ -44,8 +44,8 @@ public class AuthRole {
     @AllArgsConstructor
     public static class Pk implements Serializable {
 
-        private Long authNo;
-        private Long roleNo;
+        private Long authId;
+        private Long roleId;
 
     }
 
