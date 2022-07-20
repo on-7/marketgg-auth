@@ -7,6 +7,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.EmailUseRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
+import com.nhnacademy.marketgg.auth.dto.response.SignUpResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
@@ -48,13 +49,13 @@ public class AuthController {
      * @throws RoleNotFoundException - 역할을 부여받지 않거나, 읽을 수 없는 경우 예외 발생
      */
     @PostMapping("/signup")
-    public ResponseEntity<Void> doSignup(@RequestBody final SignUpRequest signUpRequest)
+    public ResponseEntity<SignUpResponse> doSignup(@RequestBody final SignUpRequest signUpRequest)
         throws RoleNotFoundException {
 
-        // TODO: UUID 로 바뀐 로직으로 회원가입 처리해야 함.
-        authService.signup(signUpRequest);
+
         return ResponseEntity.status(CREATED)
-                             .build();
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(authService.signup(signUpRequest));
     }
 
     /**

@@ -27,8 +27,7 @@ public class RedisUtils {
     public void set(String key, String value) throws RedisInvalidSubscriptionException {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         if(hasKey(key)) {
-            throw new RedisInvalidSubscriptionException("해당 이메일은 메일 재발송 시간이 경과하지 않았습니다."
-                    , new IllegalArgumentException());
+            throw new RedisInvalidSubscriptionException("해당 이메일은 메일 재발송 시간이 경과하지 않았습니다.");
         }
 
         valueOperations.set(key, value, TIMEOUT, TimeUnit.MINUTES);

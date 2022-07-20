@@ -2,6 +2,8 @@ package com.nhnacademy.marketgg.auth.config;
 
 import java.util.Map;
 import java.util.Optional;
+
+import com.nhnacademy.marketgg.auth.exception.SecureManagerException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -91,7 +93,7 @@ public class RedisConfig {
         String[] info = connectInfo.split(":");
 
         if (info.length != 3) {
-            throw new com.nhnacademy.marketgg.client.exception.SecureManagerException();
+            throw new SecureManagerException();
         }
 
         return info;

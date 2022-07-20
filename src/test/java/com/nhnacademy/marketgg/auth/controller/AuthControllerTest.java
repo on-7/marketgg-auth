@@ -3,9 +3,9 @@ package com.nhnacademy.marketgg.auth.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
-import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
+import com.nhnacademy.marketgg.auth.dto.response.SignUpResponse;
 import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;
@@ -16,22 +16,20 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
-
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuthController.class)
@@ -55,16 +53,21 @@ class AuthControllerTest {
     @MockBean
     UserDetailsService userDetailsService;
 
+    @MockBean
+    PasswordEncoder passwordEncoder;
+
     @Test
     @DisplayName("회원가입 테스트")
     void testDoSignup() throws Exception {
+
         SignUpRequest testSignUpRequest = new SignUpRequest();
 
         ReflectionTestUtils.setField(testSignUpRequest, "email", "test@test.com");
         ReflectionTestUtils.setField(testSignUpRequest, "password", "1234");
         ReflectionTestUtils.setField(testSignUpRequest, "name", "testName");
+        ReflectionTestUtils.setField(testSignUpRequest, "phoneNumber", "010-1234-1234");
 
-        doNothing().when(authService).signup(testSignUpRequest);
+        when(authService.signup(testSignUpRequest)).thenReturn(any());
 
         mockMvc.perform(post("/auth/signup")
                                 .contentType(APPLICATION_JSON)
@@ -91,6 +94,7 @@ class AuthControllerTest {
                .andDo(print());
     }
 
+    //TODO : 테스트 코드 로직수정 필요
     @Test
     @DisplayName("회원 이메일 중복체크 예외처리")
     void testExistsEmailThrownByEmailOverlapException() throws Exception {
