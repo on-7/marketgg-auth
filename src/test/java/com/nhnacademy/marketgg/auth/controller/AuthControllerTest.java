@@ -7,8 +7,7 @@ import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
 import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
-import com.nhnacademy.marketgg.auth.jwt.CustomUser;
-import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
+import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(WebSecurityConfig.class)
 @MockBean({
         AuthenticationManager.class,
-        TokenGenerator.class,
+        TokenUtils.class,
         RedisTemplate.class
 })
 class AuthControllerTest {
@@ -106,26 +105,5 @@ class AuthControllerTest {
                .andExpect(result -> assertTrue(result.getResolvedException() instanceof EmailOverlapException));
 
     }
-
-
-    // @DisplayName("로그인 시 헤더에 jwt 토큰 저장")
-    // @Test
-    // void testDoLogin() throws Exception {
-    //     LoginRequest loginRequest = new LoginRequest();
-    //     ReflectionTestUtils.setField(loginRequest, "email", "email");
-    //     ReflectionTestUtils.setField(loginRequest, "password", "password");
-    //
-    //     String jsonLoginRequest = mapper.writeValueAsString(loginRequest);
-    //
-    //     CustomUser customUser = new CustomUser("username", "password", new ArrayList<>());
-    //
-    //     when(userDetailsService.loadUserByUsername("username")).thenReturn(customUser);
-    //
-    //     mockMvc.perform(post("/auth/login")
-    //                             .contentType(APPLICATION_JSON)
-    //                             .content(jsonLoginRequest))
-    //            .andExpect(status().isOk())
-    //            .andExpect(header().string(HttpHeaders.AUTHORIZATION, "Bearer jwt-token"));
-    // }
 
 }

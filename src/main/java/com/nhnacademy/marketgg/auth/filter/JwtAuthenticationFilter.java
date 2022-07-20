@@ -2,10 +2,11 @@ package com.nhnacademy.marketgg.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
+import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.exception.InvalidLoginRequestException;
-import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
+import com.nhnacademy.marketgg.auth.exception.LoginFailException;
+import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import java.io.IOException;
-import java.util.Date;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -19,22 +20,25 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * 로그인 시 실행되는 필터입니다.
+ *
+ * @version 1.0.0
+ */
 @Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private static final String REFRESH_TOKEN = "REFRESH_TOKEN";
-
     private final ObjectMapper mapper;
-    private final TokenGenerator tokenGenerator;
+    private final TokenUtils tokenUtils;
     private final RedisTemplate<String, Object> redisTemplate;
 
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager, ObjectMapper mapper,
-                                   TokenGenerator tokenGenerator,
+                                   TokenUtils tokenUtils,
                                    RedisTemplate<String, Object> redisTemplate) {
 
         super(authenticationManager);
         this.mapper = mapper;
-        this.tokenGenerator = tokenGenerator;
+        this.tokenUtils = tokenUtils;
         this.redisTemplate = redisTemplate;
     }
 
@@ -66,13 +70,21 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             FilterChain chain, Authentication authResult)
         throws IOException, ServletException {
 
-        Date issueDate = new Date();
-        String jwt = tokenGenerator.generateJwt(authResult, issueDate);
+        TokenResponse tokenResponse = tokenUtils.saveRefreshToken(redisTemplate, authResult);
 
-        redisTemplate.opsForHash().put(authResult.getName(), REFRESH_TOKEN,
-            tokenGenerator.generateRefreshToken(authResult, issueDate));
+        response.addHeader(HttpHeaders.AUTHORIZATION, TokenUtils.BEARER + tokenResponse.getJwt());
+        response.addHeader(TokenUtils.JWT_EXPIRE, tokenResponse.getExpireDate().toString());
+    }
 
-        response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request,
+                                              HttpServletResponse response,
+                                              AuthenticationException failed)
+        throws IOException, ServletException {
+
+        log.error("로그인 실패", failed);
+
+        throw new LoginFailException();
     }
 
 }

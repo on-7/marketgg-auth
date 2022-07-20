@@ -2,7 +2,7 @@ package com.nhnacademy.marketgg.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.filter.JwtAuthenticationFilter;
-import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
+import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,19 +17,27 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * Spring Security 기본 설정을 진행합니다.
+ *
+ * @version 1.0.0
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
     private final ObjectMapper mapper;
-    private final TokenGenerator tokenGenerator;
+    private final TokenUtils tokenUtils;
     private final RedisTemplate<String, Object> redisTemplate;
 
     /**
-     * @param configuration
-     * @return
-     * @throws Exception
+     * 인증을 관리하는 AuthenticationManger 를 반환합니다.
+     *
+     * @param configuration - 인증 구성을 내보냅니다.
+     * @return 인증 정보를 관리하는 AuthenticationManager 를 관리한다.
+     * @throws Exception getAuthenticationManager() 에서 throw 하는 예외입니다.
+     * @see <a href="https://docs.spring.io/spring-security/site/docs/current/api/org/springframework/security/config/annotation/authentication/configuration/AuthenticationConfiguration.html">AuthenticationConfiguration</a>
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -51,16 +59,14 @@ public class WebSecurityConfig {
      *
      * @param http - 세부 보안 기능을 설정할 수 있는 API 제공 클래스
      * @return 인증 처리와 관련된 SecurityFilterChain
-     * @throws Exception
+     * @throws Exception Spring Security 의 메소드에서 발생하는 예외입니다.
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
             .httpBasic().disable()
             .formLogin().disable()
-            .addFilter(getJwtAuthenticationFilter())
-            .authorizeRequests()
-            .antMatchers("/auth/**").permitAll();
+            .addFilter(getJwtAuthenticationFilter());
 
         http.csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -80,7 +86,7 @@ public class WebSecurityConfig {
     private JwtAuthenticationFilter getJwtAuthenticationFilter() throws Exception {
         JwtAuthenticationFilter jwtAuthenticationFilter =
                 new JwtAuthenticationFilter(authenticationManager(null),
-                                            mapper, tokenGenerator, redisTemplate);
+                                            mapper, tokenUtils, redisTemplate);
 
         jwtAuthenticationFilter.setFilterProcessesUrl("/auth/login");
 

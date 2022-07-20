@@ -3,8 +3,10 @@ package com.nhnacademy.marketgg.auth.jwt;
 import static java.util.stream.Collectors.toList;
 
 import com.nhnacademy.marketgg.auth.entity.Role;
+
 import java.util.Collection;
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,11 +15,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 /**
  * UserDetailsService 에서 반환하는 UserDetails 를 상속받은 사용자 정보를 담고있는 클래스 입니다.
  */
-
 @AllArgsConstructor
 public class CustomUser implements UserDetails {
 
-    private final String email;
+    private final String uuid;
     private final String password;
     private final List<Role> authorities;
 
@@ -40,7 +41,7 @@ public class CustomUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return uuid;
     }
 
     @Override
@@ -62,4 +63,5 @@ public class CustomUser implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }

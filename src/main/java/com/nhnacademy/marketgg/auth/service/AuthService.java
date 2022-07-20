@@ -1,9 +1,10 @@
 package com.nhnacademy.marketgg.auth.service;
 
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
-import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
+import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
+
 import javax.management.relation.RoleNotFoundException;
 
 /**
@@ -14,7 +15,7 @@ import javax.management.relation.RoleNotFoundException;
 public interface AuthService {
 
     void signup(final SignUpRequest signUpRequest) throws RoleNotFoundException;
-    
+
     /**
      * 로그아웃을 진행합니다.
      *
@@ -32,6 +33,6 @@ public interface AuthService {
      * @return 새로운 JWT 를 반환합니다.
      * @since 1.0.0
      */
-    String renewToken(final String token);
+    TokenResponse renewToken(final String token);
 
 }
