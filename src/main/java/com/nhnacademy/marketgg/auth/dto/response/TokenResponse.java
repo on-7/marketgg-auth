@@ -12,6 +12,6 @@ import lombok.RequiredArgsConstructor;
 public class TokenResponse {
 
     private final String jwt;
-    private final LocalDateTime expireDate;
+    private final LocalDateTime expiredDate;
 
 }
