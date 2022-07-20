@@ -31,6 +31,9 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * JWT 토큰을 생성하고 필요한 정보를 제공하는 클래스입니다.
+ *
+ * @version 1.0.0
+ * @see <a href="jwt.io">JWT Description</a>
  */
 @Slf4j
 @Component
@@ -65,7 +68,7 @@ public class TokenUtils {
                       @Value("${jwt.expire-time}") long tokenExpirationDate,
                       @Value("${jwt.refresh-expire-time}") long refreshTokenExpirationDate) {
         this.restTemplate = restTemplate;
-        this.key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(getJwtSecret(secretUrl)));
+        this.key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(this.getJwtSecret(secretUrl)));
         this.tokenExpirationDate = tokenExpirationDate;
         this.refreshTokenExpirationDate = refreshTokenExpirationDate;
     }
@@ -192,18 +195,16 @@ public class TokenUtils {
         return new UsernamePasswordAuthenticationToken(uuid, "", authorities);
     }
 
-    private String getJwtSecret(String jwtSecretUrl) {
-        Map<String, Map<String, String>> response =
-            restTemplate.getForObject(jwtSecretUrl, Map.class);
+    /**
+     * Redis 에 Refresh Token 을 저장하고 JWT 정보를 반환합니다.
+     *
+     * @param redisTemplate  - Refresh Token 을 저장하기 위한 Redis
+     * @param authentication - 사용자 정보
+     * @return - JWT 정보
+     */
+    public TokenResponse saveRefreshToken(RedisTemplate<String, Object> redisTemplate,
+                                          Authentication authentication) {
 
-        return Optional.ofNullable(response)
-                       .orElseThrow(IllegalArgumentException::new)
-                       .get("body")
-                       .get("secret");
-    }
-
-    public TokenResponse saveRefreshToken(RedisTemplate<String, String> redisTemplate,
-                                      Authentication authentication) {
         Date issueDate = new Date(System.currentTimeMillis());
         String refreshToken = this.generateRefreshToken(authentication, issueDate);
 
@@ -222,6 +223,16 @@ public class TokenUtils {
                                                    .withNano(0);
 
         return new TokenResponse(newJwt, tokenExpire);
+    }
+
+    private String getJwtSecret(String jwtSecretUrl) {
+        Map<String, Map<String, String>> response =
+            restTemplate.getForObject(jwtSecretUrl, Map.class);
+
+        return Optional.ofNullable(response)
+                       .orElseThrow(IllegalArgumentException::new)
+                       .get("body")
+                       .get("secret");
     }
 
 }

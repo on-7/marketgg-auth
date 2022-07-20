@@ -2,13 +2,11 @@ package com.nhnacademy.marketgg.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
+import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.exception.InvalidLoginRequestException;
 import com.nhnacademy.marketgg.auth.exception.LoginFailException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -72,25 +70,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             FilterChain chain, Authentication authResult)
         throws IOException, ServletException {
 
-        Date issueDate = new Date();
-        String jwt = tokenUtils.generateJwt(authResult, issueDate);
-        String refreshToken = tokenUtils.generateRefreshToken(authResult, issueDate);
+        TokenResponse tokenResponse = tokenUtils.saveRefreshToken(redisTemplate, authResult);
 
-        redisTemplate.opsForHash().put(authResult.getName(), TokenUtils.REFRESH_TOKEN,
-            refreshToken);
-
-        redisTemplate.expireAt(authResult.getName(),
-            new Date(issueDate.getTime() + tokenUtils.getRefreshTokenExpirationDate()));
-
-        Date tokenExpireDate =
-            new Date(issueDate.getTime() + tokenUtils.getTokenExpirationDate());
-        LocalDateTime ldt = tokenExpireDate.toInstant()
-                                           .atZone(ZoneId.systemDefault())
-                                           .toLocalDateTime()
-                                           .withNano(0);
-
-        response.addHeader(HttpHeaders.AUTHORIZATION, TokenUtils.BEARER + jwt);
-        response.addHeader(TokenUtils.JWT_EXPIRE, ldt.toString());
+        response.addHeader(HttpHeaders.AUTHORIZATION, TokenUtils.BEARER + tokenResponse.getJwt());
+        response.addHeader(TokenUtils.JWT_EXPIRE, tokenResponse.getExpireDate().toString());
     }
 
     @Override

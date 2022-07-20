@@ -15,21 +15,16 @@ import com.nhnacademy.marketgg.auth.repository.RoleRepository;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import com.nhnacademy.marketgg.auth.util.MailUtils;
 import com.nhnacademy.marketgg.auth.util.RedisUtils;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import javax.management.relation.RoleNotFoundException;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultAuthService implements AuthService {
@@ -88,23 +83,7 @@ public class DefaultAuthService implements AuthService {
         Authentication authentication =
             tokenUtils.getAuthenticationFromExpiredToken(token, uuid);
 
-        Date issueDate = new Date(System.currentTimeMillis());
-        String newRefreshToken = tokenUtils.generateRefreshToken(authentication, issueDate);
-
-        redisTemplate.opsForHash().put(uuid, TokenUtils.REFRESH_TOKEN, newRefreshToken);
-        redisTemplate.expireAt(uuid,
-            new Date(issueDate.getTime() + tokenUtils.getRefreshTokenExpirationDate()));
-
-        String newJwt = tokenUtils.generateJwt(authentication, issueDate);
-
-        Date tokenExpireDate =
-            new Date(issueDate.getTime() + tokenUtils.getTokenExpirationDate());
-        LocalDateTime ldt = tokenExpireDate.toInstant()
-                                           .atZone(ZoneId.systemDefault())
-                                           .toLocalDateTime()
-                                           .withNano(0);
-
-        return new TokenResponse(newJwt, ldt);
+        return tokenUtils.saveRefreshToken(redisTemplate, authentication);
     }
 
     @Override

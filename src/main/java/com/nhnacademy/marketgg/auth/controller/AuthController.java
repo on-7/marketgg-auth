@@ -98,6 +98,12 @@ public class AuthController {
                              .build();
     }
 
+    /**
+     * 회원이 로그아웃 요청 시 실행되는 메서드입니다.
+     *
+     * @param request - 회원의 요청정보입니다.
+     * @return 로그아웃이 완료되었다는 뜻으로 200 OK 를 응답합니다.
+     */
     @GetMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request) {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
