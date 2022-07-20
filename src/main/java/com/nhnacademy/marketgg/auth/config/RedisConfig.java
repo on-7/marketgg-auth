@@ -1,5 +1,7 @@
 package com.nhnacademy.marketgg.auth.config;
 
+import java.util.Map;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,27 +11,32 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Redis 기본 설정을 담당합니다.
  *
  * @version 1.0.0
  */
-
 @Configuration
 public class RedisConfig {
 
-    @Value("${redis.host}")
-    private String host;
+    private final RestTemplate restTemplate;
+    private final String host;
+    private final int port;
+    private final int database;
+    private final String password;
 
-    @Value("${redis.port}")
-    private int port;
-
-    @Value("${redis.password}")
-    private String password;
-
-    @Value("${redis.database}")
-    private int database;
+    public RedisConfig(RestTemplate restTemplate,
+                       @Value("${redis.password-url}") String redisPasswordUrl,
+                       @Value("${redis.url}") String redisInfoUrl) {
+        this.restTemplate = restTemplate;
+        String[] info = this.getRedisInfo(redisInfoUrl);
+        this.host = info[0];
+        this.port = Integer.parseInt(info[1]);
+        this.database = Integer.parseInt(info[2]);
+        this.password = this.getRedisPassword(redisPasswordUrl);
+    }
 
     /**
      * Redis 연결과 관련된 설정을 하는 RedisConnectionFactory 를 스프링 빈으로 등록한다.
@@ -70,6 +77,34 @@ public class RedisConfig {
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
 
         return redisTemplate;
+    }
+
+    private String[] getRedisInfo(String infoUrl) {
+        Map<String, Map<String, String>> response =
+            restTemplate.getForObject(infoUrl, Map.class);
+
+        String connectInfo = Optional.ofNullable(response)
+                                     .orElseThrow(IllegalArgumentException::new)
+                                     .get("body")
+                                     .get("secret");
+
+        String[] info = connectInfo.split(":");
+
+        if (info.length != 3) {
+            throw new com.nhnacademy.marketgg.client.exception.SecureManagerException();
+        }
+
+        return info;
+    }
+
+    private String getRedisPassword(String passwordUrl) {
+        Map<String, Map<String, String>> response =
+            restTemplate.getForObject(passwordUrl, Map.class);
+
+        return Optional.ofNullable(response)
+                       .orElseThrow(IllegalArgumentException::new)
+                       .get("body")
+                       .get("secret");
     }
 
 }
