@@ -41,12 +41,12 @@ class DefaultUserDetailsServiceTest {
     @Test
     void testLoadUserByUsername() {
         when(authRepository.findByEmail(anyString())).thenReturn(Optional.of(mock(Auth.class)));
-        when(roleRepository.findRolesByAuthNo(anyLong())).thenReturn(new ArrayList<>());
+        when(roleRepository.findRolesByAuthId(anyLong())).thenReturn(new ArrayList<>());
 
         UserDetails userDetails = defaultUserDetailsService.loadUserByUsername("email");
 
         verify(authRepository, times(1)).findByEmail(anyString());
-        verify(roleRepository, times(1)).findRolesByAuthNo(anyLong());
+        verify(roleRepository, times(1)).findRolesByAuthId(anyLong());
 
         assertThat(userDetails).isNotNull()
                                .isInstanceOf(CustomUser.class);
@@ -59,7 +59,7 @@ class DefaultUserDetailsServiceTest {
 
         when(authRepository.findByEmail(email))
                 .thenThrow(new AuthNotFoundException(email));
-        Mockito.when(roleRepository.findRolesByAuthNo(anyLong()))
+        Mockito.when(roleRepository.findRolesByAuthId(anyLong()))
                .thenReturn(new ArrayList<>());
 
         Assertions.assertThatThrownBy(() -> defaultUserDetailsService.loadUserByUsername(email))

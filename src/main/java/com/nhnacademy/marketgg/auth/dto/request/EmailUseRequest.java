@@ -5,9 +5,8 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Getter
-public class EmailRequest {
+public class EmailUseRequest {
 
     private String email;
-    private boolean isReferrer;
 
 }

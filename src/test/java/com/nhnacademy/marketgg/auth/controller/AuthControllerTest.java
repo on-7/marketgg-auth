@@ -5,7 +5,7 @@ import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
-import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
+import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
 import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;
@@ -76,15 +76,17 @@ class AuthControllerTest {
     @Test
     @DisplayName("회원 이메일 중복체크 사용가능")
     void testCheckEmail() throws Exception {
-        EmailRequest emailRequest = new EmailRequest();
+        EmailRequest testEmailRequest = new EmailRequest();
 
-        ReflectionTestUtils.setField(emailRequest, "email", "testEmail");
+        ReflectionTestUtils.setField(testEmailRequest, "email", "testEmail");
+        ReflectionTestUtils.setField(testEmailRequest, "isReferrer", true);
 
-        when(authService.checkEmail(emailRequest.getEmail())).thenReturn(any(EmailResponse.class));
+        when(authService.checkEmail(testEmailRequest))
+                        .thenReturn(any(ExistEmailResponse.class));
 
         mockMvc.perform(post("/auth/check/email")
                                 .contentType(APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(emailRequest)))
+                                .content(mapper.writeValueAsString(testEmailRequest)))
                .andExpect(status().isOk())
                .andDo(print());
     }
@@ -95,8 +97,9 @@ class AuthControllerTest {
         EmailRequest emailRequest = new EmailRequest();
 
         ReflectionTestUtils.setField(emailRequest, "email", "testEmail");
+        ReflectionTestUtils.setField(emailRequest, "isReferrer", false);
 
-        when(authService.checkEmail(emailRequest.getEmail()))
+        when(authService.checkEmail(emailRequest))
                 .thenThrow(new EmailOverlapException(emailRequest.getEmail()));
 
         mockMvc.perform(post("/auth/check/email")
