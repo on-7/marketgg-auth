@@ -2,6 +2,7 @@ package com.nhnacademy.marketgg.auth.service;
 
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
+import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
 import javax.management.relation.RoleNotFoundException;
 
@@ -31,6 +32,6 @@ public interface AuthService {
      * @return 새로운 JWT 를 반환합니다.
      * @since 1.0.0
      */
-    String renewToken(final String token);
+    TokenResponse renewToken(final String token);
 
 }

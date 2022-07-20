@@ -7,6 +7,8 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
+import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
+import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import java.util.Objects;
 import javax.management.relation.RoleNotFoundException;
@@ -33,8 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-
-    private static final int HEADER_BEARER = 7;
 
     private final AuthService authService;
 
@@ -78,17 +78,19 @@ public class AuthController {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         HttpStatus httpStatus = OK;
 
-        String newToken = null;
+        TokenResponse newToken = null;
         if (authorizationHeader.isBlank()
-            || (newToken = authService.renewToken(authorizationHeader.substring(HEADER_BEARER))) ==
-            null) {
+            || ((newToken =
+            authService.renewToken(authorizationHeader.substring(TokenUtils.BEARER_LENGTH)))
+            == null)) {
             httpStatus = UNAUTHORIZED;
         }
 
         HttpHeaders headers = new HttpHeaders();
 
         if (Objects.nonNull(newToken)) {
-            headers.setBearerAuth(newToken);
+            headers.setBearerAuth(newToken.getJwt());
+            headers.set(TokenUtils.JWT_EXPIRE, newToken.getExpireDate().toString());
         }
 
         return ResponseEntity.status(httpStatus)
@@ -101,7 +103,7 @@ public class AuthController {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (Objects.nonNull(authorizationHeader)) {
-            authService.logout(authorizationHeader.substring(HEADER_BEARER));
+            authService.logout(authorizationHeader.substring(TokenUtils.BEARER_LENGTH));
         }
 
         return ResponseEntity.status(OK)

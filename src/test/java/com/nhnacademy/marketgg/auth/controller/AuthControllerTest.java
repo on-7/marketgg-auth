@@ -6,7 +6,7 @@ import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
 import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
-import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
+import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(WebSecurityConfig.class)
 @MockBean({
         AuthenticationManager.class,
-        TokenGenerator.class,
+        TokenUtils.class,
         RedisTemplate.class
 })
 class AuthControllerTest {

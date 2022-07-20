@@ -7,7 +7,7 @@ import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.entity.AuthRole;
 import com.nhnacademy.marketgg.auth.entity.Role;
 import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
-import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
+import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.repository.AuthRepository;
 import com.nhnacademy.marketgg.auth.repository.AuthRoleRepository;
 import com.nhnacademy.marketgg.auth.repository.RoleRepository;
@@ -69,7 +69,7 @@ class DefaultAuthServiceTest {
     RedisTemplate<String, Object> redisTemplate;
 
     @Mock
-    TokenGenerator tokenGenerator;
+    TokenUtils tokenUtils;
 
     @Test
     @DisplayName("회원가입 테스트")

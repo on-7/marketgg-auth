@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.exception.InvalidLoginRequestException;
 import com.nhnacademy.marketgg.auth.exception.LoginFailException;
-import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
+import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -30,19 +30,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private static final String REFRESH_TOKEN = "REFRESH_TOKEN";
-
     private final ObjectMapper mapper;
-    private final TokenGenerator tokenGenerator;
+    private final TokenUtils tokenUtils;
     private final RedisTemplate<String, Object> redisTemplate;
 
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager, ObjectMapper mapper,
-                                   TokenGenerator tokenGenerator,
+                                   TokenUtils tokenUtils,
                                    RedisTemplate<String, Object> redisTemplate) {
 
         super(authenticationManager);
         this.mapper = mapper;
-        this.tokenGenerator = tokenGenerator;
+        this.tokenUtils = tokenUtils;
         this.redisTemplate = redisTemplate;
     }
 
@@ -75,23 +73,24 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         throws IOException, ServletException {
 
         Date issueDate = new Date();
-        String jwt = tokenGenerator.generateJwt(authResult, issueDate);
+        String jwt = tokenUtils.generateJwt(authResult, issueDate);
+        String refreshToken = tokenUtils.generateRefreshToken(authResult, issueDate);
 
-        redisTemplate.opsForHash().put(authResult.getName(), REFRESH_TOKEN,
-            tokenGenerator.generateRefreshToken(authResult, issueDate));
+        redisTemplate.opsForHash().put(authResult.getName(), TokenUtils.REFRESH_TOKEN,
+            refreshToken);
 
         redisTemplate.expireAt(authResult.getName(),
-            new Date(issueDate.getTime() + tokenGenerator.getRefreshTokenExpirationDate()));
+            new Date(issueDate.getTime() + tokenUtils.getRefreshTokenExpirationDate()));
 
         Date tokenExpireDate =
-            new Date(issueDate.getTime() + tokenGenerator.getTokenExpirationDate());
+            new Date(issueDate.getTime() + tokenUtils.getTokenExpirationDate());
         LocalDateTime ldt = tokenExpireDate.toInstant()
                                            .atZone(ZoneId.systemDefault())
                                            .toLocalDateTime()
                                            .withNano(0);
 
-        response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
-        response.addHeader("JWT-Expire", ldt.toString());
+        response.addHeader(HttpHeaders.AUTHORIZATION, TokenUtils.BEARER + jwt);
+        response.addHeader(TokenUtils.JWT_EXPIRE, ldt.toString());
     }
 
     @Override

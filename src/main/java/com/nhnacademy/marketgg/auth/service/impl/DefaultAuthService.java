@@ -3,40 +3,43 @@ package com.nhnacademy.marketgg.auth.service.impl;
 import com.nhnacademy.marketgg.auth.constant.Roles;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
+import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.entity.AuthRole;
 import com.nhnacademy.marketgg.auth.entity.Role;
 import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
-import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
+import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.repository.AuthRepository;
 import com.nhnacademy.marketgg.auth.repository.AuthRoleRepository;
 import com.nhnacademy.marketgg.auth.repository.RoleRepository;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import com.nhnacademy.marketgg.auth.util.MailUtils;
 import com.nhnacademy.marketgg.auth.util.RedisUtils;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import javax.management.relation.RoleNotFoundException;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultAuthService implements AuthService {
-
-    private static final String REFRESH_TOKEN = "REFRESH_TOKEN";
 
     private final AuthRepository authRepository;
     private final RoleRepository roleRepository;
     private final AuthRoleRepository authRoleRepository;
     private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final TokenGenerator tokenGenerator;
+    private final TokenUtils tokenUtils;
     private final MailUtils mailUtils;
     private final RedisUtils redisUtils;
 
@@ -58,41 +61,50 @@ public class DefaultAuthService implements AuthService {
 
     @Override
     public void logout(final String token) {
-        if (tokenGenerator.isInvalidToken(token)) {
+        if (tokenUtils.isInvalidToken(token)) {
             return;
         }
 
-        String email = tokenGenerator.getUuidFromExpiredToken(token);
+        String email = tokenUtils.getUuidFromExpiredToken(token);
 
-        redisTemplate.opsForHash().delete(email, REFRESH_TOKEN);
-        long tokenExpireTime = tokenGenerator.getExpireDate(token) - System.currentTimeMillis();
+        redisTemplate.opsForHash().delete(email, TokenUtils.REFRESH_TOKEN);
+        long tokenExpireTime = tokenUtils.getExpireDate(token) - System.currentTimeMillis();
         redisTemplate.opsForValue().set(token, true, tokenExpireTime, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public String renewToken(final String token) {
-        String uuid = tokenGenerator.getUuidFromExpiredToken(token);
+    public TokenResponse renewToken(final String token) {
+        String uuid = tokenUtils.getUuidFromExpiredToken(token);
 
         String refreshToken =
-            (String) redisTemplate.opsForHash().get(uuid, REFRESH_TOKEN);
+            (String) redisTemplate.opsForHash().get(uuid, TokenUtils.REFRESH_TOKEN);
 
-        if (isInvalidToken(uuid, refreshToken)) {
+        if (this.isInvalidToken(uuid, refreshToken)) {
             return null;
         }
 
+        redisTemplate.opsForHash().delete(uuid, TokenUtils.REFRESH_TOKEN);
+
         Authentication authentication =
-            tokenGenerator.getAuthenticationFromExpiredToken(token, uuid);
+            tokenUtils.getAuthenticationFromExpiredToken(token, uuid);
 
         Date issueDate = new Date(System.currentTimeMillis());
+        String newRefreshToken = tokenUtils.generateRefreshToken(authentication, issueDate);
 
-        String newRefreshToken = tokenGenerator.generateRefreshToken(authentication, issueDate);
-
-        redisTemplate.opsForHash().delete(uuid, REFRESH_TOKEN);
-        redisTemplate.opsForHash().put(uuid, REFRESH_TOKEN, newRefreshToken);
+        redisTemplate.opsForHash().put(uuid, TokenUtils.REFRESH_TOKEN, newRefreshToken);
         redisTemplate.expireAt(uuid,
-            new Date(issueDate.getTime() + tokenGenerator.getRefreshTokenExpirationDate()));
+            new Date(issueDate.getTime() + tokenUtils.getRefreshTokenExpirationDate()));
 
-        return tokenGenerator.generateJwt(authentication, issueDate);
+        String newJwt = tokenUtils.generateJwt(authentication, issueDate);
+
+        Date tokenExpireDate =
+            new Date(issueDate.getTime() + tokenUtils.getTokenExpirationDate());
+        LocalDateTime ldt = tokenExpireDate.toInstant()
+                                           .atZone(ZoneId.systemDefault())
+                                           .toLocalDateTime()
+                                           .withNano(0);
+
+        return new TokenResponse(newJwt, ldt);
     }
 
     @Override
@@ -114,8 +126,8 @@ public class DefaultAuthService implements AuthService {
 
     private boolean isInvalidToken(String email, String refreshToken) {
         return Objects.isNull(refreshToken)
-            || tokenGenerator.isInvalidToken(refreshToken)
-            || !Objects.equals(email, tokenGenerator.getUuidFromExpiredToken(refreshToken));
+            || tokenUtils.isInvalidToken(refreshToken)
+            || !Objects.equals(email, tokenUtils.getUuidFromExpiredToken(refreshToken));
     }
 
 }

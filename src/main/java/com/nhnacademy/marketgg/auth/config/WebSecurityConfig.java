@@ -2,7 +2,7 @@ package com.nhnacademy.marketgg.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.filter.JwtAuthenticationFilter;
-import com.nhnacademy.marketgg.auth.jwt.TokenGenerator;
+import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +28,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurityConfig {
 
     private final ObjectMapper mapper;
-    private final TokenGenerator tokenGenerator;
+    private final TokenUtils tokenUtils;
     private final RedisTemplate<String, Object> redisTemplate;
 
     /**
@@ -86,7 +86,7 @@ public class WebSecurityConfig {
     private JwtAuthenticationFilter getJwtAuthenticationFilter() throws Exception {
         JwtAuthenticationFilter jwtAuthenticationFilter =
                 new JwtAuthenticationFilter(authenticationManager(null),
-                                            mapper, tokenGenerator, redisTemplate);
+                                            mapper, tokenUtils, redisTemplate);
 
         jwtAuthenticationFilter.setFilterProcessesUrl("/auth/login");
 

@@ -1,5 +1,6 @@
 package com.nhnacademy.marketgg.auth.dto.response;
 
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -11,5 +12,6 @@ import lombok.RequiredArgsConstructor;
 public class TokenResponse {
 
     private final String jwt;
-    
+    private final LocalDateTime expireDate;
+
 }
