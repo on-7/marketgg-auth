@@ -1,12 +1,6 @@
 package com.nhnacademy.marketgg.auth.entity;
 
-import com.sun.istack.NotNull;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
+import java.io.Serializable;
 import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -14,8 +8,18 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.Table;
-import java.io.Serializable;
+import javax.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+/**
+ * 회원과 권한의 관계를 맺는 클래스입니다.
+ *
+ * @version 1.0.0
+ */
 @Table(name = "auth_roles")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,13 +31,13 @@ public class AuthRole {
     private Pk id;
 
     @NotNull
-    @MapsId("authNo")
+    @MapsId("authId")
     @ManyToOne
     @JoinColumn(name = "auth_no")
     private Auth auth;
 
     @NotNull
-    @MapsId("roleNo")
+    @MapsId("roleId")
     @ManyToOne
     @JoinColumn(name = "role_no")
     private Role role;
@@ -44,9 +48,9 @@ public class AuthRole {
     @AllArgsConstructor
     public static class Pk implements Serializable {
 
-        private Long authNo;
-        private Long roleNo;
-    
+        private Long authId;
+        private Long roleId;
+
     }
 
 }

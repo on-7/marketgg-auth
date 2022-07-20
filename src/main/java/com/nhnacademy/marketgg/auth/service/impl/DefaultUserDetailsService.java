@@ -14,7 +14,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
- * email 을 이용하여 사용자를 찾습니다.
+ * Email 을 이용하여 사용자를 찾습니다.
+ *
+ * @version 1.0.0
  */
 
 @Service
@@ -36,9 +38,9 @@ public class DefaultUserDetailsService implements UserDetailsService {
         Auth auth = authRepository.findByEmail(email)
                                   .orElseThrow(() -> new AuthNotFoundException(email));
 
-        List<Role> roles = roleRepository.findRolesByAuthNo(auth.getAuthNo());
+        List<Role> roles = roleRepository.findRolesByAuthId(auth.getId());
 
-        return new CustomUser(auth.getEmail(), auth.getPassword(), roles);
+        return new CustomUser(auth.getUuid(), auth.getPassword(), roles);
     }
 
 }

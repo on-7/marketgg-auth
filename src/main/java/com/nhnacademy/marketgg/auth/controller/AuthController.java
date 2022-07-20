@@ -1,10 +1,18 @@
 package com.nhnacademy.marketgg.auth.controller;
 
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
-import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.response.EmailResponse;
+import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
+import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;
+import java.util.Objects;
+import javax.management.relation.RoleNotFoundException;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -17,14 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.management.relation.RoleNotFoundException;
-import javax.servlet.http.HttpServletRequest;
-import java.util.Objects;
-
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-
 /**
  * 인증 관련 요청을 처리하는 Controller 입니다.
  *
@@ -35,8 +35,6 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-
-    private static final int HEADER_BEARER = 7;
 
     private final AuthService authService;
 
@@ -49,7 +47,7 @@ public class AuthController {
      */
     @PostMapping("/signup")
     public ResponseEntity<Void> doSignup(@RequestBody final SignUpRequest signUpRequest)
-            throws RoleNotFoundException {
+        throws RoleNotFoundException {
 
         authService.signup(signUpRequest);
         return ResponseEntity.status(CREATED)
@@ -80,16 +78,19 @@ public class AuthController {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         HttpStatus httpStatus = OK;
 
-        String newToken = null;
+        TokenResponse newToken = null;
         if (authorizationHeader.isBlank()
-            || (newToken = authService.renewToken(authorizationHeader.substring(7))) == null) {
+            || ((newToken =
+            authService.renewToken(authorizationHeader.substring(TokenUtils.BEARER_LENGTH)))
+            == null)) {
             httpStatus = UNAUTHORIZED;
         }
 
         HttpHeaders headers = new HttpHeaders();
 
         if (Objects.nonNull(newToken)) {
-            headers.setBearerAuth(newToken);
+            headers.setBearerAuth(newToken.getJwt());
+            headers.set(TokenUtils.JWT_EXPIRE, newToken.getExpireDate().toString());
         }
 
         return ResponseEntity.status(httpStatus)
@@ -97,12 +98,18 @@ public class AuthController {
                              .build();
     }
 
+    /**
+     * 회원이 로그아웃 요청 시 실행되는 메서드입니다.
+     *
+     * @param request - 회원의 요청정보입니다.
+     * @return 로그아웃이 완료되었다는 뜻으로 200 OK 를 응답합니다.
+     */
     @GetMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request) {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (Objects.nonNull(authorizationHeader)) {
-            authService.logout(authorizationHeader.substring(HEADER_BEARER));
+            authService.logout(authorizationHeader.substring(TokenUtils.BEARER_LENGTH));
         }
 
         return ResponseEntity.status(OK)
