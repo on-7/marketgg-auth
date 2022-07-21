@@ -52,7 +52,6 @@ public class AuthController {
     public ResponseEntity<SignUpResponse> doSignup(@RequestBody final SignUpRequest signUpRequest)
         throws RoleNotFoundException {
 
-
         return ResponseEntity.status(CREATED)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(authService.signup(signUpRequest));
