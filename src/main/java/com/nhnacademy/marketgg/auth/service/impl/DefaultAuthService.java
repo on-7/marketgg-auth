@@ -4,6 +4,7 @@ import com.nhnacademy.marketgg.auth.constant.Roles;
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.EmailUseRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
+import com.nhnacademy.marketgg.auth.dto.response.SignUpResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
 import com.nhnacademy.marketgg.auth.dto.response.UseEmailResponse;
@@ -44,7 +45,7 @@ public class DefaultAuthService implements AuthService {
 
     @Transactional
     @Override
-    public void signup(final SignUpRequest signUpRequest) throws RoleNotFoundException {
+    public SignUpResponse signup(final SignUpRequest signUpRequest) throws RoleNotFoundException {
 
         signUpRequest.encodingPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         Auth auth = new Auth(signUpRequest);
@@ -56,6 +57,8 @@ public class DefaultAuthService implements AuthService {
         AuthRole.Pk pk = new AuthRole.Pk(authNo, role.getId());
         AuthRole authRole = new AuthRole(pk, savedAuth, role);
         authRoleRepository.save(authRole);
+        String uuid = savedAuth.getUuid();
+        return new SignUpResponse(uuid);
     }
 
     @Override

@@ -3,6 +3,8 @@ package com.nhnacademy.marketgg.auth.config;
 import com.nhnacademy.marketgg.client.exception.SecureManagerException;
 import java.util.Map;
 import java.util.Optional;
+
+import com.nhnacademy.marketgg.auth.exception.SecureManagerException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
