@@ -107,7 +107,7 @@ public class AuthController {
 
         if (Objects.nonNull(newToken)) {
             headers.setBearerAuth(newToken.getJwt());
-            headers.set(TokenUtils.JWT_EXPIRE, newToken.getExpireDate().toString());
+            headers.set(TokenUtils.JWT_EXPIRE, newToken.getExpiredDate().toString());
         }
 
         return ResponseEntity.status(httpStatus)

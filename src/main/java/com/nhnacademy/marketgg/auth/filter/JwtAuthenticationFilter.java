@@ -73,7 +73,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         TokenResponse tokenResponse = tokenUtils.saveRefreshToken(redisTemplate, authResult);
 
         response.addHeader(HttpHeaders.AUTHORIZATION, TokenUtils.BEARER + tokenResponse.getJwt());
-        response.addHeader(TokenUtils.JWT_EXPIRE, tokenResponse.getExpireDate().toString());
+        response.addHeader(TokenUtils.JWT_EXPIRE, tokenResponse.getExpiredDate().toString());
     }
 
     @Override
