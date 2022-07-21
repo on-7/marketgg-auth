@@ -67,7 +67,7 @@ class AuthControllerTest {
         ReflectionTestUtils.setField(testSignUpRequest, "name", "testName");
         ReflectionTestUtils.setField(testSignUpRequest, "phoneNumber", "010-1234-1234");
 
-        when(authService.signup(testSignUpRequest)).thenReturn(any());
+        when(authService.signup(testSignUpRequest)).thenReturn(any(SignUpResponse.class));
 
         mockMvc.perform(post("/auth/signup")
                                 .contentType(APPLICATION_JSON)
