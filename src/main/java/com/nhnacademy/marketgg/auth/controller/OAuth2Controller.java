@@ -1,7 +1,6 @@
 package com.nhnacademy.marketgg.auth.controller;
 
 import com.nhnacademy.marketgg.auth.dto.response.GoogleProfile;
-import com.nhnacademy.marketgg.auth.oauth2.OAuthToken;
 import com.nhnacademy.marketgg.auth.service.OAuth2Service;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

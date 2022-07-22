@@ -3,10 +3,8 @@ package com.nhnacademy.marketgg.auth.jwt;
 import static java.util.stream.Collectors.toList;
 
 import com.nhnacademy.marketgg.auth.entity.Role;
-
 import java.util.Collection;
 import java.util.List;
-
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
