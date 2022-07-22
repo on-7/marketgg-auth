@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 public class SignUpResponse {
 
     private final String uuid;
+    private final String referrerUuid;
 
 }
 

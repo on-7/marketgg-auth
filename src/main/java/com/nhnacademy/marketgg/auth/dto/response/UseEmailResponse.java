@@ -1,9 +1,9 @@
 package com.nhnacademy.marketgg.auth.dto.response;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-@RequiredArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 public class UseEmailResponse {
