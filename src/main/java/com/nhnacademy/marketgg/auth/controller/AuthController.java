@@ -7,11 +7,11 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.EmailUseRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
+import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
 import com.nhnacademy.marketgg.auth.dto.response.SignUpResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
-import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
-import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
 import com.nhnacademy.marketgg.auth.dto.response.UseEmailResponse;
+import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import java.util.Objects;
 import javax.management.relation.RoleNotFoundException;
@@ -65,7 +65,8 @@ public class AuthController {
      * @return 이메일로 로그인 요청 존재하는 이메일인지 성공/실패 여부가 담긴 ResponseEntity
      */
     @PostMapping("/check/email")
-    public ResponseEntity<ExistEmailResponse> checkEmail(@RequestBody final EmailRequest emailRequest) {
+    public ResponseEntity<ExistEmailResponse> checkEmail(
+        @RequestBody final EmailRequest emailRequest) {
         return ResponseEntity.status(OK)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(authService.checkEmail(emailRequest));
@@ -78,10 +79,11 @@ public class AuthController {
      * @return 이메일로 로그인 요청 사용할 수 있는 이메일인지 성공/실패 여부가 담긴 ResponseEntity
      */
     @PostMapping("/use/email")
-    public ResponseEntity<UseEmailResponse> useEmail(@RequestBody final EmailUseRequest emailUseRequest) {
+    public ResponseEntity<UseEmailResponse> useEmail(
+        @RequestBody final EmailUseRequest emailUseRequest) {
         return ResponseEntity.status(OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(authService.useEmail(emailUseRequest));
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(authService.useEmail(emailUseRequest));
     }
 
     /**

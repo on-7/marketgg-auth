@@ -19,6 +19,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+/**
+ * 회원의 정보를 저장합니다.
+ *
+ * @version 1.0.0
+ */
 @Table(name = "auth")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

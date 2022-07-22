@@ -4,9 +4,9 @@ import com.nhnacademy.marketgg.auth.constant.Roles;
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.EmailUseRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
+import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
 import com.nhnacademy.marketgg.auth.dto.response.SignUpResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
-import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
 import com.nhnacademy.marketgg.auth.dto.response.UseEmailResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.entity.AuthRole;
@@ -19,17 +19,22 @@ import com.nhnacademy.marketgg.auth.repository.RoleRepository;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import com.nhnacademy.marketgg.auth.util.MailUtils;
 import com.nhnacademy.marketgg.auth.util.RedisUtils;
+import com.nhnacademy.marketgg.auth.util.Status;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import javax.management.relation.RoleNotFoundException;
 import javax.transaction.Transactional;
-import com.nhnacademy.marketgg.auth.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * 회원가입 및 인증 관련 처리를 하는 클래스입니다.
+ *
+ * @version 1.0.0
+ */
 @Service
 @RequiredArgsConstructor
 public class DefaultAuthService implements AuthService {
@@ -63,13 +68,15 @@ public class DefaultAuthService implements AuthService {
 
     @Override
     public void logout(final String token) {
+        String uuid = tokenUtils.getUuidFromExpiredToken(token);
+
         if (tokenUtils.isInvalidToken(token)) {
+            redisTemplate.opsForHash().delete(uuid, TokenUtils.REFRESH_TOKEN);
             return;
         }
 
-        String email = tokenUtils.getUuidFromExpiredToken(token);
+        redisTemplate.opsForHash().delete(uuid, TokenUtils.REFRESH_TOKEN);
 
-        redisTemplate.opsForHash().delete(email, TokenUtils.REFRESH_TOKEN);
         long tokenExpireTime = tokenUtils.getExpireDate(token) - System.currentTimeMillis();
         redisTemplate.opsForValue().set(token, true, tokenExpireTime, TimeUnit.MILLISECONDS);
     }
@@ -100,7 +107,7 @@ public class DefaultAuthService implements AuthService {
         }
 
         String key = emailUseRequest.getEmail();
-        if(redisUtils.hasKey(key)){
+        if (redisUtils.hasKey(key)) {
             redisUtils.deleteAuth(key);
         }
 
@@ -111,7 +118,6 @@ public class DefaultAuthService implements AuthService {
     }
 
     /**
-     *
      * 입력한 이메일이 중복되지 않으면 Redis 에 key 값에 Email 을 보관합니다.
      * 입력한 이메일이 중복되면 예외처리 합니다.
      *
@@ -139,10 +145,10 @@ public class DefaultAuthService implements AuthService {
         return new ExistEmailResponse(false);
     }
 
-    private boolean isInvalidToken(String email, String refreshToken) {
+    private boolean isInvalidToken(String uuid, String refreshToken) {
         return Objects.isNull(refreshToken)
             || tokenUtils.isInvalidToken(refreshToken)
-            || !Objects.equals(email, tokenUtils.getUuidFromExpiredToken(refreshToken));
+            || !Objects.equals(uuid, tokenUtils.getUuidFromExpiredToken(refreshToken));
     }
 
     private boolean isReferrer(EmailRequest emailRequest) {

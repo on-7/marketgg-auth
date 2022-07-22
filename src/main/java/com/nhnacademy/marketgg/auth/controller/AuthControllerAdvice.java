@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.MethodNotAllowedException;
 
 /**
- * 전역 예외 처리
+ * 전역 예외 처리를 위한 클래스입니다.
  *
  * @version 1.0.0
  */
@@ -38,7 +38,9 @@ public class AuthControllerAdvice {
      * <a href="https://blog.outsider.ne.kr/1121" />
      * <a href="https://developer.mozilla.org/ko/docs/Web/HTTP/Status/409" />
      */
-    @ExceptionHandler(value = {EmailOverlapException.class, RedisInvalidSubscriptionException.class})
+    @ExceptionHandler(value = {
+        EmailOverlapException.class,
+        RedisInvalidSubscriptionException.class })
     public ResponseEntity<Void> handleConflictNotAllowException() {
 
         return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -50,7 +52,9 @@ public class AuthControllerAdvice {
      *
      * @return 401 Http Status 를 응답합니다.
      */
-    @ExceptionHandler(value = {LoginFailException.class, AuthNotFoundException.class})
+    @ExceptionHandler(value = {
+        LoginFailException.class,
+        AuthNotFoundException.class })
     public ResponseEntity<Void> handleLoginFailException() {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
