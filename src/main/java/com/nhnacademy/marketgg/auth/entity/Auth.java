@@ -1,8 +1,10 @@
 package com.nhnacademy.marketgg.auth.entity;
 
 import com.nhnacademy.marketgg.auth.constant.Provider;
+import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
+import com.nhnacademy.marketgg.auth.dto.response.AuthUpdateResponse;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -83,14 +85,19 @@ public class Auth {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Auth(final AuthUpdateRequest authUpdateRequest, String uuid) {
-        this.uuid = uuid;
+    public AuthUpdateResponse updateAuth(final AuthUpdateRequest authUpdateRequest) {
+        this.uuid = UUID.randomUUID().toString();
         this.email = authUpdateRequest.getEmail();
         this.password = authUpdateRequest.getPassword();
         this.name = authUpdateRequest.getName();
         this.phoneNumber = authUpdateRequest.getPhoneNumber();
         this.passwordUpdatedAt = getUpdateDate(authUpdateRequest.getPassword());
         this.provider = Provider.SELF;
+
+        return new AuthUpdateResponse(uuid);
+    }
+    public void deleteAuth(final AuthWithDrawRequest authWithDrawRequest) {
+        this.deletedAt = authWithDrawRequest.getDeletedAt();
     }
 
     /**
