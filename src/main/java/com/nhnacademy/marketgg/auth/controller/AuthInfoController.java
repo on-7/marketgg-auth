@@ -32,7 +32,7 @@ public class AuthInfoController {
 
         MemberResponse auth = authInfoService.findAuthByUuid(jwt);
         SingleResponse<MemberResponse> memberResponseSingleResponse =
-            new SingleResponse<>(true, auth);
+            new SingleResponse<>(auth);
 
         System.out.println((memberResponseSingleResponse));
 

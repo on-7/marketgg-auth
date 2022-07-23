@@ -8,8 +8,8 @@ public class ListResponse<T> extends CommonResponse {
 
     private final List<T> data;
 
-    public ListResponse(boolean success, List<T> data) {
-        super(success);
+    public ListResponse(List<T> data) {
+        super(true);
         this.data = data;
     }
 

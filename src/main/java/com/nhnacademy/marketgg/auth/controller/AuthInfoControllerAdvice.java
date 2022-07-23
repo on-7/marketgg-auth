@@ -19,7 +19,7 @@ public class AuthInfoControllerAdvice {
     })
     public ResponseEntity<CommonResponse> errorControl(Exception e) {
         log.error("", e);
-        ErrorEntity error = new ErrorEntity(false, e.getMessage());
+        ErrorEntity error = new ErrorEntity(e.getMessage());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .contentType(MediaType.APPLICATION_JSON)

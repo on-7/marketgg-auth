@@ -9,8 +9,8 @@ public class SingleResponse<T> extends CommonResponse {
 
     private final T data;
 
-    public SingleResponse(boolean success, T data) {
-        super(success);
+    public SingleResponse(T data) {
+        super(true);
         this.data = data;
     }
 

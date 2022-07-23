@@ -5,10 +5,10 @@ import lombok.Getter;
 @Getter
 public class ErrorEntity extends CommonResponse {
 
-    String message;
+    private final String message;
 
-    public ErrorEntity(boolean success, String message) {
-        super(success);
+    public ErrorEntity(String message) {
+        super(false);
         this.message = message;
     }
 
