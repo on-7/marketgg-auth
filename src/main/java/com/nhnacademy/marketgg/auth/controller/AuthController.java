@@ -1,32 +1,28 @@
 package com.nhnacademy.marketgg.auth.controller;
 
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.EmailUseRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
+import com.nhnacademy.marketgg.auth.dto.request.UpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
 import com.nhnacademy.marketgg.auth.dto.response.SignUpResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.dto.response.UseEmailResponse;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;
-import java.util.Objects;
-import javax.management.relation.RoleNotFoundException;
-import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.management.relation.RoleNotFoundException;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
+
+import static org.springframework.http.HttpStatus.*;
 
 /**
  * 인증 관련 요청을 처리하는 Controller 입니다.
@@ -50,7 +46,7 @@ public class AuthController {
      */
     @PostMapping("/signup")
     public ResponseEntity<SignUpResponse> doSignup(@RequestBody final SignUpRequest signUpRequest)
-        throws RoleNotFoundException {
+            throws RoleNotFoundException {
 
         return ResponseEntity.status(CREATED)
                              .contentType(MediaType.APPLICATION_JSON)
@@ -86,6 +82,18 @@ public class AuthController {
     }
 
     /**
+     *
+     * @param updateRequest - 회원정보 수정
+     * @return
+     */
+    @PutMapping
+    public ResponseEntity<Void> update(@RequestBody final UpdateRequest updateRequest) {
+        authService.update(updateRequest);
+        return ResponseEntity.status(OK)
+                             .build();
+    }
+
+    /**
      * JWT 를 갱신 요청합니다.
      *
      * @param request - Http 헤더에 JWT 토큰을 담아 요청을 전달합니다.
@@ -98,9 +106,9 @@ public class AuthController {
 
         TokenResponse newToken = null;
         if (authorizationHeader.isBlank()
-            || ((newToken =
-            authService.renewToken(authorizationHeader.substring(TokenUtils.BEARER_LENGTH)))
-            == null)) {
+                || ((newToken =
+                authService.renewToken(authorizationHeader.substring(TokenUtils.BEARER_LENGTH)))
+                == null)) {
             httpStatus = UNAUTHORIZED;
         }
 

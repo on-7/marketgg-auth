@@ -3,6 +3,7 @@ package com.nhnacademy.marketgg.auth.service;
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.EmailUseRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
+import com.nhnacademy.marketgg.auth.dto.request.UpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
 import com.nhnacademy.marketgg.auth.dto.response.SignUpResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
@@ -59,4 +60,7 @@ public interface AuthService {
      * @since 1.0.0
      */
     UseEmailResponse useEmail(final EmailUseRequest emailRequest);
+
+    void update(UpdateRequest updateRequest);
+
 }

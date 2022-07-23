@@ -4,6 +4,7 @@ import com.nhnacademy.marketgg.auth.constant.Roles;
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.EmailUseRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
+import com.nhnacademy.marketgg.auth.dto.request.UpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
 import com.nhnacademy.marketgg.auth.dto.response.SignUpResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
@@ -134,6 +135,18 @@ public class DefaultAuthService implements AuthService {
         useEmailResponse.setIsUseEmail(Boolean.FALSE);
 
         return useEmailResponse;
+    }
+
+    @Override
+    public void update(final UpdateRequest updateRequest) {
+
+        Auth auth = authRepository.findByEmail(updateRequest.getEmail())
+                                         .orElseThrow(() -> new AuthNotFoundException(updateRequest.getEmail()));
+
+        Auth updatedAuth = new Auth(updateRequest, auth.getUuid());
+
+        authRepository.save(updatedAuth);
+
     }
 
     /**

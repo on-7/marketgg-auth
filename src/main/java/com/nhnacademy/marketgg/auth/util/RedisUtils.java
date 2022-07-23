@@ -7,6 +7,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -41,9 +42,6 @@ public class RedisUtils {
     public boolean checkAuth(String email, String authKey) {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         String authK = valueOperations.getAndDelete(email);
-        if (authK.equals(authKey)) {
-            return false;
-        }
-            return true;
-        }
+        return !Objects.equals(authK, authKey);
+    }
 }
