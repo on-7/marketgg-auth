@@ -2,7 +2,7 @@ package com.nhnacademy.marketgg.auth.entity;
 
 import com.nhnacademy.marketgg.auth.constant.Provider;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
-import com.nhnacademy.marketgg.auth.dto.request.UpdateRequest;
+import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -63,6 +64,14 @@ public class Auth {
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
+    @NotNull
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @NotNull
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     public Auth(final SignUpRequest signUpRequest) {
         this.uuid = UUID.randomUUID().toString();
         this.email = signUpRequest.getEmail();
@@ -71,15 +80,16 @@ public class Auth {
         this.phoneNumber = signUpRequest.getPhoneNumber();
         this.passwordUpdatedAt = LocalDate.now();
         this.provider = Provider.SELF;
+        this.createdAt = LocalDateTime.now();
     }
 
-    public Auth(final UpdateRequest updateRequest,String uuid) {
+    public Auth(final AuthUpdateRequest authUpdateRequest, String uuid) {
         this.uuid = uuid;
-        this.email = updateRequest.getEmail();
-        this.password = updateRequest.getPassword();
-        this.name = updateRequest.getName();
-        this.phoneNumber = updateRequest.getPhoneNumber();
-        this.passwordUpdatedAt = getUpdateDate(updateRequest.getPassword());
+        this.email = authUpdateRequest.getEmail();
+        this.password = authUpdateRequest.getPassword();
+        this.name = authUpdateRequest.getName();
+        this.phoneNumber = authUpdateRequest.getPhoneNumber();
+        this.passwordUpdatedAt = getUpdateDate(authUpdateRequest.getPassword());
         this.provider = Provider.SELF;
     }
 
