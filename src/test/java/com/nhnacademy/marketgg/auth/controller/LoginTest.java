@@ -12,6 +12,7 @@ import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.entity.Role;
 import com.nhnacademy.marketgg.auth.repository.RoleRepository;
 import com.nhnacademy.marketgg.auth.service.AuthService;
+import com.nhnacademy.marketgg.auth.service.SignUpService;
 import java.util.List;
 import javax.management.relation.RoleNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,9 @@ public class LoginTest {
     AuthService authService;
 
     @Autowired
+    SignUpService signUpService;
+
+    @Autowired
     RoleRepository roleRepository;
 
     @Autowired
@@ -53,7 +57,7 @@ public class LoginTest {
         roleRepository.saveAll(List.of(roleUser, roleAdmin));
 
         SignUpRequest signUpRequest = getSignupRequest();
-        authService.signup(signUpRequest);
+        signUpService.signup(signUpRequest);
     }
 
     @Test

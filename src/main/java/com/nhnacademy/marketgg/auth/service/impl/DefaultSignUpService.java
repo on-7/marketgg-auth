@@ -19,12 +19,11 @@ import com.nhnacademy.marketgg.auth.service.SignUpService;
 import com.nhnacademy.marketgg.auth.util.MailUtils;
 import com.nhnacademy.marketgg.auth.util.RedisUtils;
 import com.nhnacademy.marketgg.auth.util.Status;
+import javax.management.relation.RoleNotFoundException;
+import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import javax.management.relation.RoleNotFoundException;
-import javax.transaction.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +51,8 @@ public class DefaultSignUpService implements SignUpService {
         // 추천인 이메일이 있는경우
         if (signUpRequest.getReferrerEmail() != null) {
             Auth referrerAuth = authRepository.findByEmail(signUpRequest.getReferrerEmail())
-                                              .orElseThrow(() -> new AuthNotFoundException(signUpRequest.getReferrerEmail()));
+                                              .orElseThrow(() -> new AuthNotFoundException(
+                                                  signUpRequest.getReferrerEmail()));
 
             referrerUuid = referrerAuth.getUuid();
         }
@@ -64,7 +64,7 @@ public class DefaultSignUpService implements SignUpService {
         Long authNo = savedAuth.getId();
         Role role = roleRepository.findByName(Roles.ROLE_USER)
                                   .orElseThrow(
-                                          () -> new RoleNotFoundException("해당 권한은 존재 하지 않습니다."));
+                                      () -> new RoleNotFoundException("해당 권한은 존재 하지 않습니다."));
         AuthRole.Pk pk = new AuthRole.Pk(authNo, role.getId());
         AuthRole authRole = new AuthRole(pk, savedAuth, role);
         authRoleRepository.save(authRole);

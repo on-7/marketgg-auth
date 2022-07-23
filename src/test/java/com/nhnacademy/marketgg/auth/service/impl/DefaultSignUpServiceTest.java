@@ -78,15 +78,6 @@ class DefaultSignUpServiceTest {
     @Mock
     PasswordEncoder passwordEncoder;
 
-    @Mock
-    AuthenticationManager authenticationManager;
-
-    @Mock
-    RedisTemplate<String, Object> redisTemplate;
-
-    @Mock
-    TokenUtils tokenUtils;
-
     @Test
     @DisplayName("회원가입 테스트")
     void testSignup() throws RoleNotFoundException {
@@ -158,107 +149,6 @@ class DefaultSignUpServiceTest {
         verify(authRepository, times(1)).existsByEmail(any());
     }
 
-    @Test
-    @DisplayName("로그아웃")
-    void testLogout() {
-        String jwt = "jwt";
-        String uuid = UUID.randomUUID().toString();
 
-        given(tokenUtils.getUuidFromExpiredToken(jwt)).willReturn(uuid);
-        given(tokenUtils.isInvalidToken(jwt)).willReturn(false);
-
-        HashOperations<String, Object, Object> mockHash
-            = mock(HashOperations.class);
-
-        given(redisTemplate.opsForHash()).willReturn(mockHash);
-        given(mockHash.delete(uuid, TokenUtils.REFRESH_TOKEN)).willReturn(0L);
-
-        given(tokenUtils.getExpireDate(jwt)).willReturn(System.currentTimeMillis() + 1000L);
-
-        ValueOperations<String, Object> mockValue = mock(ValueOperations.class);
-        given(redisTemplate.opsForValue()).willReturn(mockValue);
-        doNothing().when(mockValue).set(anyString(), anyBoolean(), anyLong(), any(TimeUnit.class));
-
-        authService.logout(jwt);
-
-        verify(mockHash).delete(uuid, TokenUtils.REFRESH_TOKEN);
-        verify(mockValue).set(anyString(), anyBoolean(), anyLong(), any(TimeUnit.class));
-    }
-
-    @Test
-    @DisplayName("만료된 토큰을 가진 사용자가 로그아웃")
-    void testLogoutWithInvalidJWT() {
-        String jwt = "jwt";
-        String uuid = UUID.randomUUID().toString();
-
-        given(tokenUtils.getUuidFromExpiredToken(jwt)).willReturn(uuid);
-        given(tokenUtils.isInvalidToken(jwt)).willReturn(true);
-
-        HashOperations<String, Object, Object> mockHash
-            = mock(HashOperations.class);
-
-        given(redisTemplate.opsForHash()).willReturn(mockHash);
-        given(mockHash.delete(uuid, TokenUtils.REFRESH_TOKEN)).willReturn(0L);
-
-        authService.logout(jwt);
-
-        verify(mockHash).delete(uuid, TokenUtils.REFRESH_TOKEN);
-    }
-
-    @Test
-    @DisplayName("토큰 재발급")
-    void testRenewToken() {
-        String uuid = UUID.randomUUID().toString();
-        String jwt = "jwt";
-        String refreshToken = "refreshToken";
-
-        given(tokenUtils.getUuidFromExpiredToken(jwt)).willReturn(uuid);
-
-        HashOperations<String, Object, Object> mockHash
-            = mock(HashOperations.class);
-        given(redisTemplate.opsForHash()).willReturn(mockHash);
-        given(mockHash.get(uuid, TokenUtils.REFRESH_TOKEN)).willReturn(refreshToken);
-
-        given(tokenUtils.isInvalidToken(refreshToken)).willReturn(false);
-        given(tokenUtils.getUuidFromExpiredToken(refreshToken)).willReturn(uuid);
-
-        when(mockHash.delete(uuid, TokenUtils.REFRESH_TOKEN)).thenReturn(0L);
-
-        Authentication authentication = new UsernamePasswordAuthenticationToken(uuid, "");
-
-        LocalDateTime now = LocalDateTime.now();
-        given(tokenUtils.getAuthenticationFromExpiredToken(jwt, uuid)).willReturn(authentication);
-        given(tokenUtils.saveRefreshToken(redisTemplate, authentication)).willReturn(
-            new TokenResponse(jwt, now));
-
-        TokenResponse tokenResponse = authService.renewToken(jwt);
-
-        verify(mockHash, times(1)).get(uuid, TokenUtils.REFRESH_TOKEN);
-        verify(mockHash, times(1)).delete(uuid, TokenUtils.REFRESH_TOKEN);
-
-        assertThat(tokenResponse.getJwt()).isEqualTo(jwt);
-        assertThat(tokenResponse.getExpiredDate().toString()).hasToString(now.toString());
-    }
-
-    @Test
-    @DisplayName("토큰 재발급 시 리프레시 토큰 만료로 재발급 못받음")
-    void testRenewTokenFail() {
-        String uuid = UUID.randomUUID().toString();
-        String jwt = "jwt";
-        String refreshToken = "refreshToken";
-
-        given(tokenUtils.getUuidFromExpiredToken(jwt)).willReturn(uuid);
-
-        HashOperations<String, Object, Object> mockHash
-            = mock(HashOperations.class);
-        given(redisTemplate.opsForHash()).willReturn(mockHash);
-        given(mockHash.get(uuid, TokenUtils.REFRESH_TOKEN)).willReturn(refreshToken);
-
-        given(tokenUtils.isInvalidToken(refreshToken)).willReturn(true);
-
-        TokenResponse tokenResponse = authService.renewToken(jwt);
-
-        assertThat(tokenResponse).isNull();
-    }
 
 }

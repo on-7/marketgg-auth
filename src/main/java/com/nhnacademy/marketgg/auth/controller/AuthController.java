@@ -1,8 +1,13 @@
 package com.nhnacademy.marketgg.auth.controller;
 
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;
+import java.util.Objects;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -10,12 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Objects;
-
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @RestController
 @RequestMapping("/auth")
@@ -37,9 +36,9 @@ public class AuthController {
 
         TokenResponse newToken = null;
         if (authorizationHeader.isBlank()
-                || ((newToken =
-                authService.renewToken(authorizationHeader.substring(TokenUtils.BEARER_LENGTH)))
-                == null)) {
+            || ((newToken =
+            authService.renewToken(authorizationHeader.substring(TokenUtils.BEARER_LENGTH)))
+            == null)) {
             httpStatus = UNAUTHORIZED;
         }
 

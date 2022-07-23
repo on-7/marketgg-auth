@@ -18,8 +18,10 @@ import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
 import com.nhnacademy.marketgg.auth.dto.response.SignUpResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
+import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.SignUpService;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,9 +61,6 @@ class SignUpControllerTest {
 
     @MockBean
     SignUpService signUpService;
-
-    @MockBean
-    UserDetailsService userDetailsService;
 
     @MockBean
     PasswordEncoder passwordEncoder;
@@ -123,37 +122,5 @@ class SignUpControllerTest {
     //                result.getResolvedException() instanceof EmailOverlapException));
     //
     // }
-
-    @Test
-    @DisplayName("JWT 갱신 요청")
-    void testRenewToken() throws Exception {
-        LocalDateTime now = LocalDateTime.now();
-        TokenResponse tokenResponse = new TokenResponse("jwt", now);
-
-        given(authService.renewToken("JWT-TOKEN")).willReturn(tokenResponse);
-
-        when(signUpService.checkEmail(emailRequest))
-                .thenThrow(new EmailOverlapException(emailRequest.getEmail()));
-
-    @Test
-    @DisplayName("JWT 갱신 요청 시 리프레시 토큰 만료")
-    void testRenewTokenFail() throws Exception {
-        given(authService.renewToken("JWT-TOKEN")).willReturn(null);
-
-        mockMvc.perform(get("/auth/refresh")
-                   .header(HttpHeaders.AUTHORIZATION, "Bearer JWT-TOKEN"))
-               .andExpect(status().isUnauthorized())
-               .andDo(print());
-    }
-
-    @Test
-    @DisplayName("로그아웃")
-    void testLogout() throws Exception {
-            mockMvc.perform(get("/auth/logout")
-                       .header(HttpHeaders.AUTHORIZATION, "Bearer JWT-TOKEN"))
-                   .andDo(print());
-        doNothing().when(authService).logout("JWT-TOKEN");
-
-    }
 
 }
