@@ -5,6 +5,6 @@ import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
 
 public interface AuthInfoService {
 
-    MemberResponse findAuthByUuid(String token) throws UnAuthorizationException;
+    MemberResponse findAuthByUuid(final String token) throws UnAuthorizationException;
 
 }

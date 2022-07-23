@@ -19,21 +19,19 @@ public class DefaultAuthInfoService implements AuthInfoService {
     private final AuthRepository authRepository;
 
     @Override
-    public MemberResponse findAuthByUuid(String token) throws UnAuthorizationException {
+    public MemberResponse findAuthByUuid(final String token) throws UnAuthorizationException {
         if (Objects.isNull(token) || tokenUtils.isInvalidToken(token)) {
             throw new UnAuthorizationException();
         }
 
-        token = token.substring(TokenUtils.BEARER_LENGTH);
-        String uuid = tokenUtils.getUuidFromToken(token);
+        String jwt = token.substring(TokenUtils.BEARER_LENGTH);
+        String uuid = tokenUtils.getUuidFromToken(jwt);
 
         Auth auth = authRepository.findByUuid(uuid)
                                   .orElseThrow(AuthNotFoundException::new);
 
-        MemberResponse memberResponse =
-            new MemberResponse(auth.getEmail(), auth.getName(), auth.getPhoneNumber());
+        return new MemberResponse(auth.getEmail(), auth.getName(), auth.getPhoneNumber());
 
-        return memberResponse;
     }
 
 }
