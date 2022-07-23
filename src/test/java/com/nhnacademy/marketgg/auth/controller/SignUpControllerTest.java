@@ -19,8 +19,7 @@ import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
 import com.nhnacademy.marketgg.auth.dto.response.SignUpResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
-import com.nhnacademy.marketgg.auth.service.AuthService;
-import java.time.LocalDateTime;
+import com.nhnacademy.marketgg.auth.service.SignUpService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +34,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(AuthController.class)
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(SignUpController.class)
 @Import(WebSecurityConfig.class)
 @MockBean({
     AuthenticationManager.class,
     TokenUtils.class,
     RedisTemplate.class
 })
-class AuthControllerTest {
+class SignUpControllerTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -51,7 +58,7 @@ class AuthControllerTest {
     ObjectMapper mapper;
 
     @MockBean
-    AuthService authService;
+    SignUpService signUpService;
 
     @MockBean
     UserDetailsService userDetailsService;
@@ -70,7 +77,7 @@ class AuthControllerTest {
         ReflectionTestUtils.setField(testSignUpRequest, "name", "testName");
         ReflectionTestUtils.setField(testSignUpRequest, "phoneNumber", "010-1234-1234");
 
-        when(authService.signup(testSignUpRequest)).thenReturn(any(SignUpResponse.class));
+        when(signUpService.signup(testSignUpRequest)).thenReturn(any(SignUpResponse.class));
 
         mockMvc.perform(post("/auth/signup")
                    .contentType(APPLICATION_JSON)
@@ -87,8 +94,8 @@ class AuthControllerTest {
         ReflectionTestUtils.setField(testEmailRequest, "email", "testEmail");
         ReflectionTestUtils.setField(testEmailRequest, "isReferrer", true);
 
-        when(authService.checkEmail(testEmailRequest))
-            .thenReturn(any(ExistEmailResponse.class));
+        when(signUpService.checkEmail(testEmailRequest))
+                        .thenReturn(any(ExistEmailResponse.class));
 
         mockMvc.perform(post("/auth/check/email")
                    .contentType(APPLICATION_JSON)
@@ -125,12 +132,8 @@ class AuthControllerTest {
 
         given(authService.renewToken("JWT-TOKEN")).willReturn(tokenResponse);
 
-        mockMvc.perform(get("/auth/refresh")
-                   .header(HttpHeaders.AUTHORIZATION, "Bearer JWT-TOKEN"))
-               .andExpect(status().isOk())
-               .andExpect(header().string(HttpHeaders.AUTHORIZATION, "Bearer jwt"))
-               .andDo(print());
-    }
+        when(signUpService.checkEmail(emailRequest))
+                .thenThrow(new EmailOverlapException(emailRequest.getEmail()));
 
     @Test
     @DisplayName("JWT 갱신 요청 시 리프레시 토큰 만료")

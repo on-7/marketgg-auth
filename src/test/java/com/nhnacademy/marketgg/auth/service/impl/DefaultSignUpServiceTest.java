@@ -55,10 +55,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 @Import({
     WebSecurityConfig.class
 })
-class DefaultAuthServiceTest {
+class DefaultSignUpServiceTest {
 
     @InjectMocks
-    DefaultAuthService authService;
+    DefaultSignUpService defaultSignUpService;
 
     @Mock
     AuthRepository authRepository;
@@ -115,7 +115,7 @@ class DefaultAuthServiceTest {
 
         given(authRoleRepository.save(any(AuthRole.class))).willReturn(authRole);
 
-        authService.signup(testSignUpRequest);
+        defaultSignUpService.signup(testSignUpRequest);
 
         verify(authRepository, times(1)).save(any(auth.getClass()));
         // getDeclaringClass() 메서드는 이 클래스의 선언 클래스를 가져오는 데 사용됨.
@@ -136,7 +136,7 @@ class DefaultAuthServiceTest {
         ReflectionTestUtils.setField(testEmailRequest, "email", "test@test.com");
         ReflectionTestUtils.setField(testEmailRequest, "isReferrer", false);
 
-        authService.checkEmail(testEmailRequest);
+        defaultSignUpService.checkEmail(testEmailRequest);
 
         verify(authRepository, times(1)).existsByEmail(any());
     }
@@ -152,8 +152,8 @@ class DefaultAuthServiceTest {
         ReflectionTestUtils.setField(testEmailRequest, "isReferrer", false);
 
 
-        assertThatThrownBy(() -> authService.checkEmail(testEmailRequest))
-            .isInstanceOf(EmailOverlapException.class);
+        assertThatThrownBy(() -> defaultSignUpService.checkEmail(testEmailRequest))
+                .isInstanceOf(EmailOverlapException.class);
 
         verify(authRepository, times(1)).existsByEmail(any());
     }

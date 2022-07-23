@@ -39,9 +39,4 @@ public class RedisUtils {
         valueOperations.getAndDelete(email);
     }
 
-    public boolean checkAuth(String email, String authKey) {
-        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        String authK = valueOperations.getAndDelete(email);
-        return !Objects.equals(authK, authKey);
-    }
 }
