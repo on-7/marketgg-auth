@@ -3,13 +3,12 @@ package com.nhnacademy.marketgg.auth.service.impl;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -22,11 +21,6 @@ public class DefaultAuthService implements AuthService {
     public void logout(final String token) {
         String uuid = tokenUtils.getUuidFromExpiredToken(token);
 
-        if (tokenUtils.isInvalidToken(token)) {
-            redisTemplate.opsForHash().delete(uuid, TokenUtils.REFRESH_TOKEN);
-            return;
-        }
-
         redisTemplate.opsForHash().delete(uuid, TokenUtils.REFRESH_TOKEN);
 
         long tokenExpireTime = tokenUtils.getExpireDate(token) - System.currentTimeMillis();
@@ -38,7 +32,7 @@ public class DefaultAuthService implements AuthService {
         String uuid = tokenUtils.getUuidFromExpiredToken(token);
 
         String refreshToken =
-                (String) redisTemplate.opsForHash().get(uuid, TokenUtils.REFRESH_TOKEN);
+            (String) redisTemplate.opsForHash().get(uuid, TokenUtils.REFRESH_TOKEN);
 
         if (this.isInvalidToken(uuid, refreshToken)) {
             return null;
@@ -47,12 +41,12 @@ public class DefaultAuthService implements AuthService {
         redisTemplate.opsForHash().delete(uuid, TokenUtils.REFRESH_TOKEN);
 
         Authentication authentication =
-                tokenUtils.getAuthenticationFromExpiredToken(token, uuid);
+            tokenUtils.getAuthenticationFromExpiredToken(token, uuid);
 
         return tokenUtils.saveRefreshToken(redisTemplate, authentication);
     }
 
-    private boolean isInvalidToken(String email, String refreshToken) {
+    private boolean isInvalidToken(String uuid, String refreshToken) {
         return Objects.isNull(refreshToken)
             || tokenUtils.isInvalidToken(refreshToken)
             || !Objects.equals(uuid, tokenUtils.getUuidFromExpiredToken(refreshToken));
