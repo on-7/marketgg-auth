@@ -15,6 +15,11 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * 회원의 정보를 저장합니다.
+ *
+ * @version 1.0.0
+ */
 @Table(name = "auth")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

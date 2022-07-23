@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
  *
  * @version 1.0.0
  */
-
 @Service
 @RequiredArgsConstructor
 public class DefaultUserDetailsService implements UserDetailsService {

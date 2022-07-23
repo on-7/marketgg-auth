@@ -40,7 +40,8 @@ public class WebSecurityConfig {
      * @see <a href="https://docs.spring.io/spring-security/site/docs/current/api/org/springframework/security/config/annotation/authentication/configuration/AuthenticationConfiguration.html">AuthenticationConfiguration</a>
      */
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+        throws Exception {
         return configuration.getAuthenticationManager();
     }
 
@@ -65,8 +66,9 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
             .httpBasic().disable()
-            .formLogin().disable()
-            .addFilter(getJwtAuthenticationFilter());
+            .formLogin().disable();
+
+        http.addFilter(getJwtAuthenticationFilter());
 
         http.csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -85,8 +87,8 @@ public class WebSecurityConfig {
 
     private JwtAuthenticationFilter getJwtAuthenticationFilter() throws Exception {
         JwtAuthenticationFilter jwtAuthenticationFilter =
-                new JwtAuthenticationFilter(authenticationManager(null),
-                                            mapper, tokenUtils, redisTemplate);
+            new JwtAuthenticationFilter(authenticationManager(null),
+                mapper, tokenUtils, redisTemplate);
 
         jwtAuthenticationFilter.setFilterProcessesUrl("/auth/login");
 

@@ -22,17 +22,21 @@ import com.nhnacademy.marketgg.auth.service.AuthService;
 import com.nhnacademy.marketgg.auth.util.MailUtils;
 import com.nhnacademy.marketgg.auth.util.RedisUtils;
 import com.nhnacademy.marketgg.auth.util.Status;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import javax.management.relation.RoleNotFoundException;
+import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.RoleNotFoundException;
-import javax.transaction.Transactional;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-
+/**
+ * 회원가입 및 인증 관련 처리를 하는 클래스입니다.
+ *
+ * @version 1.0.0
+ */
 @Service
 @RequiredArgsConstructor
 public class DefaultAuthService implements AuthService {
@@ -84,13 +88,15 @@ public class DefaultAuthService implements AuthService {
 
     @Override
     public void logout(final String token) {
+        String uuid = tokenUtils.getUuidFromExpiredToken(token);
+
         if (tokenUtils.isInvalidToken(token)) {
+            redisTemplate.opsForHash().delete(uuid, TokenUtils.REFRESH_TOKEN);
             return;
         }
 
-        String email = tokenUtils.getUuidFromExpiredToken(token);
+        redisTemplate.opsForHash().delete(uuid, TokenUtils.REFRESH_TOKEN);
 
-        redisTemplate.opsForHash().delete(email, TokenUtils.REFRESH_TOKEN);
         long tokenExpireTime = tokenUtils.getExpireDate(token) - System.currentTimeMillis();
         redisTemplate.opsForValue().set(token, true, tokenExpireTime, TimeUnit.MILLISECONDS);
     }
@@ -171,10 +177,10 @@ public class DefaultAuthService implements AuthService {
         return new ExistEmailResponse(false);
     }
 
-    private boolean isInvalidToken(String email, String refreshToken) {
+    private boolean isInvalidToken(String uuid, String refreshToken) {
         return Objects.isNull(refreshToken)
-                || tokenUtils.isInvalidToken(refreshToken)
-                || !Objects.equals(email, tokenUtils.getUuidFromExpiredToken(refreshToken));
+            || tokenUtils.isInvalidToken(refreshToken)
+            || !Objects.equals(uuid, tokenUtils.getUuidFromExpiredToken(refreshToken));
     }
 
     private boolean isReferrer(EmailRequest emailRequest) {

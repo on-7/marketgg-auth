@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.exception.InvalidLoginRequestException;
-import com.nhnacademy.marketgg.auth.exception.LoginFailException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import java.io.IOException;
 import javax.servlet.FilterChain;
@@ -83,8 +82,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         throws IOException, ServletException {
 
         log.error("로그인 실패", failed);
-
-        throw new LoginFailException();
+        getFailureHandler().onAuthenticationFailure(request, response, failed);
     }
 
 }
