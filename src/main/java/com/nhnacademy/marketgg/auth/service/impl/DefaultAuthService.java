@@ -65,7 +65,8 @@ public class DefaultAuthService implements AuthService {
         // 추천인 이메일이 있는경우
         if (signUpRequest.getReferrerEmail() != null) {
             Auth referrerAuth = authRepository.findByEmail(signUpRequest.getReferrerEmail())
-                                              .orElseThrow(() -> new AuthNotFoundException(signUpRequest.getReferrerEmail()));
+                                              .orElseThrow(() -> new AuthNotFoundException(
+                                                  signUpRequest.getReferrerEmail()));
 
             referrerUuid = referrerAuth.getUuid();
         }
@@ -77,7 +78,7 @@ public class DefaultAuthService implements AuthService {
         Long authNo = savedAuth.getId();
         Role role = roleRepository.findByName(Roles.ROLE_USER)
                                   .orElseThrow(
-                                          () -> new RoleNotFoundException("해당 권한은 존재 하지 않습니다."));
+                                      () -> new RoleNotFoundException("해당 권한은 존재 하지 않습니다."));
         AuthRole.Pk pk = new AuthRole.Pk(authNo, role.getId());
         AuthRole authRole = new AuthRole(pk, savedAuth, role);
         authRoleRepository.save(authRole);
@@ -87,7 +88,7 @@ public class DefaultAuthService implements AuthService {
 
     @Override
     public void logout(final String token) {
-        String uuid = tokenUtils.getUuidFromExpiredToken(token);
+        String uuid = tokenUtils.getUuidFromToken(token);
 
         if (tokenUtils.isInvalidToken(token)) {
             redisTemplate.opsForHash().delete(uuid, TokenUtils.REFRESH_TOKEN);
@@ -102,10 +103,10 @@ public class DefaultAuthService implements AuthService {
 
     @Override
     public TokenResponse renewToken(final String token) {
-        String uuid = tokenUtils.getUuidFromExpiredToken(token);
+        String uuid = tokenUtils.getUuidFromToken(token);
 
         String refreshToken =
-                (String) redisTemplate.opsForHash().get(uuid, TokenUtils.REFRESH_TOKEN);
+            (String) redisTemplate.opsForHash().get(uuid, TokenUtils.REFRESH_TOKEN);
 
         if (this.isInvalidToken(uuid, refreshToken)) {
             return null;
@@ -114,7 +115,7 @@ public class DefaultAuthService implements AuthService {
         redisTemplate.opsForHash().delete(uuid, TokenUtils.REFRESH_TOKEN);
 
         Authentication authentication =
-                tokenUtils.getAuthenticationFromExpiredToken(token, uuid);
+            tokenUtils.getAuthenticationFromExpiredToken(token, uuid);
 
         return tokenUtils.saveRefreshToken(redisTemplate, authentication);
     }
@@ -167,7 +168,7 @@ public class DefaultAuthService implements AuthService {
     private boolean isInvalidToken(String uuid, String refreshToken) {
         return Objects.isNull(refreshToken)
             || tokenUtils.isInvalidToken(refreshToken)
-            || !Objects.equals(uuid, tokenUtils.getUuidFromExpiredToken(refreshToken));
+            || !Objects.equals(uuid, tokenUtils.getUuidFromToken(refreshToken));
     }
 
     private boolean isReferrer(EmailRequest emailRequest) {

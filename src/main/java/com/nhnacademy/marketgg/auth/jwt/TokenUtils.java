@@ -119,6 +119,7 @@ public class TokenUtils {
     }
 
     private Claims getClaims(String token) {
+        log.info("token = {}", token);
         if (token.startsWith(BEARER)) {
             token = token.substring(BEARER_LENGTH);
         }
@@ -158,12 +159,12 @@ public class TokenUtils {
     }
 
     /**
-     * 만료된 토큰에서 사용자의 Email 정보를 얻습니다.
+     * 토큰에서 사용자의 Email 정보를 얻습니다.
      *
-     * @param token - 만료된 JWT
+     * @param token - JWT
      * @return 사용자의 UUID 를 반환받는다.
      */
-    public String getUuidFromExpiredToken(String token) {
+    public String getUuidFromToken(String token) {
         try {
             return getClaims(token).getSubject();
         } catch (ExpiredJwtException e) {
