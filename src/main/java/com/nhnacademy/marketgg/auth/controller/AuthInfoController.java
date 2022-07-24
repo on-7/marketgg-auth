@@ -2,6 +2,7 @@ package com.nhnacademy.marketgg.auth.controller;
 
 import static org.springframework.http.HttpStatus.OK;
 
+import com.nhnacademy.marketgg.auth.annotation.Token;
 import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.response.AuthUpdateResponse;
@@ -13,8 +14,6 @@ import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthInfoService;
 import com.nhnacademy.marketgg.auth.service.AuthService;
-import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,6 +26,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 회원 정보 관련 정보 요청을 처리하는 클래스입니다.
+ *
+ * @version 1.0.0
+ */
 @RestController
 @RequestMapping("/auth/info")
 @RequiredArgsConstructor
@@ -39,15 +43,13 @@ public class AuthInfoController {
     /**
      * 회원정보 수정을 위한 컨트롤러 메서드 입니다.
      *
+     * @param token             - JWT
      * @param authUpdateRequest - 수정할 회원 정보를 담고있는 객체 입니다.
      * @return - 상태코드를 리턴합니다.
      */
     @PutMapping
-    public ResponseEntity<Void> update(@RequestBody final AuthUpdateRequest authUpdateRequest,
-                                       HttpServletRequest httpServletRequest)
-        throws UnAuthorizationException {
-
-        String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
+    public ResponseEntity<Void> update(@Token String token,
+                                       @RequestBody final AuthUpdateRequest authUpdateRequest) {
 
         TokenResponse update
             = authInfoService.update(token, authUpdateRequest);
@@ -66,29 +68,32 @@ public class AuthInfoController {
     /**
      * 회원정보 삭제를 위한 컨트롤러 메서드 입니다.
      *
-     * @param httpServletRequest - Header 를 가지고 있는 객체 입니다. 해당 객체를 통해 uuid 를 추출해서 soft delete 를 할 예정입니다.
+     * @param token - JWT
      * @return - AuthWithdrawResponse Auth 서버와 Shop 서버간의 통신에서 오는 시간 격차를 줄이기 위한 객체 입니다.
      */
-
     @DeleteMapping
     public ResponseEntity<AuthUpdateResponse> withdraw(
-        @RequestBody final AuthWithDrawRequest authWithDrawRequest
-        , HttpServletRequest httpServletRequest) throws UnAuthorizationException {
+        @Token String token,
+        @RequestBody final AuthWithDrawRequest authWithDrawRequest) {
 
-        authInfoService.withdraw(httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION)
-            , authWithDrawRequest);
+        authInfoService.withdraw(token, authWithDrawRequest);
+
         return ResponseEntity.status(OK)
                              .build();
     }
 
+    /**
+     * JWT 토큰을 이용하여 사용자 정보를 응답합니다.
+     *
+     * @param token - JWT
+     * @return - 사용자 정보
+     * @throws UnAuthorizationException - JWT 를 통해 인증할 수 없는 사용자일 경우 발생하는 예외
+     */
     @GetMapping
-    public ResponseEntity<? extends CommonResponse> getAuthInfo(HttpServletRequest request)
+    public ResponseEntity<? extends CommonResponse> getAuthInfo(@Token String token)
         throws UnAuthorizationException {
 
-        String jwt = Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
-                             .orElseThrow(UnAuthorizationException::new);
-
-        MemberResponse auth = authInfoService.findAuthByUuid(jwt);
+        MemberResponse auth = authInfoService.findAuthByUuid(token);
         SingleResponse<MemberResponse> memberResponseSingleResponse =
             new SingleResponse<>(auth);
 

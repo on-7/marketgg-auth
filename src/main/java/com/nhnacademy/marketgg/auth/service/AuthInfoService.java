@@ -10,10 +10,8 @@ public interface AuthInfoService {
 
     MemberResponse findAuthByUuid(final String token) throws UnAuthorizationException;
 
-    TokenResponse update(final String token, final AuthUpdateRequest authUpdateRequest)
-        throws UnAuthorizationException;
+    TokenResponse update(final String token, final AuthUpdateRequest authUpdateRequest);
 
-    void withdraw(final String token, final AuthWithDrawRequest authWithDrawRequest)
-        throws UnAuthorizationException;
+    void withdraw(final String token, final AuthWithDrawRequest authWithDrawRequest);
 
 }
