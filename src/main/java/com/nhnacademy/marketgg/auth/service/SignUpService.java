@@ -36,4 +36,5 @@ public interface SignUpService {
      * @since 1.0.0
      */
     UseEmailResponse useEmail(final EmailUseRequest emailRequest);
+
 }

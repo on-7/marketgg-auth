@@ -32,7 +32,6 @@ public class DefaultAuthInfoService implements AuthInfoService {
 
     @Override
     public MemberResponse findAuthByUuid(final String token){
-
         String uuid = tokenUtils.getUuidFromToken(token);
         Auth auth = authRepository.findByUuid(uuid)
                                   .orElseThrow(AuthNotFoundException::new);
