@@ -12,6 +12,7 @@ import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.entity.Role;
 import com.nhnacademy.marketgg.auth.repository.RoleRepository;
 import com.nhnacademy.marketgg.auth.service.AuthService;
+import com.nhnacademy.marketgg.auth.service.SignUpService;
 import java.util.List;
 import javax.management.relation.RoleNotFoundException;
 
