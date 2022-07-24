@@ -70,7 +70,6 @@ public class Auth {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @NotNull
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
