@@ -7,6 +7,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class AuthUpdateResponse {
 
+    private final String deletedUuid;
     private final String uuid;
-
 }

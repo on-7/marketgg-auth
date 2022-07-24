@@ -3,11 +3,13 @@ package com.nhnacademy.marketgg.auth.controller;
 import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.response.AuthUpdateResponse;
+import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
+import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthInfoService;
+import com.nhnacademy.marketgg.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +24,8 @@ public class AuthInfoController {
 
     private final AuthInfoService authInfoService;
 
+    private final AuthService authService;
+
     /**
      * 회원정보 수정을 위한 컨트롤러 메서드 입니다.
      *
@@ -29,13 +33,23 @@ public class AuthInfoController {
      * @return - 상태코드를 리턴합니다.
      */
     @PutMapping
-    public ResponseEntity<AuthUpdateResponse> update(@RequestBody final AuthUpdateRequest authUpdateRequest
+    public ResponseEntity<Void> update(@RequestBody final AuthUpdateRequest authUpdateRequest
             , HttpServletRequest httpServletRequest) throws UnAuthorizationException {
 
+        String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
+
+        TokenResponse update
+                = authInfoService.update(token, authUpdateRequest);
+
+        authService.logout(token);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setBearerAuth(update.getJwt());
+        httpHeaders.set(TokenUtils.JWT_EXPIRE, update.getExpiredDate().toString());
+
         return ResponseEntity.status(OK)
-                             .contentType(MediaType.APPLICATION_JSON)
-                             .body(authInfoService.update(httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION)
-                                     , authUpdateRequest));
+                             .headers(httpHeaders)
+                             .build();
     }
 
     /**
