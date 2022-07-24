@@ -1,14 +1,6 @@
 package com.nhnacademy.marketgg.auth.service;
 
-import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
-import com.nhnacademy.marketgg.auth.dto.request.EmailUseRequest;
-import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
-import com.nhnacademy.marketgg.auth.dto.request.UpdateRequest;
-import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
-import com.nhnacademy.marketgg.auth.dto.response.SignUpResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
-import com.nhnacademy.marketgg.auth.dto.response.UseEmailResponse;
-import javax.management.relation.RoleNotFoundException;
 
 /**
  * 인증 관련 비즈니스 로직을 처리하는 클래스입니다.

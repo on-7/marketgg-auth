@@ -60,6 +60,9 @@ class DefaultSignUpServiceTest {
     @InjectMocks
     DefaultSignUpService defaultSignUpService;
 
+    @InjectMocks
+    DefaultAuthService defaultAuthService;
+
     @Mock
     AuthRepository authRepository;
 
@@ -164,7 +167,7 @@ class DefaultSignUpServiceTest {
         String jwt = "jwt";
         String uuid = UUID.randomUUID().toString();
 
-        given(tokenUtils.getUuidFromExpiredToken(jwt)).willReturn(uuid);
+        given(tokenUtils.getUuidFromToken(jwt)).willReturn(uuid);
         given(tokenUtils.isInvalidToken(jwt)).willReturn(false);
 
         HashOperations<String, Object, Object> mockHash
@@ -179,7 +182,7 @@ class DefaultSignUpServiceTest {
         given(redisTemplate.opsForValue()).willReturn(mockValue);
         doNothing().when(mockValue).set(anyString(), anyBoolean(), anyLong(), any(TimeUnit.class));
 
-        authService.logout(jwt);
+        defaultAuthService.logout(jwt);
 
         verify(mockHash).delete(uuid, TokenUtils.REFRESH_TOKEN);
         verify(mockValue).set(anyString(), anyBoolean(), anyLong(), any(TimeUnit.class));
@@ -191,7 +194,7 @@ class DefaultSignUpServiceTest {
         String jwt = "jwt";
         String uuid = UUID.randomUUID().toString();
 
-        given(tokenUtils.getUuidFromExpiredToken(jwt)).willReturn(uuid);
+        given(tokenUtils.getUuidFromToken(jwt)).willReturn(uuid);
         given(tokenUtils.isInvalidToken(jwt)).willReturn(true);
 
         HashOperations<String, Object, Object> mockHash
@@ -200,7 +203,7 @@ class DefaultSignUpServiceTest {
         given(redisTemplate.opsForHash()).willReturn(mockHash);
         given(mockHash.delete(uuid, TokenUtils.REFRESH_TOKEN)).willReturn(0L);
 
-        authService.logout(jwt);
+        defaultAuthService.logout(jwt);
 
         verify(mockHash).delete(uuid, TokenUtils.REFRESH_TOKEN);
     }
@@ -212,7 +215,7 @@ class DefaultSignUpServiceTest {
         String jwt = "jwt";
         String refreshToken = "refreshToken";
 
-        given(tokenUtils.getUuidFromExpiredToken(jwt)).willReturn(uuid);
+        given(tokenUtils.getUuidFromToken(jwt)).willReturn(uuid);
 
         HashOperations<String, Object, Object> mockHash
             = mock(HashOperations.class);
@@ -220,7 +223,7 @@ class DefaultSignUpServiceTest {
         given(mockHash.get(uuid, TokenUtils.REFRESH_TOKEN)).willReturn(refreshToken);
 
         given(tokenUtils.isInvalidToken(refreshToken)).willReturn(false);
-        given(tokenUtils.getUuidFromExpiredToken(refreshToken)).willReturn(uuid);
+        given(tokenUtils.getUuidFromToken(refreshToken)).willReturn(uuid);
 
         when(mockHash.delete(uuid, TokenUtils.REFRESH_TOKEN)).thenReturn(0L);
 
@@ -231,7 +234,7 @@ class DefaultSignUpServiceTest {
         given(tokenUtils.saveRefreshToken(redisTemplate, authentication)).willReturn(
             new TokenResponse(jwt, now));
 
-        TokenResponse tokenResponse = authService.renewToken(jwt);
+        TokenResponse tokenResponse = defaultAuthService.renewToken(jwt);
 
         verify(mockHash, times(1)).get(uuid, TokenUtils.REFRESH_TOKEN);
         verify(mockHash, times(1)).delete(uuid, TokenUtils.REFRESH_TOKEN);
@@ -247,7 +250,7 @@ class DefaultSignUpServiceTest {
         String jwt = "jwt";
         String refreshToken = "refreshToken";
 
-        given(tokenUtils.getUuidFromExpiredToken(jwt)).willReturn(uuid);
+        given(tokenUtils.getUuidFromToken(jwt)).willReturn(uuid);
 
         HashOperations<String, Object, Object> mockHash
             = mock(HashOperations.class);
@@ -256,7 +259,7 @@ class DefaultSignUpServiceTest {
 
         given(tokenUtils.isInvalidToken(refreshToken)).willReturn(true);
 
-        TokenResponse tokenResponse = authService.renewToken(jwt);
+        TokenResponse tokenResponse = defaultAuthService.renewToken(jwt);
 
         assertThat(tokenResponse).isNull();
     }

@@ -163,7 +163,7 @@ public class TokenUtils {
      * @param token - 만료된 JWT
      * @return 사용자의 UUID 를 반환받는다.
      */
-    public String getUuidFromExpiredToken(String token) {
+    public String getUuidFromToken(String token) {
         try {
             return getClaims(token).getSubject();
         } catch (ExpiredJwtException e) {
