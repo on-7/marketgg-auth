@@ -13,4 +13,5 @@ public interface AuthRepository extends JpaRepository<Auth, Long> {
 
     Optional<Auth> findByUuid(String uuid);
 
+    boolean existsByUuid(String uuid);
 }
