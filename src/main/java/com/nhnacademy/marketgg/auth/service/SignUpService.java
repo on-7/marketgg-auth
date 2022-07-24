@@ -6,7 +6,6 @@ import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
 import com.nhnacademy.marketgg.auth.dto.response.SignUpResponse;
 import com.nhnacademy.marketgg.auth.dto.response.UseEmailResponse;
-
 import javax.management.relation.RoleNotFoundException;
 
 public interface SignUpService {
@@ -16,7 +15,7 @@ public interface SignUpService {
      *
      * @param signUpRequest - 회원가입시 중요정보 입니다.
      * @return SignUpResponse - 회원가입시 Auth 서버에서 먼저 생성 되었던
-     *                          UUID 를 Server 에 전해주기 위한 클래스입니다.
+     * UUID 를 Server 에 전해주기 위한 클래스입니다.
      * @throws RoleNotFoundException - 권한이 없으면 예외를 던집니다.
      */
     SignUpResponse signup(final SignUpRequest signUpRequest) throws RoleNotFoundException;

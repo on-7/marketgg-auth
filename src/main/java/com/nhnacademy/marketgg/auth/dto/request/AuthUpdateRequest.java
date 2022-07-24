@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Getter
-public class UpdateRequest {
+public class AuthUpdateRequest {
 
     private String email;
     private String password;

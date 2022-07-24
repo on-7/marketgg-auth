@@ -1,8 +1,10 @@
 package com.nhnacademy.marketgg.auth.entity;
 
 import com.nhnacademy.marketgg.auth.constant.Provider;
+import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
-import com.nhnacademy.marketgg.auth.dto.request.UpdateRequest;
+import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
+import com.nhnacademy.marketgg.auth.dto.response.AuthUpdateResponse;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +14,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -63,6 +66,13 @@ public class Auth {
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
+    @NotNull
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     public Auth(final SignUpRequest signUpRequest) {
         this.uuid = UUID.randomUUID().toString();
         this.email = signUpRequest.getEmail();
@@ -71,16 +81,20 @@ public class Auth {
         this.phoneNumber = signUpRequest.getPhoneNumber();
         this.passwordUpdatedAt = LocalDate.now();
         this.provider = Provider.SELF;
+        this.createdAt = LocalDateTime.now();
     }
 
-    public Auth(final UpdateRequest updateRequest,String uuid) {
-        this.uuid = uuid;
-        this.email = updateRequest.getEmail();
-        this.password = updateRequest.getPassword();
-        this.name = updateRequest.getName();
-        this.phoneNumber = updateRequest.getPhoneNumber();
-        this.passwordUpdatedAt = getUpdateDate(updateRequest.getPassword());
-        this.provider = Provider.SELF;
+    public void updateAuth(final AuthUpdateRequest authUpdateRequest) {
+        this.uuid = UUID.randomUUID().toString();
+        this.email = authUpdateRequest.getEmail();
+        this.password = authUpdateRequest.getPassword();
+        this.name = authUpdateRequest.getName();
+        this.phoneNumber = authUpdateRequest.getPhoneNumber();
+        this.passwordUpdatedAt = getUpdateDate(authUpdateRequest.getPassword());
+    }
+
+    public void deleteAuth(final AuthWithDrawRequest authWithDrawRequest) {
+        this.deletedAt = authWithDrawRequest.getDeletedAt();
     }
 
     /**
@@ -89,7 +103,7 @@ public class Auth {
      * @param updatedPassword - 수정된 비밀번호 입니다.
      * @return LocalDate - 비밀번호가 수정된 날짜를 기점으로 갱신합니다.
      */
-    private LocalDate getUpdateDate(String updatedPassword) {
+    private LocalDate getUpdateDate(final String updatedPassword) {
         if (isUpdatePassword(updatedPassword)) {
             return this.passwordUpdatedAt;
         }
@@ -103,8 +117,11 @@ public class Auth {
      * @param updatedPassword - 수정된 비밀번호 입니다.
      * @return boolean - Null 이 아니고, 기존 비밀번호랑 같으면 false 를 반환.
      */
-    private boolean isUpdatePassword(String updatedPassword) {
+    private boolean isUpdatePassword(final String updatedPassword) {
         return Objects.isNull(updatedPassword) || Objects.equals(this.password, updatedPassword);
     }
 
+    public void updateUuid(final String uuid) {
+        this.uuid = uuid;
+    }
 }

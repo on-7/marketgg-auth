@@ -19,7 +19,7 @@ public class DefaultAuthService implements AuthService {
 
     @Override
     public void logout(final String token) {
-        String uuid = tokenUtils.getUuidFromExpiredToken(token);
+        String uuid = tokenUtils.getUuidFromToken(token);
 
         redisTemplate.opsForHash().delete(uuid, TokenUtils.REFRESH_TOKEN);
 
@@ -29,7 +29,7 @@ public class DefaultAuthService implements AuthService {
 
     @Override
     public TokenResponse renewToken(final String token) {
-        String uuid = tokenUtils.getUuidFromExpiredToken(token);
+        String uuid = tokenUtils.getUuidFromToken(token);
 
         String refreshToken =
             (String) redisTemplate.opsForHash().get(uuid, TokenUtils.REFRESH_TOKEN);
@@ -49,7 +49,7 @@ public class DefaultAuthService implements AuthService {
     private boolean isInvalidToken(String uuid, String refreshToken) {
         return Objects.isNull(refreshToken)
             || tokenUtils.isInvalidToken(refreshToken)
-            || !Objects.equals(uuid, tokenUtils.getUuidFromExpiredToken(refreshToken));
+            || !Objects.equals(uuid, tokenUtils.getUuidFromToken(refreshToken));
     }
 
 }
