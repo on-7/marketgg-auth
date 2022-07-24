@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public class ExistEmailResponse {
+public class MemberResponse {
 
-    private final boolean isExistEmail;
+    private final String email;
+    private final String name;
+    private final String phoneNumber;
 
 }

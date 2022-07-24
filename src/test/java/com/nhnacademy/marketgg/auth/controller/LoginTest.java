@@ -15,6 +15,8 @@ import com.nhnacademy.marketgg.auth.service.AuthService;
 import com.nhnacademy.marketgg.auth.service.SignUpService;
 import java.util.List;
 import javax.management.relation.RoleNotFoundException;
+
+import com.nhnacademy.marketgg.auth.service.SignUpService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +32,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
-public class LoginTest {
+class LoginTest {
 
     @Autowired
     MockMvc mockMvc;

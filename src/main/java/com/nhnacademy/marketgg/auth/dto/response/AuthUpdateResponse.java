@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public class ExistEmailResponse {
+public class AuthUpdateResponse {
 
-    private final boolean isExistEmail;
-
+    private final String deletedUuid;
+    private final String uuid;
 }

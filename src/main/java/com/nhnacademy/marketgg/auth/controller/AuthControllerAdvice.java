@@ -1,6 +1,7 @@
 package com.nhnacademy.marketgg.auth.controller;
 
 import com.nhnacademy.marketgg.auth.exception.AuthNotFoundException;
+import com.nhnacademy.marketgg.auth.exception.AuthWithDrawOverlapException;
 import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
 import com.nhnacademy.marketgg.auth.exception.LoginFailException;
 import org.springframework.data.redis.connection.RedisInvalidSubscriptionException;
@@ -39,8 +40,9 @@ public class AuthControllerAdvice {
      * <a href="https://developer.mozilla.org/ko/docs/Web/HTTP/Status/409" />
      */
     @ExceptionHandler(value = {
-        EmailOverlapException.class,
-        RedisInvalidSubscriptionException.class })
+            EmailOverlapException.class,
+            RedisInvalidSubscriptionException.class,
+            AuthWithDrawOverlapException.class})
     public ResponseEntity<Void> handleConflictNotAllowException() {
 
         return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -53,8 +55,8 @@ public class AuthControllerAdvice {
      * @return 401 Http Status 를 응답합니다.
      */
     @ExceptionHandler(value = {
-        LoginFailException.class,
-        AuthNotFoundException.class })
+            LoginFailException.class,
+            AuthNotFoundException.class})
     public ResponseEntity<Void> handleLoginFailException() {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

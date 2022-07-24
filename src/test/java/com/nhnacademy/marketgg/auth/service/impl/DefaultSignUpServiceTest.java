@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.will;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -34,7 +33,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import javax.management.relation.RoleNotFoundException;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,6 +57,9 @@ class DefaultSignUpServiceTest {
 
     @InjectMocks
     DefaultSignUpService defaultSignUpService;
+
+    @InjectMocks
+    DefaultAuthService defaultAuthService;
 
     @Mock
     AuthRepository authRepository;
@@ -148,7 +149,5 @@ class DefaultSignUpServiceTest {
 
         verify(authRepository, times(1)).existsByEmail(any());
     }
-
-
 
 }

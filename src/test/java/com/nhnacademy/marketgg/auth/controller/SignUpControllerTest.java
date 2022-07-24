@@ -1,16 +1,5 @@
 package com.nhnacademy.marketgg.auth.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
@@ -20,6 +9,7 @@ import com.nhnacademy.marketgg.auth.dto.response.SignUpResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
+import com.nhnacademy.marketgg.auth.service.AuthService;
 import com.nhnacademy.marketgg.auth.service.SignUpService;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
@@ -36,10 +26,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.time.LocalDateTime;
+
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,9 +41,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(SignUpController.class)
 @Import(WebSecurityConfig.class)
 @MockBean({
-    AuthenticationManager.class,
-    TokenUtils.class,
-    RedisTemplate.class
+        AuthenticationManager.class,
+        TokenUtils.class,
+        RedisTemplate.class
 })
 class SignUpControllerTest {
 
@@ -79,8 +73,8 @@ class SignUpControllerTest {
         when(signUpService.signup(testSignUpRequest)).thenReturn(any(SignUpResponse.class));
 
         mockMvc.perform(post("/auth/signup")
-                   .contentType(APPLICATION_JSON)
-                   .content(mapper.writeValueAsString(testSignUpRequest)))
+                       .contentType(APPLICATION_JSON)
+                       .content(mapper.writeValueAsString(testSignUpRequest)))
                .andExpect(status().isCreated())
                .andDo(print());
     }
@@ -94,11 +88,11 @@ class SignUpControllerTest {
         ReflectionTestUtils.setField(testEmailRequest, "isReferrer", true);
 
         when(signUpService.checkEmail(testEmailRequest))
-                        .thenReturn(any(ExistEmailResponse.class));
+                .thenReturn(any(ExistEmailResponse.class));
 
         mockMvc.perform(post("/auth/check/email")
-                   .contentType(APPLICATION_JSON)
-                   .content(mapper.writeValueAsString(testEmailRequest)))
+                       .contentType(APPLICATION_JSON)
+                       .content(mapper.writeValueAsString(testEmailRequest)))
                .andExpect(status().isOk())
                .andDo(print());
     }
@@ -122,5 +116,5 @@ class SignUpControllerTest {
     //                result.getResolvedException() instanceof EmailOverlapException));
     //
     // }
-
+    
 }
