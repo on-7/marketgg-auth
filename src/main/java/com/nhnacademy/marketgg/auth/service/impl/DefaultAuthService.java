@@ -21,11 +21,6 @@ public class DefaultAuthService implements AuthService {
     public void logout(final String token) {
         String uuid = tokenUtils.getUuidFromToken(token);
 
-        if (tokenUtils.isInvalidToken(token)) {
-            redisTemplate.opsForHash().delete(uuid, TokenUtils.REFRESH_TOKEN);
-            return;
-        }
-
         redisTemplate.opsForHash().delete(uuid, TokenUtils.REFRESH_TOKEN);
 
         long tokenExpireTime = tokenUtils.getExpireDate(token) - System.currentTimeMillis();

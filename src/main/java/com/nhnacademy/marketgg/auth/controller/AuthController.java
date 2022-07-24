@@ -3,11 +3,11 @@ package com.nhnacademy.marketgg.auth.controller;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
+import com.nhnacademy.marketgg.auth.annotation.Token;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import java.util.Objects;
-import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,19 +26,17 @@ public class AuthController {
     /**
      * JWT 를 갱신 요청합니다.
      *
-     * @param request - Http 헤더에 JWT 토큰을 담아 요청을 전달합니다.
+     * @param token - 검증된 JWT
      * @return 요청 결과를 반환합니다.
      */
     @GetMapping("/refresh")
-    public ResponseEntity<Void> renewToken(final HttpServletRequest request) {
-        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+    public ResponseEntity<Void> renewToken(@Token String token) {
+
         HttpStatus httpStatus = OK;
 
-        TokenResponse newToken = null;
-        if (authorizationHeader.isBlank()
-            || ((newToken =
-            authService.renewToken(authorizationHeader.substring(TokenUtils.BEARER_LENGTH)))
-            == null)) {
+        TokenResponse newToken = authService.renewToken(token);
+
+        if (Objects.isNull(newToken)) {
             httpStatus = UNAUTHORIZED;
         }
 
@@ -57,16 +55,12 @@ public class AuthController {
     /**
      * 회원이 로그아웃 요청 시 실행되는 메서드입니다.
      *
-     * @param request - 회원의 요청정보입니다.
+     * @param token - 검증된 JWT
      * @return 로그아웃이 완료되었다는 뜻으로 200 OK 를 응답합니다.
      */
     @GetMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-        if (Objects.nonNull(authorizationHeader)) {
-            authService.logout(authorizationHeader.substring(TokenUtils.BEARER_LENGTH));
-        }
+    public ResponseEntity<Void> logout(@Token String token) {
+        authService.logout(token);
 
         return ResponseEntity.status(OK)
                              .build();
