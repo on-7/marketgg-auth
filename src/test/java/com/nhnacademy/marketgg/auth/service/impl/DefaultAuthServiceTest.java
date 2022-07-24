@@ -7,7 +7,9 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -56,7 +58,7 @@ class DefaultAuthServiceTest {
         String uuid = UUID.randomUUID().toString();
 
         given(tokenUtils.getUuidFromToken(jwt)).willReturn(uuid);
-        given(tokenUtils.isInvalidToken(jwt)).willReturn(false);
+        lenient().when(tokenUtils.isInvalidToken(jwt)).thenReturn(false);
 
         HashOperations<String, Object, Object> mockHash
             = mock(HashOperations.class);
@@ -83,13 +85,17 @@ class DefaultAuthServiceTest {
         String uuid = UUID.randomUUID().toString();
 
         given(tokenUtils.getUuidFromToken(jwt)).willReturn(uuid);
-        given(tokenUtils.isInvalidToken(jwt)).willReturn(true);
+        lenient().when(tokenUtils.isInvalidToken(jwt)).thenReturn(true);
 
         HashOperations<String, Object, Object> mockHash
             = mock(HashOperations.class);
 
         given(redisTemplate.opsForHash()).willReturn(mockHash);
         given(mockHash.delete(uuid, TokenUtils.REFRESH_TOKEN)).willReturn(0L);
+
+        ValueOperations<String, Object> mockValue = mock(ValueOperations.class);
+        given(redisTemplate.opsForValue()).willReturn(mockValue);
+        willDoNothing().given(mockValue).set(any(), anyBoolean(), anyLong(), any(TimeUnit.class));
 
         authService.logout(jwt);
 

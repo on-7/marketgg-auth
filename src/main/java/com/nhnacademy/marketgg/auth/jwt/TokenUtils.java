@@ -42,9 +42,8 @@ public class TokenUtils {
     public static final String REFRESH_TOKEN = "REFRESH_TOKEN";
     public static final String JWT_EXPIRE = "JWT-Expire";
     public static final String BEARER = "Bearer ";
-    public static final int BEARER_LENGTH = 7;
-
     private static final String AUTHORITIES = "AUTHORITIES";
+    public static final int BEARER_LENGTH = 7;
 
     private final RestTemplate restTemplate;
     private final Key key;
