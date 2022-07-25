@@ -57,10 +57,8 @@ public class RedisConfig {
      */
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
+        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(host, port);
 
-        configuration.setHostName(host);
-        configuration.setPort(port);
         configuration.setPassword(password);
         configuration.setDatabase(database);
 
@@ -76,9 +74,7 @@ public class RedisConfig {
      * @since 1.0.0
      */
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(
-            RedisConnectionFactory redisConnectionFactory) {
-
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
 
         redisTemplate.setConnectionFactory(redisConnectionFactory);

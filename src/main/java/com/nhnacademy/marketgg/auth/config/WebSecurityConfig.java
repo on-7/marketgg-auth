@@ -40,8 +40,7 @@ public class WebSecurityConfig {
      * @see <a href="https://docs.spring.io/spring-security/site/docs/current/api/org/springframework/security/config/annotation/authentication/configuration/AuthenticationConfiguration.html">AuthenticationConfiguration</a>
      */
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
-        throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
