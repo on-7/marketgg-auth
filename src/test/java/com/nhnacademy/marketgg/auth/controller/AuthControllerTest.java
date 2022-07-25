@@ -8,11 +8,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.marketgg.auth.aspect.TokenAspect;
 import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import java.time.LocalDateTime;
+import java.util.Date;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +26,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(AuthController.class)
-@Import(WebSecurityConfig.class)
+@Import({ WebSecurityConfig.class, TokenAspect.class })
 @MockBean({
     AuthenticationManager.class,
     TokenUtils.class,
@@ -40,6 +47,9 @@ public class AuthControllerTest {
     @Autowired
     ObjectMapper mapper;
 
+    @Autowired
+    TokenUtils tokenUtils;
+
     @MockBean
     AuthService authService;
 
@@ -50,14 +60,18 @@ public class AuthControllerTest {
     @DisplayName("JWT 갱신 요청")
     void testRenewToken() throws Exception {
         LocalDateTime now = LocalDateTime.now();
-        TokenResponse tokenResponse = new TokenResponse("jwt", now);
 
-        given(authService.renewToken("JWT-TOKEN")).willReturn(tokenResponse);
+        Authentication authentication =
+            new UsernamePasswordAuthenticationToken("username", "password");
+        String token = createToken(authentication, new Date(), 60000L);
+        TokenResponse tokenResponse = new TokenResponse(token, now);
+
+        given(authService.renewToken(token)).willReturn(tokenResponse);
 
         mockMvc.perform(get("/auth/refresh")
-                   .header(HttpHeaders.AUTHORIZATION, "Bearer JWT-TOKEN"))
+                   .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                .andExpect(status().isOk())
-               .andExpect(header().string(HttpHeaders.AUTHORIZATION, "Bearer jwt"))
+               .andExpect(header().string(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                .andDo(print());
     }
 
@@ -80,6 +94,13 @@ public class AuthControllerTest {
                .andDo(print());
         doNothing().when(authService).logout("JWT-TOKEN");
 
+    }
+
+    private String createToken(Authentication authentication, Date issueDate, long expirationDate) {
+        ReflectionTestUtils.setField(tokenUtils, "key", Keys.hmacShaKeyFor(
+            Decoders.BASE64URL.decode("test-keytest-keytest-keytest-keytest-keytest-key")));
+        return ReflectionTestUtils.invokeMethod(tokenUtils, "createToken", authentication,
+            issueDate, expirationDate);
     }
 
 }

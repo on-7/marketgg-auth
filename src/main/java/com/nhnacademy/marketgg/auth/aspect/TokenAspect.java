@@ -1,13 +1,15 @@
 package com.nhnacademy.marketgg.auth.aspect;
 
+import com.nhnacademy.marketgg.auth.annotation.Token;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
-import java.util.Arrays;
+import java.lang.reflect.Parameter;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -35,6 +37,7 @@ public class TokenAspect {
      */
     @Around("execution(* com.nhnacademy.marketgg.auth.controller.*.*(.., @com.nhnacademy.marketgg.auth.annotation.Token (*), ..))")
     public Object parseToken(ProceedingJoinPoint pjp) throws Throwable {
+        log.info("Method: {}", pjp.getSignature().getName());
         ServletRequestAttributes requestAttributes =
             Objects.requireNonNull(
                 (ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
@@ -51,13 +54,18 @@ public class TokenAspect {
         String jwt = token.substring(TokenUtils.BEARER_LENGTH);
         log.info("Parsed jwt = {}", jwt);
 
-        Object[] args = Arrays.stream(pjp.getArgs())
-                              .map(arg -> {
-                                  if (arg instanceof String) {
-                                      arg = jwt;
-                                  }
-                                  return arg;
-                              }).toArray();
+        Object[] args = pjp.getArgs();
+
+        MethodSignature methodSignature = (MethodSignature) pjp.getSignature();
+        Parameter[] parameters = methodSignature.getMethod().getParameters();
+        boolean isFound = false;
+        for (int i = 0; i < parameters.length && !isFound; i++) {
+            Parameter parameter = parameters[i];
+            if (parameter.getAnnotation(Token.class) != null) {
+                args[i] = jwt;
+                break;
+            }
+        }
 
         return pjp.proceed(args);
     }
