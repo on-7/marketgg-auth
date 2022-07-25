@@ -67,8 +67,7 @@ public class TokenUtils {
                       @Value("${gg.jwt.expire-time}") long tokenExpirationDate,
                       @Value("${gg.jwt.refresh-expire-time}") long refreshTokenExpirationDate) {
         this.restTemplate = restTemplate;
-        // this.key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(this.getJwtSecret(secretUrl)));
-        this.key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secretUrl));
+        this.key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(this.getJwtSecret(secretUrl)));
         this.tokenExpirationDate = tokenExpirationDate;
         this.refreshTokenExpirationDate = refreshTokenExpirationDate;
     }
