@@ -89,15 +89,16 @@ public class RedisConfig {
     }
 
     private String[] getRedisInfo(String infoUrl) {
-        Map<String, Map<String, String>> response =
-                restTemplate.getForObject(infoUrl, Map.class);
+        // Map<String, Map<String, String>> response =
+        //         restTemplate.getForObject(infoUrl, Map.class);
+        //
+        // String connectInfo = Optional.ofNullable(response)
+        //                              .orElseThrow(IllegalArgumentException::new)
+        //                              .get("body")
+        //                              .get("secret");
 
-        String connectInfo = Optional.ofNullable(response)
-                                     .orElseThrow(IllegalArgumentException::new)
-                                     .get("body")
-                                     .get("secret");
-
-        String[] info = connectInfo.split(":");
+        // String[] info = connectInfo.split(":");
+        String[] info = infoUrl.split(":");
 
         if (info.length != 3) {
             throw new SecureManagerException();
