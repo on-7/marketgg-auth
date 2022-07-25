@@ -6,19 +6,20 @@ import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.exception.AuthNotFoundException;
+import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.repository.AuthRepository;
 import com.nhnacademy.marketgg.auth.repository.RoleRepository;
 import com.nhnacademy.marketgg.auth.service.AuthInfoService;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +31,7 @@ public class DefaultAuthInfoService implements AuthInfoService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
-    public MemberResponse findAuthByUuid(final String token) {
+    public MemberResponse findAuthByUuid(final String token){
         String uuid = tokenUtils.getUuidFromToken(token);
         Auth auth = authRepository.findByUuid(uuid)
                                   .orElseThrow(AuthNotFoundException::new);
@@ -52,12 +53,12 @@ public class DefaultAuthInfoService implements AuthInfoService {
         List<SimpleGrantedAuthority> roles = roleRepository.findRolesByAuthId(updatedAuth.getId())
                                                            .stream()
                                                            .map(r -> new SimpleGrantedAuthority(
-                                                                   r.getName().name()))
+                                                               r.getName().name()))
                                                            .collect(
-                                                                   Collectors.toUnmodifiableList());
+                                                               Collectors.toUnmodifiableList());
 
         UsernamePasswordAuthenticationToken auth =
-                new UsernamePasswordAuthenticationToken(updatedAuth.getUuid(), "", roles);
+            new UsernamePasswordAuthenticationToken(updatedAuth.getUuid(), "", roles);
 
         return tokenUtils.saveRefreshToken(redisTemplate, auth);
     }

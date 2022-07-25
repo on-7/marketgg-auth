@@ -19,16 +19,12 @@ import com.nhnacademy.marketgg.auth.service.SignUpService;
 import com.nhnacademy.marketgg.auth.util.MailUtils;
 import com.nhnacademy.marketgg.auth.util.RedisUtils;
 import com.nhnacademy.marketgg.auth.util.Status;
+import javax.management.relation.RoleNotFoundException;
+import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.RoleNotFoundException;
-import javax.transaction.Transactional;
-
-/**
- * 회원가입에 필요한 메서드를 담은 구현체 입니다.
- */
 @Service
 @RequiredArgsConstructor
 public class DefaultSignUpService implements SignUpService {
@@ -56,7 +52,7 @@ public class DefaultSignUpService implements SignUpService {
         if (signUpRequest.getReferrerEmail() != null) {
             Auth referrerAuth = authRepository.findByEmail(signUpRequest.getReferrerEmail())
                                               .orElseThrow(() -> new AuthNotFoundException(
-                                                      signUpRequest.getReferrerEmail()));
+                                                  signUpRequest.getReferrerEmail()));
 
             referrerUuid = referrerAuth.getUuid();
         }
@@ -68,7 +64,7 @@ public class DefaultSignUpService implements SignUpService {
         Long authNo = savedAuth.getId();
         Role role = roleRepository.findByName(Roles.ROLE_USER)
                                   .orElseThrow(
-                                          () -> new RoleNotFoundException("해당 권한은 존재 하지 않습니다."));
+                                      () -> new RoleNotFoundException("해당 권한은 존재 하지 않습니다."));
         AuthRole.Pk pk = new AuthRole.Pk(authNo, role.getId());
         AuthRole authRole = new AuthRole(pk, savedAuth, role);
         authRoleRepository.save(authRole);
@@ -115,7 +111,10 @@ public class DefaultSignUpService implements SignUpService {
             redisUtils.deleteAuth(key);
         }
 
-        return new UseEmailResponse(Boolean.TRUE);
+        UseEmailResponse useEmailResponse = new UseEmailResponse();
+        useEmailResponse.setIsUseEmail(Boolean.FALSE);
+
+        return useEmailResponse;
     }
 
     private boolean isReferrer(EmailRequest emailRequest) {
