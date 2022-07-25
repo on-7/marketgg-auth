@@ -25,13 +25,13 @@ public class OAuth2Service {
 
     private static final String GOOGLE_TOKEN_REQUEST_URL = "https://oauth2.googleapis.com/token";
 
-    @Value("${google.client-id}")
+    @Value("${gg.google.client-id}")
     private String googleClientId;
 
-    @Value("${google.client-key}")
+    @Value("${gg.google.client-key}")
     private String googleClientKey;
 
-    @Value("${google.redirect-uri}")
+    @Value("${gg.google.redirect-uri}")
     private String redirectUri;
 
     private final RestTemplate restTemplate;

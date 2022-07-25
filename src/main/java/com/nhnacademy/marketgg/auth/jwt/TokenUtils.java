@@ -63,9 +63,9 @@ public class TokenUtils {
      * @param restTemplate - restTemplate 스프링 빈을 주입받습니다.
      */
     public TokenUtils(RestTemplate restTemplate,
-                      @Value("${jwt.secret-url}") String secretUrl,
-                      @Value("${jwt.expire-time}") long tokenExpirationDate,
-                      @Value("${jwt.refresh-expire-time}") long refreshTokenExpirationDate) {
+                      @Value("${gg.jwt.secret-url}") String secretUrl,
+                      @Value("${gg.jwt.expire-time}") long tokenExpirationDate,
+                      @Value("${gg.jwt.refresh-expire-time}") long refreshTokenExpirationDate) {
         this.restTemplate = restTemplate;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(this.getJwtSecret(secretUrl)));
         this.tokenExpirationDate = tokenExpirationDate;

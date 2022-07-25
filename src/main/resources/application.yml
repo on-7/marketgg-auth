@@ -1,31 +1,7 @@
 spring:
-  
-  profiles:
-    include: db, mail, oauth2
+  application:
+    name: marketgg-auth
 
-  jpa:
-    show-sql: true
-    properties:
-      hibernate.format_sql: true
-      decorator:
-        datasource:
-          p6spy:
-            enable-logging: true
-      hibernate:
-        hbm2ddl:
-          auto: create
-  
-  thymeleaf:
-    cache: false
-
-server:
-  port: 7070
-
-jwt:
-  secret-url: https://api-keymanager.cloud.toast.com/keymanager/v1.0/appkey/mcXcTmrnbRezlila/secrets/2e2391a7260646499390dc43b38a3cd0
-  expire-time: 1800000 # 30분
-  refresh-expire-time: 604800000 # 7일
-
-redis:
-  url: https://api-keymanager.cloud.toast.com/keymanager/v1.0/appkey/mcXcTmrnbRezlila/secrets/5408ab7824e3463fa31f054b9e5f19f8
-  password-url: https://api-keymanager.cloud.toast.com/keymanager/v1.0/appkey/mcXcTmrnbRezlila/secrets/42c84798d4784e83be3c568a75809829
+  config:
+#    import: "optional:configserver:http://127.0.0.1:8888"
+    import: "optional:configserver:http://133.186.209.70:8888"

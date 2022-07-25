@@ -28,9 +28,17 @@ public class RedisConfig {
     private final int database;
     private final String password;
 
+    /**
+     * RedisConfig 생성자입니다.
+     *
+     * @param restTemplate     - Redis 명령어를 수행하기 위한 고수준 추상화 클래스
+     * @param redisInfoUrl     - 암호화한 Redis Info 경로
+     * @param redisPasswordUrl - 암호화한 Redis 비밀번호 경로
+     */
     public RedisConfig(RestTemplate restTemplate,
-                       @Value("${redis.password-url}") String redisPasswordUrl,
-                       @Value("${redis.url}") String redisInfoUrl) {
+                       @Value("${gg.redis.url}") String redisInfoUrl,
+                       @Value("${gg.redis.password-url}") String redisPasswordUrl) {
+
         this.restTemplate = restTemplate;
         String[] info = this.getRedisInfo(redisInfoUrl);
         this.host = info[0];
@@ -69,7 +77,7 @@ public class RedisConfig {
      */
     @Bean
     public RedisTemplate<String, Object> redisTemplate(
-        RedisConnectionFactory redisConnectionFactory) {
+            RedisConnectionFactory redisConnectionFactory) {
 
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
 
@@ -82,7 +90,7 @@ public class RedisConfig {
 
     private String[] getRedisInfo(String infoUrl) {
         Map<String, Map<String, String>> response =
-            restTemplate.getForObject(infoUrl, Map.class);
+                restTemplate.getForObject(infoUrl, Map.class);
 
         String connectInfo = Optional.ofNullable(response)
                                      .orElseThrow(IllegalArgumentException::new)
@@ -100,7 +108,7 @@ public class RedisConfig {
 
     private String getRedisPassword(String passwordUrl) {
         Map<String, Map<String, String>> response =
-            restTemplate.getForObject(passwordUrl, Map.class);
+                restTemplate.getForObject(passwordUrl, Map.class);
 
         return Optional.ofNullable(response)
                        .orElseThrow(IllegalArgumentException::new)
