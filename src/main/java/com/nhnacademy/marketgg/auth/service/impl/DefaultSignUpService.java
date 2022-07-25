@@ -115,7 +115,7 @@ public class DefaultSignUpService implements SignUpService {
             redisUtils.deleteAuth(key);
         }
 
-        return new UseEmailResponse(Boolean.TRUE);
+        return new UseEmailResponse(true);
     }
 
     private boolean isReferrer(EmailRequest emailRequest) {
