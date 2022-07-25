@@ -6,14 +6,37 @@ import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
 
+/**
+ * 사용자 정보 요청 관련 비즈니스 로직을 처리합니다.
+ *
+ * @version 1.0.0
+ */
 public interface AuthInfoService {
 
+    /**
+     * UUID 를 이용하여 사용자를 찾아 반환합니다.
+     *
+     * @param token - JWT
+     * @return - 사용자 정보를 반환합니다.
+     * @throws UnAuthorizationException - 유효하지 않은 JWT 로 요청시 발생하는 예외입니다.
+     */
     MemberResponse findAuthByUuid(final String token) throws UnAuthorizationException;
 
-    TokenResponse update(final String token, final AuthUpdateRequest authUpdateRequest)
-        throws UnAuthorizationException;
+    /**
+     * 사용자 정보를 업데이트합니다.
+     *
+     * @param token             -  JWT
+     * @param authUpdateRequest - 사용자 업데이트 정보
+     * @return - 새로운 JWT
+     */
+    TokenResponse update(final String token, final AuthUpdateRequest authUpdateRequest);
 
-    void withdraw(final String token, final AuthWithDrawRequest authWithDrawRequest)
-        throws UnAuthorizationException;
+    /**
+     * 회원탈퇴합니다.
+     *
+     * @param token               - JWT
+     * @param authWithDrawRequest - 탈퇴한 사용자 정보
+     */
+    void withdraw(final String token, final AuthWithDrawRequest authWithDrawRequest);
 
 }

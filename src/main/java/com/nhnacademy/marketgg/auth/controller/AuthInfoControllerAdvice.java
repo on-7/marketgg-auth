@@ -14,6 +14,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class AuthInfoControllerAdvice {
 
+    /**
+     * 사용자 정보 요청 시 발생하는 예외를 처리합니다.
+     *
+     * @param e - 발생한 예외
+     * @return - 클라이언트 오류 코드를 반환합니다.
+     */
     @ExceptionHandler({
         AuthNotFoundException.class
     })

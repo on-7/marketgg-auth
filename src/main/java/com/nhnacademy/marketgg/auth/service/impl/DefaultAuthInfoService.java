@@ -30,12 +30,20 @@ public class DefaultAuthInfoService implements AuthInfoService {
     private final RoleRepository roleRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
+    @Override
+    public MemberResponse findAuthByUuid(final String token){
+        String uuid = tokenUtils.getUuidFromToken(token);
+        Auth auth = authRepository.findByUuid(uuid)
+                                  .orElseThrow(AuthNotFoundException::new);
+
+        return new MemberResponse(auth.getEmail(), auth.getName(), auth.getPhoneNumber());
+    }
+
     @Transactional
     @Override
-    public TokenResponse update(final String token, final AuthUpdateRequest authUpdateRequest)
-        throws UnAuthorizationException {
+    public TokenResponse update(final String token, final AuthUpdateRequest authUpdateRequest) {
 
-        String uuid = getUuid(token);
+        String uuid = tokenUtils.getUuidFromToken(token);
         Auth updatedAuth = authRepository.findByUuid(uuid)
                                          .orElseThrow(AuthNotFoundException::new);
 
@@ -57,41 +65,14 @@ public class DefaultAuthInfoService implements AuthInfoService {
 
     @Transactional
     @Override
-    public void withdraw(String token, final AuthWithDrawRequest authWithDrawRequest)
-        throws UnAuthorizationException {
+    public void withdraw(String token, final AuthWithDrawRequest authWithDrawRequest) {
 
-        Auth deletedAuth = authRepository.findByUuid(getUuid(token))
+        String uuid = tokenUtils.getUuidFromToken(token);
+
+        Auth deletedAuth = authRepository.findByUuid(uuid)
                                          .orElseThrow(AuthNotFoundException::new);
 
         deletedAuth.deleteAuth(authWithDrawRequest);
-    }
-
-    private String getUuid(String token)
-        throws UnAuthorizationException {
-
-        if (Objects.isNull(token)
-            || tokenUtils.isInvalidToken(token)) {
-            throw new UnAuthorizationException();
-        }
-
-        String jwt = token.substring(TokenUtils.BEARER_LENGTH);
-
-        return tokenUtils.getUuidFromToken(jwt);
-    }
-
-    @Override
-    public MemberResponse findAuthByUuid(final String token) throws UnAuthorizationException {
-        if (Objects.isNull(token) || tokenUtils.isInvalidToken(token)) {
-            throw new UnAuthorizationException();
-        }
-
-        String jwt = token.substring(TokenUtils.BEARER_LENGTH);
-        String uuid = tokenUtils.getUuidFromToken(jwt);
-
-        Auth auth = authRepository.findByUuid(uuid)
-                                  .orElseThrow(AuthNotFoundException::new);
-
-        return new MemberResponse(auth.getEmail(), auth.getName(), auth.getPhoneNumber());
     }
 
 }
