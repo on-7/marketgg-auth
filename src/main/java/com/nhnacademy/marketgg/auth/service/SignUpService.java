@@ -6,8 +6,12 @@ import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
 import com.nhnacademy.marketgg.auth.dto.response.SignUpResponse;
 import com.nhnacademy.marketgg.auth.dto.response.UseEmailResponse;
+
 import javax.management.relation.RoleNotFoundException;
 
+/**
+ *  회원가입에 필요한 메서드를 담은 인터페이스 입니다.
+ */
 public interface SignUpService {
 
     /**
