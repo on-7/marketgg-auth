@@ -1,7 +1,7 @@
 package com.nhnacademy.marketgg.auth.config;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -9,7 +9,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.time.Duration;
-import java.util.Objects;
 import javax.net.ssl.SSLContext;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -20,8 +19,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
@@ -39,13 +39,12 @@ public class RestTemplateConfig {
 
         KeyStore clientStore = KeyStore.getInstance("PKCS12");
 
-        clientStore.load(new FileInputStream(ResourceUtils.getFile(
-                                 Objects.requireNonNull(this.getClass().getResource(clientCertificateResName)))),
-                         clientCertificatePassword.toCharArray());
+        Resource resource = new ClassPathResource(this.clientCertificateResName);
+        clientStore.load(resource.getInputStream(), this.clientCertificatePassword.toCharArray());
 
         SSLContext sslContext = SSLContexts.custom()
                                            .setProtocol("TLS")
-                                           .loadKeyMaterial(clientStore, clientCertificatePassword.toCharArray())
+                                           .loadKeyMaterial(clientStore, this.clientCertificatePassword.toCharArray())
                                            .loadTrustMaterial(new TrustSelfSignedStrategy())
                                            .build();
 
