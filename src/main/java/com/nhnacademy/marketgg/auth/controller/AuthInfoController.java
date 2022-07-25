@@ -1,11 +1,8 @@
 package com.nhnacademy.marketgg.auth.controller;
 
-import static org.springframework.http.HttpStatus.OK;
-
 import com.nhnacademy.marketgg.auth.annotation.Token;
 import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
-import com.nhnacademy.marketgg.auth.dto.response.AuthUpdateResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.dto.response.common.CommonResponse;
@@ -25,6 +22,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import static org.springframework.http.HttpStatus.OK;
 
 /**
  * 회원 정보 관련 정보 요청을 처리하는 클래스입니다.
@@ -52,13 +51,15 @@ public class AuthInfoController {
                                        @RequestBody final AuthUpdateRequest authUpdateRequest) {
 
         TokenResponse update
-            = authInfoService.update(token, authUpdateRequest);
+                = authInfoService.update(token, authUpdateRequest);
 
         authService.logout(token);
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(update.getJwt());
         httpHeaders.set(TokenUtils.JWT_EXPIRE, update.getExpiredDate().toString());
+
+        // FIXME : 수정전,후 회원의 uuid 를 반환 해야함.
 
         return ResponseEntity.status(OK)
                              .headers(httpHeaders)
@@ -68,15 +69,16 @@ public class AuthInfoController {
     /**
      * 회원정보 삭제를 위한 컨트롤러 메서드 입니다.
      *
-     * @param token - JWT
-     * @return - AuthWithdrawResponse Auth 서버와 Shop 서버간의 통신에서 오는 시간 격차를 줄이기 위한 객체 입니다.
+     * @param token               - JWT
+     * @param authWithDrawRequest - 삭제될 날짜를 담은 객체입니다.
+     * @return - 상태코드를 리턴합니다.
      */
     @DeleteMapping
-    public ResponseEntity<AuthUpdateResponse> withdraw(
-        @Token String token,
-        @RequestBody final AuthWithDrawRequest authWithDrawRequest) {
+    public ResponseEntity<Void> withdraw(@Token String token,
+                                         @RequestBody final AuthWithDrawRequest authWithDrawRequest) {
 
         authInfoService.withdraw(token, authWithDrawRequest);
+        authService.logout(token);
 
         return ResponseEntity.status(OK)
                              .build();
@@ -91,11 +93,11 @@ public class AuthInfoController {
      */
     @GetMapping
     public ResponseEntity<? extends CommonResponse> getAuthInfo(@Token String token)
-        throws UnAuthorizationException {
+            throws UnAuthorizationException {
 
         MemberResponse auth = authInfoService.findAuthByUuid(token);
         SingleResponse<MemberResponse> memberResponseSingleResponse =
-            new SingleResponse<>(auth);
+                new SingleResponse<>(auth);
 
         return ResponseEntity.status(HttpStatus.OK)
                              .contentType(MediaType.APPLICATION_JSON)

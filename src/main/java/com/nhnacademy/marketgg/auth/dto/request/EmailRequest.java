@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * 존재하는 이메일과 추천인 이메일의 존재를 확인하기 위한 클래스입니다.
+ * 중복 이메일처리와 해당 이메일이 추천인 이메일인지를 확인하기 위한 클래스입니다.
  */
 @AllArgsConstructor
 @NoArgsConstructor
