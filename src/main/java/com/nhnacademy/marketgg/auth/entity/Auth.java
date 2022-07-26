@@ -1,22 +1,27 @@
 package com.nhnacademy.marketgg.auth.entity;
 
 import com.nhnacademy.marketgg.auth.constant.Provider;
+import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
-import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
-import com.nhnacademy.marketgg.auth.dto.response.AuthUpdateResponse;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 /**
  * 회원의 정보를 저장합니다.
@@ -73,6 +78,11 @@ public class Auth {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    /**
+     * 회원가입에 필요한 정보를 받아 인증 객체를 생성하는 생성자입니다.
+     *
+     * @param signUpRequest - 회원가입 요청 정보 객체
+     */
     public Auth(final SignUpRequest signUpRequest) {
         this.uuid = UUID.randomUUID().toString();
         this.email = signUpRequest.getEmail();
@@ -84,6 +94,11 @@ public class Auth {
         this.createdAt = LocalDateTime.now();
     }
 
+    /**
+     * 인증 갱신과 관련된 요청을 받아 인증 정보를 갱신하는 메서드입니다.
+     *
+     * @param authUpdateRequest - 인증 정보 갱신 요청 객체
+     */
     public void updateAuth(final AuthUpdateRequest authUpdateRequest) {
         this.uuid = UUID.randomUUID().toString();
         this.email = authUpdateRequest.getEmail();
@@ -124,4 +139,5 @@ public class Auth {
     public void updateUuid(final String uuid) {
         this.uuid = uuid;
     }
+
 }
