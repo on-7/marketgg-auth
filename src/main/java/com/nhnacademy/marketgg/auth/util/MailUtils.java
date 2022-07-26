@@ -16,16 +16,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class MailUtils {
 
-    @Value("${mail.username}")
+    @Value("${gg.mail.username}")
     private String fromEmail;
 
-    @Value("${mail.password}")
+    @Value("${gg.mail.password}")
     private String fromEmailPassword;
 
-    @Value("${mail.host}")
+    @Value("${gg.mail.host}")
     private String toHost;
 
-    @Value("${mail.port}")
+    @Value("${gg.mail.port}")
     private String toPort;
 
     private final Session session;

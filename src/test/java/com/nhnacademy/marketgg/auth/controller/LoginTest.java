@@ -15,8 +15,6 @@ import com.nhnacademy.marketgg.auth.service.AuthService;
 import com.nhnacademy.marketgg.auth.service.SignUpService;
 import java.util.List;
 import javax.management.relation.RoleNotFoundException;
-
-import com.nhnacademy.marketgg.auth.service.SignUpService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -72,8 +70,8 @@ class LoginTest {
         String requestJson = mapper.writeValueAsString(loginRequest);
 
         mockMvc.perform(post("/auth/login")
-                   .contentType(MediaType.APPLICATION_JSON)
-                   .content(requestJson))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestJson))
                .andExpect(status().isOk())
                .andExpect(header().exists(HttpHeaders.AUTHORIZATION));
     }
@@ -88,8 +86,8 @@ class LoginTest {
         String requestJson = mapper.writeValueAsString(loginRequest);
 
         mockMvc.perform(post("/auth/login")
-                   .contentType(MediaType.APPLICATION_JSON)
-                   .content(requestJson))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestJson))
                .andExpect(status().isUnauthorized())
                .andDo(print());
     }
