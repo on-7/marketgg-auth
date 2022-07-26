@@ -1,15 +1,14 @@
 package com.nhnacademy.marketgg.auth.config;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.security.KeyManagementException;
+import java.io.UncheckedIOException;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.time.Duration;
+import java.util.Optional;
 import javax.net.ssl.SSLContext;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -24,40 +23,77 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * REST 형식에 맞는 HTTP 통신에 사용 가능한 템플릿 설정 클래스입니다.
+ */
+@Slf4j
 @Configuration
 public class RestTemplateConfig {
 
-    @Value("${gg.client-certificate.resource-name}")
-    private String clientCertificateResName;
+    @Bean
+    CloseableHttpClient httpClient(final @Value("${gg.keystore.type}") String keystoreType,
+                                   final @Value("${gg.keystore.path}") String keystorePath,
+                                   final @Value("${gg.keystore.password}") String keystorePassword,
+                                   final @Value("${gg.protocol}") String protocol) {
 
-    @Value("${gg.client-certificate.password}")
-    private String clientCertificatePassword;
+        SSLContext sslContext;
+
+        try {
+
+            KeyStore clientStore = KeyStore.getInstance(keystoreType);
+            Resource resource = new ClassPathResource(keystorePath);
+            clientStore.load(resource.getInputStream(), keystorePassword.toCharArray());
+
+            sslContext = SSLContexts.custom()
+                                    .setProtocol(protocol)
+                                    .loadKeyMaterial(clientStore, keystorePassword.toCharArray())
+                                    .loadTrustMaterial(new TrustSelfSignedStrategy())
+                                    .build();
+
+        } catch (GeneralSecurityException gse) {
+            log.error("", gse);
+            throw new IllegalArgumentException(gse);
+        } catch (IOException ie) {
+            log.error("", ie);
+            throw new UncheckedIOException(ie);
+        }
+
+        SSLConnectionSocketFactory socketFactory
+                = new SSLConnectionSocketFactory(Optional.ofNullable(sslContext).orElseThrow());
+
+        return HttpClients.custom()
+                          .setSSLSocketFactory(socketFactory)
+                          .setMaxConnTotal(100)
+                          .setMaxConnPerRoute(5)
+                          .build();
+    }
 
     @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder)
-            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, IOException, CertificateException, KeyManagementException {
+    HttpComponentsClientHttpRequestFactory requestFactory(final HttpClient httpClient) {
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
 
-        KeyStore clientStore = KeyStore.getInstance("PKCS12");
+        requestFactory.setReadTimeout(5_000);
+        requestFactory.setConnectTimeout(3_000);
+        requestFactory.setHttpClient(httpClient);
 
-        Resource resource = new ClassPathResource(this.clientCertificateResName);
-        clientStore.load(resource.getInputStream(), this.clientCertificatePassword.toCharArray());
+        return requestFactory;
+    }
 
-        SSLContext sslContext = SSLContexts.custom()
-                                           .setProtocol("TLS")
-                                           .loadKeyMaterial(clientStore, this.clientCertificatePassword.toCharArray())
-                                           .loadTrustMaterial(new TrustSelfSignedStrategy())
-                                           .build();
+    @Bean(name = "clientCertificateAuthenticationRestTemplate")
+    public RestTemplate clientCertificationRestTemplate(final HttpComponentsClientHttpRequestFactory requestFactory) {
+        return new RestTemplate(requestFactory);
+    }
 
-        SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext);
-        CloseableHttpClient httpClient = HttpClients.custom()
-                                                    .setSSLSocketFactory(socketFactory)
-                                                    .build();
-
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
-
+    /**
+     * REST 형식에 맞는 HTTP 통신에 사용 가능한 템플릿입니다.
+     *
+     * @param builder - RestTemplate 생성 시 필요한 설정을 포함하여 RestTemplate 빈 생성 가능한 객체
+     * @return RestTemplate
+     */
+    @Bean
+    public RestTemplate restTemplate(final RestTemplateBuilder builder) {
         return builder.setReadTimeout(Duration.ofSeconds(5L))
                       .setConnectTimeout(Duration.ofSeconds(3L))
-                      .requestFactory(() -> factory)
                       .build();
     }
 

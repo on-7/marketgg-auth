@@ -3,6 +3,7 @@ package com.nhnacademy.marketgg.auth.config;
 import com.nhnacademy.marketgg.auth.exception.SecureManagerException;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,7 +36,7 @@ public class RedisConfig {
      * @param redisInfoUrl     - 암호화한 Redis Info 경로
      * @param redisPasswordUrl - 암호화한 Redis 비밀번호 경로
      */
-    public RedisConfig(RestTemplate restTemplate,
+    public RedisConfig(@Qualifier("clientCertificateAuthenticationRestTemplate") RestTemplate restTemplate,
                        @Value("${gg.redis.url}") String redisInfoUrl,
                        @Value("${gg.redis.password-url}") String redisPasswordUrl) {
 

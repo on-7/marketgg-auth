@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -62,7 +63,7 @@ public class TokenUtils {
      * @param refreshTokenExpirationDate - Refresh Token 의 유효기간
      * @param restTemplate - restTemplate 스프링 빈을 주입받습니다.
      */
-    public TokenUtils(RestTemplate restTemplate,
+    public TokenUtils(@Qualifier("clientCertificateAuthenticationRestTemplate") RestTemplate restTemplate,
                       @Value("${gg.jwt.secret-url}") String secretUrl,
                       @Value("${gg.jwt.expire-time}") long tokenExpirationDate,
                       @Value("${gg.jwt.refresh-expire-time}") long refreshTokenExpirationDate) {
