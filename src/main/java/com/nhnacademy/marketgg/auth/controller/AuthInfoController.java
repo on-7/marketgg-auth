@@ -1,5 +1,7 @@
 package com.nhnacademy.marketgg.auth.controller;
 
+import static org.springframework.http.HttpStatus.OK;
+
 import com.nhnacademy.marketgg.auth.annotation.Token;
 import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
@@ -23,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.springframework.http.HttpStatus.OK;
-
 /**
  * 회원 정보 관련 정보 요청을 처리하는 클래스입니다.
  *
@@ -36,7 +36,6 @@ import static org.springframework.http.HttpStatus.OK;
 public class AuthInfoController {
 
     private final AuthInfoService authInfoService;
-
     private final AuthService authService;
 
     /**
@@ -50,16 +49,13 @@ public class AuthInfoController {
     public ResponseEntity<Void> update(@Token String token,
                                        @RequestBody final AuthUpdateRequest authUpdateRequest) {
 
-        TokenResponse update
-                = authInfoService.update(token, authUpdateRequest);
+        TokenResponse update = authInfoService.update(token, authUpdateRequest);
 
         authService.logout(token);
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(update.getJwt());
         httpHeaders.set(TokenUtils.JWT_EXPIRE, update.getExpiredDate().toString());
-
-        // FIXME : 수정전,후 회원의 uuid 를 반환 해야함.
 
         return ResponseEntity.status(OK)
                              .headers(httpHeaders)
@@ -92,12 +88,9 @@ public class AuthInfoController {
      * @throws UnAuthorizationException - JWT 를 통해 인증할 수 없는 사용자일 경우 발생하는 예외
      */
     @GetMapping
-    public ResponseEntity<? extends CommonResponse> getAuthInfo(@Token String token)
-            throws UnAuthorizationException {
-
+    public ResponseEntity<CommonResponse> getAuthInfo(@Token String token) throws UnAuthorizationException {
         MemberResponse auth = authInfoService.findAuthByUuid(token);
-        SingleResponse<MemberResponse> memberResponseSingleResponse =
-                new SingleResponse<>(auth);
+        SingleResponse<MemberResponse> memberResponseSingleResponse = new SingleResponse<>(auth);
 
         return ResponseEntity.status(HttpStatus.OK)
                              .contentType(MediaType.APPLICATION_JSON)
