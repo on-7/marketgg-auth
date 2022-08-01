@@ -31,9 +31,16 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final TokenUtils tokenUtils;
     private final RedisTemplate<String, Object> redisTemplate;
 
+    /**
+     * JWT 인증 필터를 위한 생성자입니다.
+     *
+     * @param authenticationManager - 인증 매니저
+     * @param mapper                - (역)직렬화를 위한 매퍼
+     * @param tokenUtils            - 토큰과 관련된 유틸리티 객체
+     * @param redisTemplate         - Redis 데이터베이스 사용을 위한 템플릿
+     */
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager, ObjectMapper mapper,
-                                   TokenUtils tokenUtils,
-                                   RedisTemplate<String, Object> redisTemplate) {
+                                   TokenUtils tokenUtils, RedisTemplate<String, Object> redisTemplate) {
 
         super(authenticationManager);
         this.mapper = mapper;
@@ -43,17 +50,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
-                                                HttpServletResponse response)
-        throws AuthenticationException {
+                                                HttpServletResponse response) throws AuthenticationException {
         try {
             log.info("start login");
 
-            LoginRequest loginRequest =
-                mapper.readValue(request.getInputStream(), LoginRequest.class);
+            LoginRequest loginRequest = mapper.readValue(request.getInputStream(), LoginRequest.class);
 
             UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
-                    loginRequest.getPassword());
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
 
             return getAuthenticationManager().authenticate(token);
 
@@ -61,11 +65,22 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             log.error("잘못된 로그인 요청");
             throw new InvalidLoginRequestException("잘못된 로그인 요청입니다");
         }
+
     }
 
+    /**
+     * 로그인이 성공했을 때 실행하는 메서드입니다. 레디스에 Refresh token 을 적절히 넣어줍니다.
+     *
+     * @param request    - HTTP 서블릿 요청 객체
+     * @param response   - HTTP 서블릿 응답 객체
+     * @param chain      - 필터 체인
+     * @param authResult the object returned from the <tt>attemptAuthentication</tt>
+     *                   method.
+     * @throws IOException      - 입출력 예외 발생
+     * @throws ServletException - 서블릿 관련 예외 발생
+     */
     @Override
-    protected void successfulAuthentication(HttpServletRequest request,
-                                            HttpServletResponse response,
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authResult)
         throws IOException, ServletException {
 
@@ -75,11 +90,18 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.addHeader(TokenUtils.JWT_EXPIRE, tokenResponse.getExpiredDate().toString());
     }
 
+    /**
+     * 로그인이 실패했을 때 실행하는 메서드입니다.
+     *
+     * @param request  - HTTP 서블릿 요청 객체
+     * @param response - HTTP 서블릿 응답 객체
+     * @param failed   - 로그인 실패 시 인증 예외 발생
+     * @throws IOException      - 입출력 예외 발생
+     * @throws ServletException - 서블릿 관련 예외 발생
+     */
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request,
-                                              HttpServletResponse response,
-                                              AuthenticationException failed)
-        throws IOException, ServletException {
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+                                              AuthenticationException failed) throws IOException, ServletException {
 
         log.error("로그인 실패", failed);
         getFailureHandler().onAuthenticationFailure(request, response, failed);
