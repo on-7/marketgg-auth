@@ -1,18 +1,22 @@
 package com.nhnacademy.marketgg.auth.dto.response;
 
+import com.nhnacademy.marketgg.auth.constant.Provider;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@NoArgsConstructor
 @Getter
 @ToString
-public class GoogleProfile {
+public class GoogleProfile extends OauthResponse {
 
-    private String email;
-    private String name;
-    private String gender;
-    private String address;
-    private String birthday;
+    private final String email;
+    private final String name;
+    private final String provider;
+
+    public GoogleProfile(String email, String name) {
+        super(false, null);
+        this.email = email;
+        this.name = name;
+        this.provider = Provider.GOOGLE.name();
+    }
 
 }
