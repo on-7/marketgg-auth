@@ -18,7 +18,7 @@ public class CustomUser implements UserDetails {
 
     private final String uuid;
     private final String password;
-    private final List<Role> authorities;
+    private final transient List<Role> authorities; // 직렬화 될 일이 없는 클래스입니다. SonarQube 위해 transient 추가
 
     /**
      * 권한 정보를 반환합니다.

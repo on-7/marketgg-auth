@@ -69,8 +69,7 @@ public class WebSecurityConfig {
 
         http.addFilter(getJwtAuthenticationFilter());
 
-        http.csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.httpBasic().disable()
             .formLogin().disable();
