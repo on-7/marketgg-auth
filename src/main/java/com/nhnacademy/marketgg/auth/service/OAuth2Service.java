@@ -90,8 +90,6 @@ public class OAuth2Service {
             throw new LoginFailException();
         }
 
-        log.info("tokenResponse.getBody().toString() = {}", tokenResponse.getBody().toString());
-
         Auth auth = authRepository.findByEmail(googleProfile.getEmail())
                                   .orElse(null);
 
