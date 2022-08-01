@@ -1,6 +1,5 @@
 package com.nhnacademy.marketgg.auth.config;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.security.GeneralSecurityException;
@@ -14,7 +13,6 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -61,7 +59,7 @@ public class RestTemplateConfig {
         }
 
         SSLConnectionSocketFactory socketFactory
-                = new SSLConnectionSocketFactory(Optional.ofNullable(sslContext).orElseThrow());
+            = new SSLConnectionSocketFactory(Optional.ofNullable(sslContext).orElseThrow());
 
         return HttpClients.custom()
                           .setSSLSocketFactory(socketFactory)
