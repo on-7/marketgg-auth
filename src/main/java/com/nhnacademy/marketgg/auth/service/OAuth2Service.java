@@ -2,7 +2,6 @@ package com.nhnacademy.marketgg.auth.service;
 
 import static java.util.stream.Collectors.toList;
 
-import com.nhnacademy.marketgg.auth.constant.Provider;
 import com.nhnacademy.marketgg.auth.dto.request.GoogleProfileRequest;
 import com.nhnacademy.marketgg.auth.dto.response.GoogleProfile;
 import com.nhnacademy.marketgg.auth.dto.response.OauthResponse;
@@ -90,8 +89,6 @@ public class OAuth2Service {
         if (Objects.isNull(googleProfile)) {
             throw new LoginFailException();
         }
-
-        log.info("tokenResponse.getBody().toString() = {}", tokenResponse.getBody().toString());
 
         Auth auth = authRepository.findByEmail(googleProfile.getEmail())
                                   .orElse(null);
