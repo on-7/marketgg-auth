@@ -90,7 +90,7 @@ public class WebSecurityConfig {
             new JwtAuthenticationFilter(authenticationManager(null),
                 mapper, tokenUtils, redisTemplate);
 
-        jwtAuthenticationFilter.setFilterProcessesUrl("/auth/login");
+        jwtAuthenticationFilter.setFilterProcessesUrl("/login");
 
         return jwtAuthenticationFilter;
     }

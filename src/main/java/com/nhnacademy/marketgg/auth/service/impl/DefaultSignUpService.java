@@ -53,7 +53,7 @@ public class DefaultSignUpService implements SignUpService {
 
         String referrerUuid = null;
         // 추천인 이메일이 있는경우
-        if (!signUpRequest.getReferrerEmail().isBlank()) {
+        if (hasReferer(signUpRequest.getReferrerEmail())) {
             Auth referrerAuth = authRepository.findByEmail(signUpRequest.getReferrerEmail())
                                               .orElseThrow(() -> new AuthNotFoundException(
                                                       signUpRequest.getReferrerEmail()));
@@ -74,6 +74,10 @@ public class DefaultSignUpService implements SignUpService {
         authRoleRepository.save(authRole);
         String uuid = savedAuth.getUuid();
         return new SignUpResponse(uuid, referrerUuid);
+    }
+
+    private boolean hasReferer(String email) {
+        return email != null && email.isBlank();
     }
 
     /**
