@@ -36,6 +36,7 @@ public class WebSecurityConfig {
      *
      * @param configuration - 인증 구성을 내보냅니다.
      * @return 인증 정보를 관리하는 AuthenticationManager 를 관리한다.
+     * @author 윤동열
      * @throws Exception getAuthenticationManager() 에서 throw 하는 예외입니다.
      * @see <a href="https://docs.spring.io/spring-security/site/docs/current/api/org/springframework/security/config/annotation/authentication/configuration/AuthenticationConfiguration.html">AuthenticationConfiguration</a>
      */
@@ -60,6 +61,7 @@ public class WebSecurityConfig {
      * @param http - 세부 보안 기능을 설정할 수 있는 API 제공 클래스
      * @return 인증 처리와 관련된 SecurityFilterChain
      * @throws Exception Spring Security 의 메소드에서 발생하는 예외입니다.
+     * @author 윤동열
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -97,6 +99,7 @@ public class WebSecurityConfig {
      * WebSecurity 커스터마이징을 지원합니다.
      *
      * @return WebSecurity 커스터마이징이 적용된 WebSecurityCustomizer
+     * @author 윤동열
      */
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {

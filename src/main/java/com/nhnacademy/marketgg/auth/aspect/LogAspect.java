@@ -14,6 +14,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class LogAspect {
 
+    /**
+     * 진입 메서드에 대한 로그를 남깁니다.
+     * @param jp - 메서드 정보
+     */
     @Before("execution(* com.nhnacademy.marketgg.auth.controller.*.*(*))")
     public void logEntryMethod(JoinPoint jp) {
         log.info("Controller Method: {}", jp.getSignature().getName());
