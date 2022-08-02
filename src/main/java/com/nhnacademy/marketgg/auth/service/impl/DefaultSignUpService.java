@@ -53,7 +53,7 @@ public class DefaultSignUpService implements SignUpService {
 
         String referrerUuid = null;
         // 추천인 이메일이 있는경우
-        if (signUpRequest.getReferrerEmail() != null) {
+        if (!signUpRequest.getReferrerEmail().isBlank()) {
             Auth referrerAuth = authRepository.findByEmail(signUpRequest.getReferrerEmail())
                                               .orElseThrow(() -> new AuthNotFoundException(
                                                       signUpRequest.getReferrerEmail()));

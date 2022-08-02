@@ -1,14 +1,14 @@
 package com.nhnacademy.marketgg.auth.dto.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @Getter
+@AllArgsConstructor
 public abstract class OauthResponse {
 
-    private final boolean success;
-    private final TokenResponse tokenResponse;
+    private boolean success;
+    private TokenResponse tokenResponse;
 
     public abstract String getEmail();
 

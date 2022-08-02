@@ -43,9 +43,11 @@ public class SignUpController {
     public ResponseEntity<SignUpResponse> doSignup(@RequestBody final SignUpRequest signUpRequest)
         throws RoleNotFoundException {
 
+        SignUpResponse signup = signUpService.signup(signUpRequest);
+
         return ResponseEntity.status(CREATED)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(signUpService.signup(signUpRequest));
+                             .body(signup);
     }
 
     /**
