@@ -2,6 +2,7 @@ package com.nhnacademy.marketgg.auth.service;
 
 import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
+import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
@@ -21,6 +22,14 @@ public interface AuthInfoService {
      * @throws UnAuthorizationException - 유효하지 않은 JWT 로 요청시 발생하는 예외입니다.
      */
     MemberResponse findAuthByUuid(final String token) throws UnAuthorizationException;
+
+    /**
+     * UUID 를 이용하여 사용자 정보 조회.
+     *
+     * @param uuid - 사용자 UUID
+     * @return 사용자의 이름, 이메일
+     */
+    MemberInfoResponse findMemberInfoByUuid(final String uuid);
 
     /**
      * 사용자 정보를 업데이트합니다.

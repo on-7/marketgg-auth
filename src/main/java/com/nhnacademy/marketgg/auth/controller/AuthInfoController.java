@@ -5,6 +5,8 @@ import static org.springframework.http.HttpStatus.OK;
 import com.nhnacademy.marketgg.auth.annotation.Token;
 import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
+import com.nhnacademy.marketgg.auth.dto.request.MemberInfoRequest;
+import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.dto.response.common.CommonResponse;
@@ -31,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @version 1.0.0
  */
 @RestController
-@RequestMapping("/auth/info")
+@RequestMapping("/info")
 @RequiredArgsConstructor
 public class AuthInfoController {
 
@@ -95,6 +97,21 @@ public class AuthInfoController {
         return ResponseEntity.status(HttpStatus.OK)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(memberResponseSingleResponse);
+    }
+
+    /**
+     * JWT 토큰을 이용하여 사용자 정보를 응답합니다.
+     *
+     * @param memberInfoRequest - 요청하려는 사용자 정보
+     * @return - 사용자 정보
+     */
+    @GetMapping("/person")
+    public ResponseEntity<CommonResponse> getMemberInfo(@RequestBody MemberInfoRequest memberInfoRequest) {
+        MemberInfoResponse memberInfoByUuid = authInfoService.findMemberInfoByUuid(memberInfoRequest.getUuid());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(new SingleResponse<>(memberInfoByUuid));
     }
 
 }

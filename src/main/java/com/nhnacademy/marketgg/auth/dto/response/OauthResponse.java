@@ -5,9 +5,15 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public class OauthResponse {
+public abstract class OauthResponse {
 
     private final boolean success;
     private final TokenResponse tokenResponse;
+
+    public abstract String getEmail();
+
+    public abstract String getName();
+
+    public abstract String getProvider();
 
 }
