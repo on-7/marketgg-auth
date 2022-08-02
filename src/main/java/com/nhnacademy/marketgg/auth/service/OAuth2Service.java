@@ -106,7 +106,7 @@ public class OAuth2Service {
 
         TokenResponse jwtResponse = tokenUtils.saveRefreshToken(redisTemplate, token);
 
-        return new OauthResponse(true, jwtResponse);
+        return new GoogleProfile(true, jwtResponse);
     }
 
 }

@@ -17,6 +17,13 @@ public class GoogleProfile extends OauthResponse {
         this.provider = Provider.GOOGLE.name();
     }
 
+    public GoogleProfile(boolean success, TokenResponse tokenResponse) {
+        super(success, tokenResponse);
+        this.email = null;
+        this.name = null;
+        this.provider = null;
+    }
+
     @Override
     public String getEmail() {
         return this.email;
