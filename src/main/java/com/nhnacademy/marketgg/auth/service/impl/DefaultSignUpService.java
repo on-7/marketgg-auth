@@ -19,16 +19,17 @@ import com.nhnacademy.marketgg.auth.service.SignUpService;
 import com.nhnacademy.marketgg.auth.util.MailUtils;
 import com.nhnacademy.marketgg.auth.util.RedisUtils;
 import com.nhnacademy.marketgg.auth.util.Status;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import javax.management.relation.RoleNotFoundException;
 import javax.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 /**
  * 회원가입에 필요한 메서드를 담은 구현체 입니다.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultSignUpService implements SignUpService {
@@ -50,30 +51,34 @@ public class DefaultSignUpService implements SignUpService {
     @Transactional
     @Override
     public SignUpResponse signup(final SignUpRequest signUpRequest) throws RoleNotFoundException {
-
+        log.info("request = {}", signUpRequest);
         String referrerUuid = null;
         // 추천인 이메일이 있는경우
-        if (signUpRequest.getReferrerEmail() != null) {
+        if (hasReferer(signUpRequest.getReferrerEmail())) {
             Auth referrerAuth = authRepository.findByEmail(signUpRequest.getReferrerEmail())
                                               .orElseThrow(() -> new AuthNotFoundException(
-                                                      signUpRequest.getReferrerEmail()));
+                                                  signUpRequest.getReferrerEmail()));
 
             referrerUuid = referrerAuth.getUuid();
         }
 
         // 추천인 이메일이 없는 경우.
-        signUpRequest.encodingPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+        signUpRequest.encodingPassword(passwordEncoder);
         Auth auth = new Auth(signUpRequest);
         Auth savedAuth = authRepository.save(auth);
         Long authNo = savedAuth.getId();
         Role role = roleRepository.findByName(Roles.ROLE_USER)
                                   .orElseThrow(
-                                          () -> new RoleNotFoundException("해당 권한은 존재 하지 않습니다."));
+                                      () -> new RoleNotFoundException("해당 권한은 존재 하지 않습니다."));
         AuthRole.Pk pk = new AuthRole.Pk(authNo, role.getId());
         AuthRole authRole = new AuthRole(pk, savedAuth, role);
         authRoleRepository.save(authRole);
         String uuid = savedAuth.getUuid();
         return new SignUpResponse(uuid, referrerUuid);
+    }
+
+    private boolean hasReferer(String email) {
+        return email != null && !email.isBlank();
     }
 
     /**

@@ -72,7 +72,7 @@ class SignUpControllerTest {
 
         when(signUpService.signup(testSignUpRequest)).thenReturn(any(SignUpResponse.class));
 
-        mockMvc.perform(post("/auth/signup")
+        mockMvc.perform(post("/signup")
                        .contentType(APPLICATION_JSON)
                        .content(mapper.writeValueAsString(testSignUpRequest)))
                .andExpect(status().isCreated())
@@ -90,7 +90,7 @@ class SignUpControllerTest {
         when(signUpService.checkEmail(testEmailRequest))
                 .thenReturn(any(ExistEmailResponse.class));
 
-        mockMvc.perform(post("/auth/check/email")
+        mockMvc.perform(post("/check/email")
                        .contentType(APPLICATION_JSON)
                        .content(mapper.writeValueAsString(testEmailRequest)))
                .andExpect(status().isOk())

@@ -90,8 +90,18 @@ public class Auth {
         this.name = signUpRequest.getName();
         this.phoneNumber = signUpRequest.getPhoneNumber();
         this.passwordUpdatedAt = LocalDate.now();
-        this.provider = Provider.SELF;
+        this.provider =
+            checkProvider(signUpRequest.getProvider()) ? Provider.valueOf(signUpRequest.getProvider()) : Provider.SELF;
         this.createdAt = LocalDateTime.now();
+    }
+
+    private boolean checkProvider(String provider) {
+        try {
+            Provider.valueOf(provider);
+            return true;
+        } catch (NullPointerException e) {
+            return false;
+        }
     }
 
     /**

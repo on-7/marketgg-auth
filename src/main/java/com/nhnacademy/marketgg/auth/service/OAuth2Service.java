@@ -2,7 +2,6 @@ package com.nhnacademy.marketgg.auth.service;
 
 import static java.util.stream.Collectors.toList;
 
-import com.nhnacademy.marketgg.auth.dto.request.GoogleProfileRequest;
 import com.nhnacademy.marketgg.auth.dto.response.GoogleProfile;
 import com.nhnacademy.marketgg.auth.dto.response.OauthResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
@@ -27,6 +26,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -54,14 +55,19 @@ public class OAuth2Service {
     private final RedisTemplate<String, Object> redisTemplate;
 
     public OauthResponse requestProfile(String code) {
-        GoogleProfileRequest profileRequest =
-            new GoogleProfileRequest(code, googleClientId, googleClientKey, redirectUri);
+
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("code", code);
+        map.add("client_id", googleClientId);
+        map.add("client_secret", googleClientKey);
+        map.add("redirect_uri", redirectUri);
+        map.add("grant_type", "authorization_code");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        HttpEntity<GoogleProfileRequest> tokenRequest
-            = new HttpEntity<>(profileRequest, headers);
+        HttpEntity<MultiValueMap<String, String>> tokenRequest
+            = new HttpEntity<>(map, headers);
 
         ResponseEntity<OAuthToken> response
             = restTemplate.postForEntity(GOOGLE_TOKEN_REQUEST_URL, tokenRequest, OAuthToken.class);
@@ -106,7 +112,7 @@ public class OAuth2Service {
 
         TokenResponse jwtResponse = tokenUtils.saveRefreshToken(redisTemplate, token);
 
-        return new OauthResponse(true, jwtResponse);
+        return new GoogleProfile(true, jwtResponse);
     }
 
 }

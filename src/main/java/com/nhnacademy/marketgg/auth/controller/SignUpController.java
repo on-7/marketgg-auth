@@ -17,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class SignUpController {
 
@@ -44,9 +42,11 @@ public class SignUpController {
     public ResponseEntity<SignUpResponse> doSignup(@RequestBody final SignUpRequest signUpRequest)
         throws RoleNotFoundException {
 
+        SignUpResponse signup = signUpService.signup(signUpRequest);
+
         return ResponseEntity.status(CREATED)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(signUpService.signup(signUpRequest));
+                             .body(signup);
     }
 
     /**

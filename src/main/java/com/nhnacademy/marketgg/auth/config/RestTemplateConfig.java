@@ -30,6 +30,16 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class RestTemplateConfig {
 
+    /**
+     * 인증서를 등록합니다.
+     *
+     * @param keystoreType - 암호화 방식
+     * @param keystorePath - 인증서 위치
+     * @param keystorePassword - 인증서 비밀번호
+     * @param protocol - 인증 방식
+     * @return 인증서의 정보를 가지고 있다.
+     * @author 이제훈
+     */
     @Bean
     CloseableHttpClient httpClient(final @Value("${gg.keystore.type}") String keystoreType,
                                    final @Value("${gg.keystore.path}") String keystorePath,
@@ -68,6 +78,13 @@ public class RestTemplateConfig {
                           .build();
     }
 
+    /**
+     * 인증서 관련 정보를 바탕으로 RestTemplate 의 통신에 관련된 설정을 합니다.
+     *
+     * @param httpClient - 인증서의 정보
+     * @return RestTemplate 의 설정 정보
+     * @author 이제훈
+     */
     @Bean
     HttpComponentsClientHttpRequestFactory requestFactory(final HttpClient httpClient) {
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
@@ -79,6 +96,13 @@ public class RestTemplateConfig {
         return requestFactory;
     }
 
+    /**
+     * 인증서가 등록된 RestTemplate 을 빈으로 등록합니다.
+     *
+     * @param requestFactory RestTemplate 생성에 관한 정보를 포함하고 있습니다.
+     * @return RestTemplate
+     * @author 이제훈
+     */
     @Bean(name = "clientCertificateAuthenticationRestTemplate")
     public RestTemplate restTemplate(final HttpComponentsClientHttpRequestFactory requestFactory) {
         return new RestTemplate(requestFactory);
@@ -88,6 +112,7 @@ public class RestTemplateConfig {
      * REST 형식에 맞는 HTTP 통신에 사용 가능한 템플릿입니다.
      *
      * @param builder - RestTemplate 생성 시 필요한 설정을 포함하여 RestTemplate 빈 생성 가능한 객체
+     * @author 이제훈
      * @return RestTemplate
      */
     @Bean
