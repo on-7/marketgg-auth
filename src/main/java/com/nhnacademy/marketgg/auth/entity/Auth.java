@@ -90,7 +90,7 @@ public class Auth {
         this.name = signUpRequest.getName();
         this.phoneNumber = signUpRequest.getPhoneNumber();
         this.passwordUpdatedAt = LocalDate.now();
-        this.provider = Provider.SELF;
+        this.provider = Provider.valueOf(signUpRequest.getProvider());
         this.createdAt = LocalDateTime.now();
     }
 
