@@ -5,7 +5,7 @@ import com.nhnacademy.marketgg.auth.dto.response.OauthResponse;
 import com.nhnacademy.marketgg.auth.dto.response.common.CommonResponse;
 import com.nhnacademy.marketgg.auth.dto.response.common.SingleResponse;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
-import com.nhnacademy.marketgg.auth.service.OAuth2Service;
+import com.nhnacademy.marketgg.auth.service.impl.GoogleLoginService;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,23 +17,33 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Google 로그인 요청시 사용되는 클래스입니다.
+ *
+ * @author 윤동열
+ */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class OAuth2Controller {
+public class GoogleLoginController {
 
-    private final OAuth2Service oAuth2Service;
+    private final GoogleLoginService googleLoginService;
 
+    /**
+     * 구글 요청 시 실행됩니다.
+     * @param request - 요청 정보
+     * @return 로그인 성공 시 JWT 를 반환하고 로그인 실패 시 사용자의 Email, 이름으로 회원가입 합니다.
+     */
     @PostMapping("/login/google")
     public ResponseEntity<CommonResponse> oauthLogin(@RequestBody Map<String, String> request) {
-        OauthResponse oauthResponse = oAuth2Service.requestProfile(request.get("code"));
+        GoogleProfile googleProfile = googleLoginService.requestProfile(request.get("code"));
 
-        if (oauthResponse.isSuccess()) {
+        if (googleProfile.isSuccess()) {
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setBearerAuth(oauthResponse.getTokenResponse().getJwt());
-            headers.set(TokenUtils.JWT_EXPIRE, oauthResponse.getTokenResponse().getExpiredDate().toString());
+            headers.setBearerAuth(googleProfile.getTokenResponse().getJwt());
+            headers.set(TokenUtils.JWT_EXPIRE, googleProfile.getTokenResponse().getExpiredDate().toString());
 
             return ResponseEntity.status(HttpStatus.OK)
                                  .headers(headers)
@@ -42,7 +52,7 @@ public class OAuth2Controller {
 
         return ResponseEntity.status(HttpStatus.OK)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(new SingleResponse<>((GoogleProfile) oauthResponse));
+                             .body(new SingleResponse<>(googleProfile));
     }
 
 }

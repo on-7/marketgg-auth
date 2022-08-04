@@ -22,7 +22,10 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -58,10 +61,10 @@ public class TokenUtils {
     /**
      * 생성자입니다.
      *
-     * @param secretUrl - JWT Secret 키를 요청하는 URL
-     * @param tokenExpirationDate - JWT 의 유효기간
+     * @param secretUrl                  - JWT Secret 키를 요청하는 URL
+     * @param tokenExpirationDate        - JWT 의 유효기간
      * @param refreshTokenExpirationDate - Refresh Token 의 유효기간
-     * @param restTemplate - restTemplate 스프링 빈을 주입받습니다.
+     * @param restTemplate               - restTemplate 스프링 빈을 주입받습니다.
      */
     public TokenUtils(@Qualifier("clientCertificateAuthenticationRestTemplate") RestTemplate restTemplate,
                       @Value("${gg.jwt.secret-url}") String secretUrl,
@@ -99,7 +102,7 @@ public class TokenUtils {
      * 토큰을 생성합니다.
      *
      * @param authentication - 사용자 정보
-     * @param issueDate - 토큰 발행일자
+     * @param issueDate      - 토큰 발행일자
      * @param expirationDate - 토큰 만료일자
      * @return JWT
      */
@@ -125,10 +128,10 @@ public class TokenUtils {
         }
 
         return Jwts.parserBuilder()
-                            .setSigningKey(key)
-                            .build()
-                            .parseClaimsJws(token)
-                            .getBody();
+                   .setSigningKey(key)
+                   .build()
+                   .parseClaimsJws(token)
+                   .getBody();
     }
 
     /**
@@ -226,10 +229,11 @@ public class TokenUtils {
     }
 
     private String getJwtSecret(String jwtSecretUrl) {
-        Map<String, Map<String, String>> response =
-            restTemplate.getForObject(jwtSecretUrl, Map.class);
+        ResponseEntity<Map<String, Map<String, String>>> response =
+            restTemplate.exchange(jwtSecretUrl, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+            });
 
-        return Optional.ofNullable(response)
+        return Optional.ofNullable(response.getBody())
                        .orElseThrow(IllegalArgumentException::new)
                        .get("body")
                        .get("secret");
