@@ -1,27 +1,30 @@
 package com.nhnacademy.marketgg.auth.controller;
 
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import com.nhnacademy.marketgg.auth.annotation.Token;
 import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.request.MemberInfoRequest;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
+import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.dto.response.common.CommonResponse;
+import com.nhnacademy.marketgg.auth.dto.response.common.ListResponse;
 import com.nhnacademy.marketgg.auth.dto.response.common.SingleResponse;
 import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthInfoService;
 import com.nhnacademy.marketgg.auth.service.AuthService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -88,14 +91,15 @@ public class AuthInfoController {
      * @param token - JWT
      * @return - 사용자 정보
      * @throws UnAuthorizationException - JWT 를 통해 인증할 수 없는 사용자일 경우 발생하는 예외
+     * @author 윤동열
      */
     @GetMapping
     public ResponseEntity<CommonResponse> getAuthInfo(@Token String token) throws UnAuthorizationException {
         MemberResponse auth = authInfoService.findAuthByUuid(token);
         SingleResponse<MemberResponse> memberResponseSingleResponse = new SingleResponse<>(auth);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                             .contentType(MediaType.APPLICATION_JSON)
+        return ResponseEntity.status(OK)
+                             .contentType(APPLICATION_JSON)
                              .body(memberResponseSingleResponse);
     }
 
@@ -104,13 +108,14 @@ public class AuthInfoController {
      *
      * @param memberInfoRequest - 요청하려는 사용자 정보
      * @return - 사용자 정보
+     * @author 윤동열
      */
     @GetMapping("/person")
     public ResponseEntity<CommonResponse> getMemberInfo(@RequestBody MemberInfoRequest memberInfoRequest) {
         MemberInfoResponse memberInfoByUuid = authInfoService.findMemberInfoByUuid(memberInfoRequest.getUuid());
 
-        return ResponseEntity.status(HttpStatus.OK)
-                             .contentType(MediaType.APPLICATION_JSON)
+        return ResponseEntity.status(OK)
+                             .contentType(APPLICATION_JSON)
                              .body(new SingleResponse<>(memberInfoByUuid));
     }
 
