@@ -3,9 +3,11 @@ package com.nhnacademy.marketgg.auth.service;
 import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
+import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
+import java.util.List;
 
 /**
  * 사용자 정보 요청 관련 비즈니스 로직을 처리합니다.
@@ -30,6 +32,16 @@ public interface AuthInfoService {
      * @return 사용자의 이름, 이메일
      */
     MemberInfoResponse findMemberInfoByUuid(final String uuid);
+
+
+    /**
+     * UUID 목록에 해당하는 회원 목록을 조회합니다.
+     *
+     * @param uuids - 요청한 회원 UUID 목록
+     * @return - 회원 목록
+     * @author 윤동열
+     */
+    List<MemberNameResponse> findMemberNameList(List<String> uuids);
 
     /**
      * 사용자 정보를 업데이트합니다.

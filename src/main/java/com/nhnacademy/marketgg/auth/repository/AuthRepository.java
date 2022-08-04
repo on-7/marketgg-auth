@@ -2,14 +2,13 @@ package com.nhnacademy.marketgg.auth.repository;
 
 import com.nhnacademy.marketgg.auth.constant.Provider;
 import com.nhnacademy.marketgg.auth.entity.Auth;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * Auth DB 접근을 위한 Repository
  */
-public interface AuthRepository extends JpaRepository<Auth, Long> {
+public interface AuthRepository extends JpaRepository<Auth, Long>, AuthRepositoryCustom {
 
     Optional<Auth> findByEmail(String email);
 

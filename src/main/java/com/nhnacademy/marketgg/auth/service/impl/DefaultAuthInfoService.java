@@ -3,6 +3,7 @@ package com.nhnacademy.marketgg.auth.service.impl;
 import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
+import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
@@ -44,6 +45,11 @@ public class DefaultAuthInfoService implements AuthInfoService {
                                   .orElseThrow(AuthNotFoundException::new);
 
         return new MemberInfoResponse(auth.getName(), auth.getEmail());
+    }
+
+    @Override
+    public List<MemberNameResponse> findMemberNameList(List<String> uuids) {
+        return authRepository.findMembersByUuid(uuids);
     }
 
     @Transactional
