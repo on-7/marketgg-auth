@@ -20,6 +20,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 사용자 정보를 처리하는 클래스입니다.
+ */
 @Service
 @RequiredArgsConstructor
 public class DefaultAuthInfoService implements AuthInfoService {
@@ -29,6 +32,11 @@ public class DefaultAuthInfoService implements AuthInfoService {
     private final RoleRepository roleRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
+    /**
+     * {@inheritDoc}
+     *
+     * @author 윤동열
+     */
     @Override
     public MemberResponse findAuthByUuid(final String token) {
         String uuid = tokenUtils.getUuidFromToken(token);
@@ -38,6 +46,11 @@ public class DefaultAuthInfoService implements AuthInfoService {
         return new MemberResponse(auth.getEmail(), auth.getName(), auth.getPhoneNumber());
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @author 윤동열
+     */
     @Override
     public MemberInfoResponse findMemberInfoByUuid(final String uuid) {
         Auth auth = authRepository.findByUuid(uuid)
