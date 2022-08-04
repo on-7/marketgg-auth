@@ -1,27 +1,31 @@
 package com.nhnacademy.marketgg.auth.controller;
 
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import com.nhnacademy.marketgg.auth.annotation.Token;
 import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.request.MemberInfoRequest;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
+import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.dto.response.common.CommonResponse;
+import com.nhnacademy.marketgg.auth.dto.response.common.ListResponse;
 import com.nhnacademy.marketgg.auth.dto.response.common.SingleResponse;
 import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthInfoService;
 import com.nhnacademy.marketgg.auth.service.AuthService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -95,7 +99,7 @@ public class AuthInfoController {
         SingleResponse<MemberResponse> memberResponseSingleResponse = new SingleResponse<>(auth);
 
         return ResponseEntity.status(HttpStatus.OK)
-                             .contentType(MediaType.APPLICATION_JSON)
+                             .contentType(APPLICATION_JSON)
                              .body(memberResponseSingleResponse);
     }
 
@@ -110,8 +114,24 @@ public class AuthInfoController {
         MemberInfoResponse memberInfoByUuid = authInfoService.findMemberInfoByUuid(memberInfoRequest.getUuid());
 
         return ResponseEntity.status(HttpStatus.OK)
-                             .contentType(MediaType.APPLICATION_JSON)
+                             .contentType(APPLICATION_JSON)
                              .body(new SingleResponse<>(memberInfoByUuid));
+    }
+
+    /**
+     * UUID 목록에 알맞은 회원 목록을 조회합니다.
+     *
+     * @param uuids - 필요한 회원의 UUID
+     * @return 회원 목록
+     * @author 윤동열
+     */
+    @PostMapping("/names")
+    public ResponseEntity<CommonResponse> getMemberList(@RequestBody List<String> uuids) {
+        List<MemberNameResponse> memberNameList = authInfoService.findMemberNameList(uuids);
+
+        return ResponseEntity.status(OK)
+                             .contentType(APPLICATION_JSON)
+                             .body(new ListResponse<>(memberNameList));
     }
 
 }

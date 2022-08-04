@@ -21,6 +21,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 회원 정보에 대한 비즈니스 로직을 처리하는 기본 구현체입니다.
+ */
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class DefaultAuthInfoService implements AuthInfoService {
@@ -30,6 +34,9 @@ public class DefaultAuthInfoService implements AuthInfoService {
     private final RoleRepository roleRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MemberResponse findAuthByUuid(final String token) {
         String uuid = tokenUtils.getUuidFromToken(token);
@@ -39,6 +46,9 @@ public class DefaultAuthInfoService implements AuthInfoService {
         return new MemberResponse(auth.getEmail(), auth.getName(), auth.getPhoneNumber());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MemberInfoResponse findMemberInfoByUuid(final String uuid) {
         Auth auth = authRepository.findByUuid(uuid)
@@ -47,11 +57,17 @@ public class DefaultAuthInfoService implements AuthInfoService {
         return new MemberInfoResponse(auth.getName(), auth.getEmail());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<MemberNameResponse> findMemberNameList(List<String> uuids) {
         return authRepository.findMembersByUuid(uuids);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Transactional
     @Override
     public TokenResponse update(final String token, final AuthUpdateRequest authUpdateRequest) {
@@ -76,6 +92,9 @@ public class DefaultAuthInfoService implements AuthInfoService {
         return tokenUtils.saveRefreshToken(redisTemplate, auth);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Transactional
     @Override
     public void withdraw(String token, final AuthWithDrawRequest authWithDrawRequest) {

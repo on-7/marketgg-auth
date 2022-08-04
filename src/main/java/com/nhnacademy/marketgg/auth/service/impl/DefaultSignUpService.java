@@ -20,15 +20,16 @@ import com.nhnacademy.marketgg.auth.util.MailUtils;
 import com.nhnacademy.marketgg.auth.util.RedisUtils;
 import com.nhnacademy.marketgg.auth.util.Status;
 import javax.management.relation.RoleNotFoundException;
-import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 회원가입에 필요한 메서드를 담은 구현체 입니다.
  */
+@Transactional(readOnly = true)
 @Slf4j
 @Service
 @RequiredArgsConstructor

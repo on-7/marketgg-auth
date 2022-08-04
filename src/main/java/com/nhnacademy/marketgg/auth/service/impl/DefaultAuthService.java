@@ -9,7 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 인증 관련 비즈니스 로직을 처리하는 기본 구현체입니다.
+ */
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class DefaultAuthService implements AuthService {

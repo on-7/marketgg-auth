@@ -22,6 +22,7 @@ public interface AuthInfoService {
      * @param token - JWT
      * @return - 사용자 정보를 반환합니다.
      * @throws UnAuthorizationException - 유효하지 않은 JWT 로 요청시 발생하는 예외입니다.
+     * @author 윤동열
      */
     MemberResponse findAuthByUuid(final String token) throws UnAuthorizationException;
 
@@ -30,6 +31,7 @@ public interface AuthInfoService {
      *
      * @param uuid - 사용자 UUID
      * @return 사용자의 이름, 이메일
+     * @author 윤동열
      */
     MemberInfoResponse findMemberInfoByUuid(final String uuid);
 
@@ -49,6 +51,7 @@ public interface AuthInfoService {
      * @param token             -  JWT
      * @param authUpdateRequest - 사용자 업데이트 정보
      * @return - 새로운 JWT
+     * @author 김훈민
      */
     TokenResponse update(final String token, final AuthUpdateRequest authUpdateRequest);
 
@@ -57,6 +60,7 @@ public interface AuthInfoService {
      *
      * @param token               - JWT
      * @param authWithDrawRequest - 탈퇴한 사용자 정보
+     * @author 김훈민
      */
     void withdraw(final String token, final AuthWithDrawRequest authWithDrawRequest);
 
