@@ -13,8 +13,8 @@ public interface AuthService {
      * 로그아웃을 진행합니다.
      *
      * @param token - 로그아웃하려는 사용자의 JWT 입니다.
-     * @since 1.0.0
      * @author 윤동열
+     * @since 1.0.0
      */
     void logout(final String token);
 
@@ -23,8 +23,8 @@ public interface AuthService {
      *
      * @param token - 만료된 JWT 입니다.
      * @return 새로운 JWT 를 반환합니다.
-     * @since 1.0.0
      * @author 윤동열
+     * @since 1.0.0
      */
     TokenResponse renewToken(final String token);
 

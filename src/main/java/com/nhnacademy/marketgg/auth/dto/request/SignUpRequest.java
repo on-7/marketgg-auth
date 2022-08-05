@@ -24,7 +24,7 @@ public class SignUpRequest {
     private String referrerEmail;
 
     private String provider;
-    
+
     public void encodingPassword(PasswordEncoder passwordEncoder) {
         this.password = passwordEncoder.encode(this.password);
     }

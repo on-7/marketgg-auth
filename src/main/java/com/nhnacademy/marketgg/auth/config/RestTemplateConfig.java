@@ -33,10 +33,10 @@ public class RestTemplateConfig {
     /**
      * 인증서를 등록합니다.
      *
-     * @param keystoreType - 암호화 방식
-     * @param keystorePath - 인증서 위치
+     * @param keystoreType     - 암호화 방식
+     * @param keystorePath     - 인증서 위치
      * @param keystorePassword - 인증서 비밀번호
-     * @param protocol - 인증 방식
+     * @param protocol         - 인증 방식
      * @return 인증서의 정보를 가지고 있다.
      * @author 이제훈
      */
@@ -112,8 +112,8 @@ public class RestTemplateConfig {
      * REST 형식에 맞는 HTTP 통신에 사용 가능한 템플릿입니다.
      *
      * @param builder - RestTemplate 생성 시 필요한 설정을 포함하여 RestTemplate 빈 생성 가능한 객체
-     * @author 이제훈
      * @return RestTemplate
+     * @author 이제훈
      */
     @Bean
     public RestTemplate restTemplate(final RestTemplateBuilder builder) {

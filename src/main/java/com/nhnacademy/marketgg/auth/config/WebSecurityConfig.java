@@ -36,8 +36,8 @@ public class WebSecurityConfig {
      *
      * @param configuration - 인증 구성을 내보냅니다.
      * @return 인증 정보를 관리하는 AuthenticationManager 를 관리한다.
-     * @author 윤동열
      * @throws Exception getAuthenticationManager() 에서 throw 하는 예외입니다.
+     * @author 윤동열
      * @see <a href="https://docs.spring.io/spring-security/site/docs/current/api/org/springframework/security/config/annotation/authentication/configuration/AuthenticationConfiguration.html">AuthenticationConfiguration</a>
      */
     @Bean

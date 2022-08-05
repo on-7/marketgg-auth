@@ -19,8 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @version 1.0.0
  */
-@Transactional(readOnly = true)
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class DefaultUserDetailsService implements UserDetailsService {
 

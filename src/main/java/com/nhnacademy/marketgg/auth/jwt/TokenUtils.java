@@ -58,10 +58,10 @@ public class TokenUtils {
     /**
      * 생성자입니다.
      *
-     * @param secretUrl - JWT Secret 키를 요청하는 URL
-     * @param tokenExpirationDate - JWT 의 유효기간
+     * @param secretUrl                  - JWT Secret 키를 요청하는 URL
+     * @param tokenExpirationDate        - JWT 의 유효기간
      * @param refreshTokenExpirationDate - Refresh Token 의 유효기간
-     * @param restTemplate - restTemplate 스프링 빈을 주입받습니다.
+     * @param restTemplate               - restTemplate 스프링 빈을 주입받습니다.
      */
     public TokenUtils(@Qualifier("clientCertificateAuthenticationRestTemplate") RestTemplate restTemplate,
                       @Value("${gg.jwt.secret-url}") String secretUrl,
@@ -99,7 +99,7 @@ public class TokenUtils {
      * 토큰을 생성합니다.
      *
      * @param authentication - 사용자 정보
-     * @param issueDate - 토큰 발행일자
+     * @param issueDate      - 토큰 발행일자
      * @param expirationDate - 토큰 만료일자
      * @return JWT
      */
@@ -125,10 +125,10 @@ public class TokenUtils {
         }
 
         return Jwts.parserBuilder()
-                            .setSigningKey(key)
-                            .build()
-                            .parseClaimsJws(token)
-                            .getBody();
+                   .setSigningKey(key)
+                   .build()
+                   .parseClaimsJws(token)
+                   .getBody();
     }
 
     /**

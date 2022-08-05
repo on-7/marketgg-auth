@@ -29,9 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * 회원가입에 필요한 메서드를 담은 구현체 입니다.
  */
-@Transactional(readOnly = true)
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class DefaultSignUpService implements SignUpService {
 

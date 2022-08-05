@@ -17,6 +17,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 소셜 로그인 요청을 처리하는 클래스입니다.
+ *
+ * @author 윤동열
+ */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +29,12 @@ public class OAuth2Controller {
 
     private final OAuth2Service oAuth2Service;
 
+    /**
+     * Google 로그인 요청 시 처리합니다.
+     *
+     * @param request - 구글에 요청을 보낼 때 필요한 정보들.
+     * @return 프로필 정보 또는 JWT
+     */
     @PostMapping("/login/google")
     public ResponseEntity<CommonResponse> oauthLogin(@RequestBody Map<String, String> request) {
         OauthResponse oauthResponse = oAuth2Service.requestProfile(request.get("code"));
