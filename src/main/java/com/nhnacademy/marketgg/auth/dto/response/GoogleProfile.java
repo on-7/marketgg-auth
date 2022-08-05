@@ -6,9 +6,13 @@ import lombok.ToString;
 @ToString
 public class GoogleProfile extends OauthResponse {
 
-    private final String email;
-    private final String name;
-    private final String provider;
+    private String email;
+    private String name;
+    private String provider;
+
+    public GoogleProfile() {
+        super(false, null);
+    }
 
     public GoogleProfile(String email, String name) {
         super(false, null);
