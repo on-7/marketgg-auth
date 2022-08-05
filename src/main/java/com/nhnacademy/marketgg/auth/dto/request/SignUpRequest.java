@@ -1,5 +1,7 @@
 package com.nhnacademy.marketgg.auth.dto.request;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -13,16 +15,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @ToString
 public class SignUpRequest {
 
+    @Email
+    @NotBlank
     private String email;
 
+    @NotBlank
     private String password;
 
+    @NotBlank
     private String name;
 
+    @NotBlank
     private String phoneNumber;
 
     private String referrerEmail;
 
+    @NotBlank
     private String provider;
 
     public void encodingPassword(PasswordEncoder passwordEncoder) {

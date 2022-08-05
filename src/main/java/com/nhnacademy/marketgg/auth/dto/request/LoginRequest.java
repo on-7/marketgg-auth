@@ -1,5 +1,7 @@
 package com.nhnacademy.marketgg.auth.dto.request;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +12,8 @@ import lombok.NoArgsConstructor;
 @Getter
 public class LoginRequest {
 
+    @Email
+    @NotBlank
     private String email;
     private String password;
 
