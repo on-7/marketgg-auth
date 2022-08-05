@@ -8,6 +8,7 @@ import lombok.Getter;
 public abstract class OauthResponse {
 
     private boolean success;
+
     private TokenResponse tokenResponse;
 
     public abstract String getEmail();

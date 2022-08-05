@@ -119,4 +119,20 @@ public class AuthInfoController {
                              .body(new SingleResponse<>(memberInfoByUuid));
     }
 
+    /**
+     * UUID 목록에 알맞은 회원 목록을 조회합니다.
+     *
+     * @param uuids - 필요한 회원의 UUID
+     * @return 회원 목록
+     * @author 윤동열
+     */
+    @PostMapping("/names")
+    public ResponseEntity<CommonResponse> getMemberList(@RequestBody List<String> uuids) {
+        List<MemberNameResponse> memberNameList = authInfoService.findMemberNameList(uuids);
+
+        return ResponseEntity.status(OK)
+                             .contentType(APPLICATION_JSON)
+                             .body(new ListResponse<>(memberNameList));
+    }
+
 }

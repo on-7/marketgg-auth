@@ -35,12 +35,23 @@ public interface AuthInfoService {
      */
     MemberInfoResponse findMemberInfoByUuid(final String uuid);
 
+
+    /**
+     * UUID 목록에 해당하는 회원 목록을 조회합니다.
+     *
+     * @param uuids - 요청한 회원 UUID 목록
+     * @return - 회원 목록
+     * @author 윤동열
+     */
+    List<MemberNameResponse> findMemberNameList(List<String> uuids);
+
     /**
      * 사용자 정보를 업데이트합니다.
      *
      * @param token             -  JWT
      * @param authUpdateRequest - 사용자 업데이트 정보
      * @return - 새로운 JWT
+     * @author 김훈민
      */
     TokenResponse update(final String token, final AuthUpdateRequest authUpdateRequest);
 
@@ -49,6 +60,7 @@ public interface AuthInfoService {
      *
      * @param token               - JWT
      * @param authWithDrawRequest - 탈퇴한 사용자 정보
+     * @author 김훈민
      */
     void withdraw(final String token, final AuthWithDrawRequest authWithDrawRequest);
 

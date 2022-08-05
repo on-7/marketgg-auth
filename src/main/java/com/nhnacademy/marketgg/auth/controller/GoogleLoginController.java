@@ -1,7 +1,6 @@
 package com.nhnacademy.marketgg.auth.controller;
 
 import com.nhnacademy.marketgg.auth.dto.response.GoogleProfile;
-import com.nhnacademy.marketgg.auth.dto.response.OauthResponse;
 import com.nhnacademy.marketgg.auth.dto.response.common.CommonResponse;
 import com.nhnacademy.marketgg.auth.dto.response.common.SingleResponse;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
@@ -30,9 +29,10 @@ public class GoogleLoginController {
     private final GoogleLoginService googleLoginService;
 
     /**
-     * 구글 요청 시 실행됩니다.
-     * @param request - 요청 정보
-     * @return 로그인 성공 시 JWT 를 반환하고 로그인 실패 시 사용자의 Email, 이름으로 회원가입 합니다.
+     * Google 로그인 요청 시 처리합니다.
+     *
+     * @param request - 구글에 요청을 보낼 때 필요한 정보들.
+     * @return 프로필 정보 또는 JWT
      */
     @PostMapping("/login/google")
     public ResponseEntity<CommonResponse> oauthLogin(@RequestBody Map<String, String> request) {

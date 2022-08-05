@@ -3,6 +3,7 @@ package com.nhnacademy.marketgg.auth.service.impl;
 import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
+import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
@@ -21,9 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 사용자 정보를 처리하는 클래스입니다.
+ * 회원 정보에 대한 비즈니스 로직을 처리하는 기본 구현체입니다.
  */
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class DefaultAuthInfoService implements AuthInfoService {
 
@@ -59,6 +61,17 @@ public class DefaultAuthInfoService implements AuthInfoService {
         return new MemberInfoResponse(auth.getName(), auth.getEmail());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<MemberNameResponse> findMemberNameList(List<String> uuids) {
+        return authRepository.findMembersByUuid(uuids);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Transactional
     @Override
     public TokenResponse update(final String token, final AuthUpdateRequest authUpdateRequest) {
@@ -83,6 +96,9 @@ public class DefaultAuthInfoService implements AuthInfoService {
         return tokenUtils.saveRefreshToken(redisTemplate, auth);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Transactional
     @Override
     public void withdraw(String token, final AuthWithDrawRequest authWithDrawRequest) {
