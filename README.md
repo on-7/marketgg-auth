@@ -77,7 +77,7 @@
 ## Contributors
 
 <a href="https://github.com/nhn-on7/marketgg-auth/graphs/contributors">
-<img alt="image" src="https://user-images.githubusercontent.com/38150034/183289740-34065fa9-2164-41b9-ba77-f7221619529e.png">
+<img src="https://contrib.rocks/image?repo=nhn-on7/marketgg-auth" />
 </a>
 
 
