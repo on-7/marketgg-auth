@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+    </head>
+    <body>
+        <!-- TODO 6-1: index view 작성 -->
+        <div th:if="${member == null}">
+            <a href="/login">로그인</a>
+        </div>
+        <div th:unless="${member == null}">
+            <div th:text="|Hello, ${member.username} !!|" ></div>
+            <a href="/logout">LOGOUT</a>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,40 @@
+# TODO 1: Profile 기본 설정
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+---
+
+# TODO 7: Redis 프로파일 추가 설정
+
+spring:
+  profiles:
+    active: redis
+
+  redis:
+    port: 6379
+    host: 133.186.211.156
+    password: "*N2vya7H@muDTwdNMR!"
+    database: 33
+
+---
+
+# TODO : MySQL 프로파일 추가 설정
+
+spring:
+  profiles:
+    active: rdb
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://133.186.211.156:3306/nhn_academy_30
+    username: nhn_academy_30
+    password: "dY)ydS7rUqApRwzo"
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
