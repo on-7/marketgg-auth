@@ -1,0 +1,26 @@
+userNotFound:
+  msg: 존재하지 않는 회원입니다.
+
+authWithdrawOverlap:
+  msg: 이미 탈퇴한 회원입니다.
+
+emailOverlap:
+  msg: 중복된 이메일입니다.
+
+invalidLoginRequest:
+  msg: 잘못된 로그인 요청입니다.
+
+loginFail:
+  msg: 로그인에 실패했습니다.
+
+oauthRequestFail:
+  msg: 잘못된 소셜 로그인 요청입니다.
+
+secureManager:
+  msg: Secure Manager Error!
+
+unAuthorization:
+  msg: 인증되지 않은 사용자입니다.
+
+invalidRequest:
+  msg: 잘못된 요청입니다.

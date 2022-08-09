@@ -9,3 +9,10 @@ spring:
     hikari:
       jdbc-url: jdbc:h2:mem:~/h2/test/testdb;MODE=MYSQL
       username: sa
+
+  messages:
+    basename: i18n/exception
+    encoding: UTF-8
+
+  main:
+    allow-bean-definition-overriding: true
