@@ -1,12 +1,18 @@
 package com.nhnacademy.marketgg.auth.session.rdb;
 
 import com.nhnacademy.marketgg.auth.session.Session;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class RdbSession implements Session {
 
-    // private final RdbSessionRepository sessionRepository;
+    private String id;
+    private Map<String, Object> session = new HashMap<>();
+    private long creationTime;
+    private long lastAccessedTime;
+    private int maxInactiveInterval;
 
     @Override
     public long getCreationTime() {

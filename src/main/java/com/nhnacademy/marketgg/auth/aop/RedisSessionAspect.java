@@ -1,13 +1,13 @@
 package com.nhnacademy.marketgg.auth.aop;
 
 import com.nhnacademy.marketgg.auth.session.Session;
+import com.nhnacademy.marketgg.auth.session.SessionContext;
 import com.nhnacademy.marketgg.auth.session.redis.RedisSession;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +39,8 @@ public class RedisSessionAspect {
         MethodSignature signature = (MethodSignature) pjp.getSignature();
         log.info("Method = {}", signature.getName());
 
-        HttpServletRequest request = getRequest();
-        String sessionId = getSessionId(request.getCookies()).orElse(request.getSession().getId());
+        HttpServletRequest request = this.getRequest();
+        String sessionId = SessionContext.get().orElse(request.getSession().getId());
 
         RedisSession session = Optional.ofNullable(redisTemplate.opsForValue().get(sessionId))
                                        .orElse(new RedisSession(sessionId));
@@ -61,7 +61,7 @@ public class RedisSessionAspect {
         }
 
         if (Objects.equals(signature.getName(), "logout")) {
-            redisTemplate.opsForValue().getAndDelete(sessionId);
+            redisTemplate.delete(sessionId);
         }
 
         return proceed;
@@ -70,8 +70,7 @@ public class RedisSessionAspect {
     @Around("execution(public void com.nhnacademy.marketgg.auth.session.redis.RedisSession.setMaxInactiveInterval(int))")
     public Object maxInactiveInterval(ProceedingJoinPoint pjp) throws Throwable {
 
-        HttpServletRequest request = getRequest();
-        Optional<String> opSessionId = getSessionId(request.getCookies());
+        Optional<String> opSessionId = SessionContext.get();
 
         if (opSessionId.isEmpty()) {
             return null;
@@ -102,12 +101,12 @@ public class RedisSessionAspect {
     public void setLastAccessedTime(JoinPoint jp, Controller controller) throws NoSuchFieldException {
         log.info("Method = {}", jp.getSignature().getName());
 
-        HttpServletRequest request = getRequest();
-        Optional<String> opSessionId = getSessionId(request.getCookies());
+        Optional<String> opSessionId = SessionContext.get();
 
         if (opSessionId.isEmpty()) {
             return;
         }
+
         String sessionId = opSessionId.get();
         RedisSession redisSession = redisTemplate.opsForValue().get(sessionId);
 
@@ -129,17 +128,6 @@ public class RedisSessionAspect {
             (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
 
         return requestAttributes.getRequest();
-    }
-
-    private Optional<String> getSessionId(Cookie[] cookies) {
-
-        for (Cookie cookie : cookies) {
-            if (Objects.equals(Session.SESSION_ID, cookie.getName())) {
-                return Optional.of(cookie.getValue());
-            }
-        }
-
-        return Optional.empty();
     }
 
 }
