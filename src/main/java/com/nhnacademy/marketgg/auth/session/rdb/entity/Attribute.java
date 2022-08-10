@@ -1,7 +1,6 @@
 package com.nhnacademy.marketgg.auth.session.rdb.entity;
 
 import java.io.Serializable;
-import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;

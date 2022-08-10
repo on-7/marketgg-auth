@@ -30,10 +30,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Profile("redis")
 @Component
 @RequiredArgsConstructor
-public class RedisSessionAspect {
+public class RedisSessionAspect implements SessionAspect {
 
     private final RedisTemplate<String, RedisSession> redisTemplate;
 
+    @Override
     @Around("execution(* *(.., com.nhnacademy.marketgg.auth.session.Session, ..))")
     public Object session(ProceedingJoinPoint pjp) throws Throwable {
         MethodSignature signature = (MethodSignature) pjp.getSignature();
@@ -67,6 +68,7 @@ public class RedisSessionAspect {
         return proceed;
     }
 
+    @Override
     @Around("execution(public void com.nhnacademy.marketgg.auth.session.redis.RedisSession.setMaxInactiveInterval(int))")
     public Object maxInactiveInterval(ProceedingJoinPoint pjp) throws Throwable {
 
@@ -97,8 +99,9 @@ public class RedisSessionAspect {
         return proceed;
     }
 
+    @Override
     @Before("@within(controller)")
-    public void setLastAccessedTime(JoinPoint jp, Controller controller) throws NoSuchFieldException {
+    public void setLastAccessedTime(JoinPoint jp, Controller controller) throws Throwable {
         log.info("Method = {}", jp.getSignature().getName());
 
         Optional<String> opSessionId = SessionContext.get();
@@ -121,13 +124,6 @@ public class RedisSessionAspect {
 
         redisTemplate.opsForValue()
                      .set(sessionId, redisSession, 30, TimeUnit.SECONDS);
-    }
-
-    private HttpServletRequest getRequest() {
-        ServletRequestAttributes requestAttributes =
-            (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-
-        return requestAttributes.getRequest();
     }
 
 }

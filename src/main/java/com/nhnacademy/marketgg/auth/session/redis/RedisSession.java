@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class RedisSession implements Session {
 
     private String id;
-    private Map<String, Object> session = new HashMap<>();
+    private Map<String, Object> session;
     private long creationTime;
     private long lastAccessedTime;
     private int maxInactiveInterval;
