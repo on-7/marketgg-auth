@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * 어떤 컨트롤러에 진입했는지 로그를 남기는 클래스입니다.
+ *
+ * @author 윤동열
  */
 @Slf4j
 @Aspect
