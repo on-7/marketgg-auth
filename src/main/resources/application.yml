@@ -5,7 +5,3 @@ spring:
   config:
     import: "optional:configserver:http://133.186.209.70:8888"
 
-  datasource:
-    hikari:
-      jdbc-url: jdbc:h2:mem:~/h2/test/testdb;MODE=MYSQL
-      username: sa
