@@ -6,6 +6,11 @@ import com.nhnacademy.marketgg.auth.entity.Role;
 import java.util.List;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
+/**
+ * QueryDsl 을 사용하기 위한 구현체 입니다.
+ *
+ * @author 윤동열
+ */
 public class RoleRepositoryImpl extends QuerydslRepositorySupport implements RoleRepositoryCustom {
 
     public RoleRepositoryImpl() {

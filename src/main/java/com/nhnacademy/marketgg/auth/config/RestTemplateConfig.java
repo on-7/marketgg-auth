@@ -25,6 +25,8 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * REST 형식에 맞는 HTTP 통신에 사용 가능한 템플릿 설정 클래스입니다.
+ *
+ * @author 이제훈
  */
 @Slf4j
 @Configuration

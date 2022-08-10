@@ -49,6 +49,7 @@ public class AuthInfoController {
      * @param token             - JWT
      * @param authUpdateRequest - 수정할 회원 정보를 담고있는 객체 입니다.
      * @return - 상태코드를 리턴합니다.
+     * @author 김훈민
      */
     @PutMapping
     public ResponseEntity<Void> update(@Token String token,
@@ -73,6 +74,7 @@ public class AuthInfoController {
      * @param token               - JWT
      * @param authWithDrawRequest - 삭제될 날짜를 담은 객체입니다.
      * @return - 상태코드를 리턴합니다.
+     * @author 김훈민
      */
     @DeleteMapping
     public ResponseEntity<Void> withdraw(@Token String token,
@@ -110,7 +112,7 @@ public class AuthInfoController {
      * @return - 사용자 정보
      * @author 윤동열
      */
-    @GetMapping("/person")
+    @PostMapping("/person")
     public ResponseEntity<CommonResponse> getMemberInfo(@RequestBody MemberInfoRequest memberInfoRequest) {
         MemberInfoResponse memberInfoByUuid = authInfoService.findMemberInfoByUuid(memberInfoRequest.getUuid());
 

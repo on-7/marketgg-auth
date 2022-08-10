@@ -10,6 +10,8 @@ import javax.management.relation.RoleNotFoundException;
 
 /**
  * 회원가입에 필요한 메서드를 담은 인터페이스 입니다.
+ *
+ * @author 김훈민
  */
 public interface SignUpService {
 

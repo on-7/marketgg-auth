@@ -17,6 +17,7 @@ import org.springframework.web.server.MethodNotAllowedException;
  * 전역 예외 처리를 위한 클래스입니다.
  *
  * @version 1.0.0
+ * @
  */
 @Slf4j
 @RestControllerAdvice

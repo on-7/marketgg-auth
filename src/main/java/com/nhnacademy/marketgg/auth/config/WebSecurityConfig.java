@@ -21,6 +21,7 @@ import org.springframework.security.web.SecurityFilterChain;
  * Spring Security 기본 설정을 진행합니다.
  *
  * @version 1.0.0
+ * @author 윤동열
  */
 @Configuration
 @EnableWebSecurity
