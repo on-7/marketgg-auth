@@ -7,6 +7,11 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Redis 를 이용한 세션을 관리하기 위한 클래스
+ *
+ * @author 윤동열
+ */
 @Getter
 @NoArgsConstructor
 public class RedisSession implements Session {

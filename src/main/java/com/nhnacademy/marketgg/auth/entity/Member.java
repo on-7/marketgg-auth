@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// TODO 2: 회원 정보를 저장하는 Entity
+/**
+ * 회원 정보를 저장하기 위한 클래스
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

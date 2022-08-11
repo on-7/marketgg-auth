@@ -7,8 +7,13 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
+/**
+ * RDB 를 이용한 Session 을 관리하기 위한 클래스
+ *
+ * @author 윤동열
+ */
 @NoArgsConstructor
+@Getter
 public class RdbSession implements Session {
 
     private SessionId sessionId;

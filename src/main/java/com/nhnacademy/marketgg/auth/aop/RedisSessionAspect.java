@@ -3,7 +3,6 @@ package com.nhnacademy.marketgg.auth.aop;
 import com.nhnacademy.marketgg.auth.session.Session;
 import com.nhnacademy.marketgg.auth.session.SessionContext;
 import com.nhnacademy.marketgg.auth.session.redis.RedisSession;
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,10 +20,14 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
+/**
+ * Redis 를 이용한 세션을 다루기 위한 AOP.
+ *
+ * {@inheritDoc}
+ *
+ * @author 윤동열
+ */
 @Slf4j
 @Aspect
 @Profile("redis")

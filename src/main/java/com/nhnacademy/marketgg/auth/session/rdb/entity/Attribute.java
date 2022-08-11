@@ -12,6 +12,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Session 의 값들을 저장하기 위한 Entity
+ *
+ * @author 윤동열
+ */
 @Entity
 @NoArgsConstructor
 @Getter

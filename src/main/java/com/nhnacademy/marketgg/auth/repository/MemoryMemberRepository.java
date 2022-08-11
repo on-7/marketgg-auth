@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
-// TODO 3: 회원 정보를 저장하는 Repository.
 // 세션을 DB 로 하다보니 회원 정보를 저장하는 DB 는 간단히 메모리를 사용하여 구성하였다.
 @Repository
 public class MemoryMemberRepository implements MemberRepository {

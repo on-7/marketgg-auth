@@ -6,6 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * 세션을 관리하기 위한 Entity.
+ *
+ * @author 윤동열
+ */
 @Entity
 @Getter
 @ToString

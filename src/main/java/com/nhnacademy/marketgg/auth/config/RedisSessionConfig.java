@@ -12,7 +12,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-// TODO 9: 프로파일에 따른 Redis 세션 설정
+/**
+ * Redis 설정을 담당한다.
+ *
+ * @author 윤동열
+ */
 @Profile("redis")
 @Configuration
 public class RedisSessionConfig {
@@ -40,7 +44,6 @@ public class RedisSessionConfig {
         return new LettuceConnectionFactory(configuration);
     }
 
-    // TODO 10: Redis Template 설정
     @Bean
     public RedisTemplate<String, RedisSession> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
 

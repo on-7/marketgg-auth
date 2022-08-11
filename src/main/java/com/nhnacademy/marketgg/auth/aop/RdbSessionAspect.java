@@ -26,6 +26,13 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
+/**
+ * MySQL 을 이용한 세션을 이용하기 위한 AOP.
+ *
+ * {@inheritDoc}
+ *
+ * @author 윤동열
+ */
 @Slf4j
 @Aspect
 @Profile("rdb")
@@ -101,8 +108,7 @@ public class RdbSessionAspect implements SessionAspect {
     }
 
     @Override
-    @Around(
-        "execution(public void com.nhnacademy.marketgg.auth.session.redis.RedisSession.setMaxInactiveInterval(int)) ")
+    @Around("execution(public void com.nhnacademy.marketgg.auth.session.redis.RedisSession.setMaxInactiveInterval(int)) ")
     public Object maxInactiveInterval(ProceedingJoinPoint pjp) throws Throwable {
         // 세션 만료시간이 변경되면 Redis 는 변경해줘야 하지만 RDB 는 따로 변경할 것이 없다.
         return pjp.proceed();

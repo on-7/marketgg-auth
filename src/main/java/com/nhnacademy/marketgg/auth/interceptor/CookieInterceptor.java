@@ -9,6 +9,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+/**
+ * Controller 메서드 실행 전 쿠키의 세션 ID 정보를 ThreadLocal 을 이용하여 저장하고 메서드 실행 완료 후 ThreadLocal 초기화.
+ *
+ * @author 윤동열
+ */
 public class CookieInterceptor implements HandlerInterceptor {
 
     @Override
