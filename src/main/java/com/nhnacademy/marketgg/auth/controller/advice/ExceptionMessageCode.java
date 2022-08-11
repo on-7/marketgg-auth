@@ -1,10 +1,13 @@
 package com.nhnacademy.marketgg.auth.controller.advice;
 
+import lombok.AllArgsConstructor;
+
 /**
  * 예외 메세지 국제화를 위한 메세지 코드 모음입니다.
  *
  * @author 윤동열
  */
+@AllArgsConstructor
 public enum ExceptionMessageCode {
 
     USER_NOT_FOUND("userNotFound.msg"),
@@ -16,10 +19,6 @@ public enum ExceptionMessageCode {
     OAUTH_REQUEST_FAIL("oauthRequestFail.msg"),
     UNAUTHORIZATION("unAuthorization.msg"),
     INVALID_REQUEST("invalidRequest.msg");
-
-    ExceptionMessageCode(String msg) {
-        this.msg = msg;
-    }
 
     public final String msg;
 
