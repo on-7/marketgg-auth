@@ -1,52 +1,47 @@
 package com.nhnacademy.marketgg.auth.session.rdb;
 
 import com.nhnacademy.marketgg.auth.session.Session;
+import com.nhnacademy.marketgg.auth.session.rdb.entity.SessionId;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 public class RdbSession implements Session {
 
-    private String id;
+    private SessionId sessionId;
     private Map<String, Object> session;
-    private long creationTime;
-    private long lastAccessedTime;
-    private int maxInactiveInterval;
 
-    public RdbSession(String id) {
-        this.id = id;
+    public RdbSession(SessionId sessionId) {
+        this.sessionId = sessionId;
         this.session = new HashMap<>();
-        this.creationTime = System.currentTimeMillis();
-        this.maxInactiveInterval = 30;
     }
 
     @Override
     public long getCreationTime() {
-        return this.creationTime;
+        return this.sessionId.getCreationTime();
     }
 
     @Override
     public String getId() {
-        return null;
+        return this.sessionId.getId();
     }
 
     @Override
     public long getLastAccessedTime() {
-        return this.lastAccessedTime;
+        return this.sessionId.getLastAccessedTime();
     }
 
     @Override
     public void setMaxInactiveInterval(int var1) {
-        this.maxInactiveInterval = var1;
+        this.sessionId.setMaxInactiveInterval(var1);
     }
 
     @Override
     public int getMaxInactiveInterval() {
-        return this.maxInactiveInterval;
+        return this.sessionId.getMaxInactiveInterval();
     }
 
     @Override
@@ -61,16 +56,21 @@ public class RdbSession implements Session {
 
     @Override
     public void removeAttribute(String var1) {
-
+        this.session.remove(var1);
     }
 
     @Override
     public void invalidate() {
-
+        this.session.clear();
     }
 
     @Override
     public boolean isNew() {
         return true;
     }
+
+    public void setSession(Map<String, Object> session) {
+        this.session = session;
+    }
+
 }

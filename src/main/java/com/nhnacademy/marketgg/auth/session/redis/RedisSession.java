@@ -75,4 +75,8 @@ public class RedisSession implements Session {
         return this.session.containsKey(MEMBER);
     }
 
+    public void setLastAccessedTime(long lastAccessedTime) {
+        this.lastAccessedTime = lastAccessedTime;
+    }
+
 }

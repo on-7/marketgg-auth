@@ -22,10 +22,16 @@ public class Attribute {
 
     @MapsId("sessionId")
     @ManyToOne
-    @JoinColumn(name = "sessionId")
+    @JoinColumn(name = "session_id")
     private SessionId session;
 
     private String value;
+
+    public Attribute(SessionId session, String attributeKey, String value) {
+        this.id = new Id(session.getId(), attributeKey);
+        this.session = session;
+        this.value = value;
+    }
 
     @Embeddable
     @EqualsAndHashCode
@@ -35,7 +41,7 @@ public class Attribute {
     public static class Id implements Serializable {
 
         private String sessionId;
-        private String key;
+        private String attributeKey;
 
     }
 

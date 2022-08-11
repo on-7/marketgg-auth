@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
@@ -48,6 +48,7 @@ public class IndexController {
 
         Cookie cookie = new Cookie(Session.SESSION_ID, sessionId);
         cookie.setHttpOnly(true);
+        cookie.setMaxAge(30);
 
         response.addCookie(cookie);
 
@@ -61,8 +62,13 @@ public class IndexController {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public String error(IllegalArgumentException e, Model model) {
-        model.addAttribute("error", e.getMessage());
+    public String error(IllegalArgumentException e, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("error", e.getMessage());
+        return "redirect:/error";
+    }
+
+    @GetMapping("/error")
+    public String errorPage() {
         return "error";
     }
 

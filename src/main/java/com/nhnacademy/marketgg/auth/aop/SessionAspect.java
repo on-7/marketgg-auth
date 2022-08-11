@@ -13,7 +13,7 @@ public interface SessionAspect {
 
     Object maxInactiveInterval(ProceedingJoinPoint pjp) throws Throwable;
 
-    void setLastAccessedTime(JoinPoint jp, Controller controller) throws Throwable;
+    void setLastAccessedTime(JoinPoint jp, Controller controller);
 
     default HttpServletRequest getRequest() {
         ServletRequestAttributes requestAttributes =

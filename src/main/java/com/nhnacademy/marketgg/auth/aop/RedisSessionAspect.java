@@ -43,6 +43,12 @@ public class RedisSessionAspect implements SessionAspect {
         HttpServletRequest request = this.getRequest();
         String sessionId = SessionContext.get().orElse(request.getSession().getId());
 
+        // 로그아웃 시 세션 삭제
+        if (Objects.equals(signature.getName(), "logout")) {
+            redisTemplate.delete(sessionId);
+            return pjp.proceed();
+        }
+
         RedisSession session = Optional.ofNullable(redisTemplate.opsForValue().get(sessionId))
                                        .orElse(new RedisSession(sessionId));
 
@@ -54,15 +60,12 @@ public class RedisSessionAspect implements SessionAspect {
                                      return arg;
                                  }).toArray();
 
-        Object proceed = pjp.proceed(objects);
+        Object proceed = pjp.proceed(objects);  // 메서드 실행
 
+        // 로그인 한 세션만 저장
         if (Objects.nonNull(session.getAttribute(Session.MEMBER))) {
             redisTemplate.opsForValue()
                          .set(sessionId, session, 30, TimeUnit.SECONDS);
-        }
-
-        if (Objects.equals(signature.getName(), "logout")) {
-            redisTemplate.delete(sessionId);
         }
 
         return proceed;
@@ -87,12 +90,7 @@ public class RedisSessionAspect implements SessionAspect {
 
         Object proceed = pjp.proceed();
 
-        Class<RedisSession> sessionClass = RedisSession.class;
-        Field field = sessionClass.getDeclaredField("maxInactiveInterval");
-        field.setAccessible(true);
-        field.get(session);
-
-        int maxInactiveInterval = (int) field.get(session);
+        int maxInactiveInterval = session.getMaxInactiveInterval();
 
         redisTemplate.opsForValue().set(sessionId, session, maxInactiveInterval, TimeUnit.SECONDS);
 
@@ -100,8 +98,8 @@ public class RedisSessionAspect implements SessionAspect {
     }
 
     @Override
-    @Before("@within(controller)")
-    public void setLastAccessedTime(JoinPoint jp, Controller controller) throws Throwable {
+    @Before("@within(controller) && !execution(* *.*logout*(*))")
+    public void setLastAccessedTime(JoinPoint jp, Controller controller) {
         log.info("Method = {}", jp.getSignature().getName());
 
         Optional<String> opSessionId = SessionContext.get();
@@ -117,10 +115,7 @@ public class RedisSessionAspect implements SessionAspect {
             return;
         }
 
-        Class<RedisSession> redisSessionClass = RedisSession.class;
-        Field field = redisSessionClass.getDeclaredField("lastAccessedTime");
-        field.setAccessible(true);
-        ReflectionUtils.setField(field, redisSession, System.currentTimeMillis());
+        redisSession.setLastAccessedTime(System.currentTimeMillis());
 
         redisTemplate.opsForValue()
                      .set(sessionId, redisSession, 30, TimeUnit.SECONDS);
