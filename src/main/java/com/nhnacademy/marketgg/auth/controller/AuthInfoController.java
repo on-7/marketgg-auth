@@ -20,6 +20,7 @@ import com.nhnacademy.marketgg.auth.service.AuthInfoService;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @version 1.0.0
  */
+@Slf4j
 @RestController
 @RequestMapping("/info")
 @RequiredArgsConstructor
@@ -99,7 +101,7 @@ public class AuthInfoController {
     public ResponseEntity<CommonResponse> getAuthInfo(@Token String token) throws UnAuthorizationException {
         MemberResponse auth = authInfoService.findAuthByUuid(token);
         SingleResponse<MemberResponse> memberResponseSingleResponse = new SingleResponse<>(auth);
-
+        log.info("MemberResponse = {}", auth);
         return ResponseEntity.status(OK)
                              .contentType(APPLICATION_JSON)
                              .body(memberResponseSingleResponse);
