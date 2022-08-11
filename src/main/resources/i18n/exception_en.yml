@@ -1,0 +1,26 @@
+userNotFound:
+  msg: This member not exist.
+
+authWithdrawOverlap:
+  msg: Member who has already left.
+
+emailOverlap:
+  msg: Duplicate email.
+
+invalidLoginRequest:
+  msg: Invalid login request.
+
+loginFail:
+  msg: Login failed.
+
+oauthRequestFail:
+  msg: Invalid social login request.
+
+secureManager:
+  msg: Secure Manager Error!
+
+unAuthorization:
+  msg: Unauthenticated user.
+
+invalidRequest:
+  msg: Invalid Request.

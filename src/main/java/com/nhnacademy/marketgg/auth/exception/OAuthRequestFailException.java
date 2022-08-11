@@ -1,9 +1,11 @@
 package com.nhnacademy.marketgg.auth.exception;
 
-public class OAuthRequestFailException extends IllegalArgumentException {
+import com.nhnacademy.marketgg.auth.controller.advice.ExceptionMessageCode;
+
+public class OAuthRequestFailException extends AuthException {
 
     public OAuthRequestFailException() {
-        super("소셜 로그인 실패");
+        super("소셜 로그인 실패", ExceptionMessageCode.OAUTH_REQUEST_FAIL);
     }
 
 }
