@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 인증 관련 비즈니스 로직을 처리하는 기본 구현체입니다.
+ *
+ * {@inheritDoc}
  */
 @Service
 @Transactional(readOnly = true)

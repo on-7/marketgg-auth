@@ -38,6 +38,7 @@ import org.springframework.web.client.RestTemplate;
  *
  * @version 1.0.0
  * @see <a href="jwt.io">JWT Description</a>
+ * @author 윤동열
  */
 @Slf4j
 @Component

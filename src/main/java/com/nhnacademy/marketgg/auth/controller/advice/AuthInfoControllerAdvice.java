@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
  * 사용자 정보 요청 시 발생하는 예외를 처리합니다.
+ *
+ * @author 윤동열
  */
 @Slf4j
 @RestControllerAdvice

@@ -23,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * 로그인 시 실행되는 필터입니다.
  *
  * @version 1.0.0
+ * @author 윤동열
  */
 @Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {

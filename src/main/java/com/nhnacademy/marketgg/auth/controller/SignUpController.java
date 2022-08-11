@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 인증 관련 요청을 처리하는 Controller 입니다.
  *
  * @version 1.0.0
+ * @author 김훈민
  */
 @Slf4j
 @RestController

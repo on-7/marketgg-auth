@@ -88,7 +88,7 @@ class AuthInfoControllerTest {
 
         given(authInfoService.findMemberInfoByUuid(any())).willReturn(memberResponse);
 
-        mockMvc.perform(get("/info/person")
+        mockMvc.perform(post("/info/person")
                    .header(HttpHeaders.AUTHORIZATION, "Bearer jwt")
                    .characterEncoding(StandardCharsets.UTF_8)
                    .contentType(APPLICATION_JSON)

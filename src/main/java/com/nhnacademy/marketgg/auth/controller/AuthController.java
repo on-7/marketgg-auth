@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 인증을 담당하는 컨트롤러 클래스입니다.
  *
  * @version 1.0.0
+ * @author 윤동열
  */
 @RestController
 @RequiredArgsConstructor
