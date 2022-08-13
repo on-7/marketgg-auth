@@ -84,7 +84,8 @@ class AuthInfoControllerTest {
 
         String email = "email@gmail.com";
         String name = "홍길동";
-        MemberInfoResponse memberResponse = new MemberInfoResponse(name, email);
+        String phoneNumber = "01012341234";
+        MemberInfoResponse memberResponse = new MemberInfoResponse(name, email, phoneNumber);
 
         given(authInfoService.findMemberInfoByUuid(any())).willReturn(memberResponse);
 
