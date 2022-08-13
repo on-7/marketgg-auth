@@ -54,6 +54,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                                 HttpServletResponse response) throws AuthenticationException {
         try {
             log.info("start login");
+            log.info("uri = {}", request.getRequestURI());
 
             LoginRequest loginRequest = mapper.readValue(request.getInputStream(), LoginRequest.class);
 
