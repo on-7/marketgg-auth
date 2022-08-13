@@ -58,4 +58,4 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
-          script: "./marketgg-auth/startup.sh"
+          script: "./marketgg-auth/restart.sh"
