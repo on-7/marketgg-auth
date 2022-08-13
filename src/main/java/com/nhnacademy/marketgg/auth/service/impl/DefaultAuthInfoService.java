@@ -58,7 +58,7 @@ public class DefaultAuthInfoService implements AuthInfoService {
         Auth auth = authRepository.findByUuid(uuid)
                                   .orElseThrow(AuthNotFoundException::new);
 
-        return new MemberInfoResponse(auth.getName(), auth.getEmail());
+        return new MemberInfoResponse(auth.getName(), auth.getEmail(), auth.getPhoneNumber());
     }
 
     /**
