@@ -3,4 +3,4 @@ spring:
     name: marketgg-auth
 
   config:
-    import: "optional:configserver:http:/config.marketgg.shop:"
+    import: "optional:configserver:http:/config.marketgg.shop"
