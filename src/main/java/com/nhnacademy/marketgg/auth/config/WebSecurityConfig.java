@@ -103,7 +103,7 @@ public class WebSecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
-                         .antMatchers("/h2-console/**");
+                         .antMatchers("/h2-console/**", "/swagger**/**");
     }
 
 }
