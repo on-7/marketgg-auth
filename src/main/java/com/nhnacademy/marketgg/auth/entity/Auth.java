@@ -150,4 +150,8 @@ public class Auth {
         this.uuid = uuid;
     }
 
+    public boolean isMember() {
+        return Objects.nonNull(this.deletedAt);
+    }
+
 }

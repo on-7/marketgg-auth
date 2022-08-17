@@ -2,6 +2,7 @@ package com.nhnacademy.marketgg.auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -14,25 +15,25 @@ import springfox.documentation.spring.web.plugins.Docket;
  *
  * @author 윤동열
  */
+@Profile("local")
 @Configuration
 public class SwaggerConfig {
 
     @Bean
     public Docket api() {
-        return new Docket(DocumentationType.OAS_30)
-            .useDefaultResponseMessages(false)
+        return new Docket(DocumentationType.SWAGGER_2)
+            .apiInfo(apiInfo())
             .select()
-            .apis(RequestHandlerSelectors.basePackage("com.nhnacademy.marketgg.shop"))
+            .apis(RequestHandlerSelectors.basePackage("com.nhnacademy.marketgg.auth.controller"))
             .paths(PathSelectors.any())
-            .build()
-            .apiInfo(apiInfo());
+            .build();
     }
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-            .title("MarketGG Auth Swagger")
-            .description("practice swagger config")
-            .version("1.0")
+            .title("Spring Boot Open Api Test with Swagger")
+            .description("설명 부분")
+            .version("1.0.0")
             .build();
     }
 

@@ -20,8 +20,8 @@ import org.springframework.security.web.SecurityFilterChain;
 /**
  * Spring Security 기본 설정을 진행합니다.
  *
- * @version 1.0.0
  * @author 윤동열
+ * @version 1.0.0
  */
 @Configuration
 @EnableWebSecurity
@@ -103,7 +103,8 @@ public class WebSecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
-                         .antMatchers("/h2-console/**", "/swagger**/**");
+                         .antMatchers("/swagger*", "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs")
+                         .antMatchers("/h2-console/**");
     }
 
 }
