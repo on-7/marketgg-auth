@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import com.nhnacademy.marketgg.auth.adapter.GoogleAdapter;
 import com.nhnacademy.marketgg.auth.dto.response.GoogleProfile;
+import com.nhnacademy.marketgg.auth.dto.response.OauthLoginResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.exception.LoginFailException;
@@ -62,17 +63,19 @@ public class GoogleLoginService implements Oauth2Service {
      * {@inheritDoc}
      */
     @Override
-    public GoogleProfile requestProfile(String code) {
+    public OauthLoginResponse requestProfile(String code) {
 
         OAuthToken tokenResponse = this.requestAccessToken(code);
 
         GoogleProfile googleProfile = this.requestGoogleProfile(tokenResponse);
+        log.info("Google Profile = {}", googleProfile);
 
         Auth auth = authRepository.findByEmail(googleProfile.getEmail())
                                   .orElse(null);
 
         if (Objects.isNull(auth)) {
-            return new GoogleProfile(googleProfile.getEmail(), googleProfile.getName());
+            // DB 에 회원 정보가 없을 시 로그인 시도한 프로필을 바탕으로 회원가입 진행
+            return OauthLoginResponse.doSignUp(googleProfile);
         }
 
         List<SimpleGrantedAuthority> roles = roleRepository.findRolesByAuthId(auth.getId())
@@ -84,7 +87,8 @@ public class GoogleLoginService implements Oauth2Service {
 
         TokenResponse jwtResponse = tokenUtils.saveRefreshToken(redisTemplate, token);
 
-        return new GoogleProfile(true, jwtResponse);
+        // 로그인 성공 시 JWT 반환
+        return OauthLoginResponse.loginSuccess(jwtResponse);
     }
 
     private OAuthToken requestAccessToken(String code) {

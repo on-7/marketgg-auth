@@ -1,4 +1,4 @@
-package com.nhnacademy.marketgg.auth.aspect;
+package com.nhnacademy.marketgg.auth.aop;
 
 import com.nhnacademy.marketgg.auth.annotation.Token;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;

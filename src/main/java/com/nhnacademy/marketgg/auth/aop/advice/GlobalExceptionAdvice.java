@@ -1,8 +1,9 @@
-package com.nhnacademy.marketgg.auth.controller.advice;
+package com.nhnacademy.marketgg.auth.aop.advice;
 
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+import com.nhnacademy.marketgg.auth.dto.response.common.AuthResult;
 import com.nhnacademy.marketgg.auth.dto.response.common.ErrorEntity;
 import com.nhnacademy.marketgg.auth.exception.SecureManagerException;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class GlobalExceptionAdvice {
      * @author 윤동열
      */
     @ExceptionHandler(SecureManagerException.class)
-    public ResponseEntity<ErrorEntity> handleSecureManager(SecureManagerException e) {
+    public ResponseEntity<AuthResult<Void>> handleSecureManager(SecureManagerException e) {
         log.error(e.getMessage());
 
         String msg = messageSource.getMessage(e.getExceptionCode(), null, LocaleContextHolder.getLocale());
@@ -44,7 +45,7 @@ public class GlobalExceptionAdvice {
 
         return ResponseEntity.status(INTERNAL_SERVER_ERROR)
                              .contentType(APPLICATION_JSON)
-                             .body(error);
+                             .body(AuthResult.error(error));
     }
 
     /**
@@ -55,12 +56,13 @@ public class GlobalExceptionAdvice {
      * @author 윤동열
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorEntity> handleException(Exception e) {
+    public ResponseEntity<AuthResult<Void>> handleException(Exception e) {
         log.error("", e);
+        ErrorEntity error = new ErrorEntity(e.getMessage());
 
         return ResponseEntity.status(INTERNAL_SERVER_ERROR)
                              .contentType(APPLICATION_JSON)
-                             .body(new ErrorEntity(e.getMessage()));
+                             .body(AuthResult.error(error));
     }
 
 }

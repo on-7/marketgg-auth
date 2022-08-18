@@ -1,4 +1,4 @@
-package com.nhnacademy.marketgg.auth.controller.advice;
+package com.nhnacademy.marketgg.auth.aop.advice;
 
 import lombok.AllArgsConstructor;
 
