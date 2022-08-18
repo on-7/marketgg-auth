@@ -1,6 +1,6 @@
 package com.nhnacademy.marketgg.auth.exception;
 
-import com.nhnacademy.marketgg.auth.controller.advice.ExceptionMessageCode;
+import com.nhnacademy.marketgg.auth.aop.advice.ExceptionMessageCode;
 
 public class EmailOverlapException extends ConflictException {
 

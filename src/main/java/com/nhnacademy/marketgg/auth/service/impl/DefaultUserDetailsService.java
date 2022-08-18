@@ -17,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Email 을 이용하여 사용자를 찾습니다.
  *
- * @version 1.0.0
  * @author 윤동열
+ * @version 1.0.0
  */
 @Service
 @Transactional(readOnly = true)

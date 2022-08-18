@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import com.nhnacademy.marketgg.auth.annotation.Token;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
+import com.nhnacademy.marketgg.auth.dto.response.common.AuthResult;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import java.util.Objects;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @version 1.0.0
  */
 @RestController
+@RequestMapping("/members")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -34,7 +37,7 @@ public class AuthController {
      * @return 요청 결과를 반환합니다.
      */
     @GetMapping("/refresh")
-    public ResponseEntity<Void> renewToken(@Token String token) {
+    public ResponseEntity<AuthResult<String>> renewToken(@Token String token) {
 
         HttpStatus httpStatus = OK;
 
@@ -53,7 +56,7 @@ public class AuthController {
 
         return ResponseEntity.status(httpStatus)
                              .headers(headers)
-                             .build();
+                             .body(AuthResult.success("Login Success"));
     }
 
     /**
@@ -63,11 +66,11 @@ public class AuthController {
      * @return 로그아웃이 완료되었다는 뜻으로 200 OK 를 응답합니다.
      */
     @GetMapping("/logout")
-    public ResponseEntity<Void> logout(@Token String token) {
+    public ResponseEntity<AuthResult<String>> logout(@Token String token) {
         authService.logout(token);
 
         return ResponseEntity.status(OK)
-                             .build();
+                             .body(AuthResult.success("Logout Success"));
     }
 
 }

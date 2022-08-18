@@ -1,7 +1,8 @@
-package com.nhnacademy.marketgg.auth.controller.advice;
+package com.nhnacademy.marketgg.auth.aop.advice;
 
-import static com.nhnacademy.marketgg.auth.controller.advice.ExceptionMessageCode.INVALID_REQUEST;
+import static com.nhnacademy.marketgg.auth.aop.advice.ExceptionMessageCode.INVALID_REQUEST;
 
+import com.nhnacademy.marketgg.auth.dto.response.common.AuthResult;
 import com.nhnacademy.marketgg.auth.dto.response.common.ErrorEntity;
 import com.nhnacademy.marketgg.auth.exception.AuthException;
 import com.nhnacademy.marketgg.auth.exception.AuthWithdrawOverlapException;
@@ -27,8 +28,8 @@ import org.springframework.web.server.MethodNotAllowedException;
  * 전역 예외 처리를 위한 클래스입니다.
  *
  * @author 윤동열
+ * @author 윤동열
  * @version 1.0.0
- * @author 윤동열 
  */
 @Slf4j
 @RestControllerAdvice
@@ -44,7 +45,7 @@ public class AuthControllerAdvice {
      * @author 윤동열
      */
     @ExceptionHandler(MethodNotAllowedException.class)
-    public ResponseEntity<ErrorEntity> handleMethodNotAllowException(MethodNotAllowedException e) {
+    public ResponseEntity<AuthResult<Void>> handleMethodNotAllowException(MethodNotAllowedException e) {
         log.debug("", e);
 
         String msg = messageSource.getMessage(INVALID_REQUEST.msg, null, LocaleContextHolder.getLocale());
@@ -52,7 +53,7 @@ public class AuthControllerAdvice {
 
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(error);
+                             .body(AuthResult.error(error));
     }
 
     /**
@@ -68,7 +69,7 @@ public class AuthControllerAdvice {
         EmailOverlapException.class,
         AuthWithdrawOverlapException.class
     })
-    public ResponseEntity<ErrorEntity> handleConflictNotAllowException(ConflictException e) {
+    public ResponseEntity<AuthResult<Void>> handleConflictNotAllowException(ConflictException e) {
         log.debug(e.toString());
 
         String msg = messageSource.getMessage(e.getExceptionCode(), null, LocaleContextHolder.getLocale());
@@ -76,7 +77,7 @@ public class AuthControllerAdvice {
 
         return ResponseEntity.status(HttpStatus.CONFLICT)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(error);
+                             .body(AuthResult.error(error));
     }
 
     /**
@@ -91,11 +92,13 @@ public class AuthControllerAdvice {
     @ExceptionHandler(value = {
         RedisInvalidSubscriptionException.class
     })
-    public ResponseEntity<ErrorEntity> handleRedisConflictNotAllowException(RedisInvalidSubscriptionException e) {
+    public ResponseEntity<AuthResult<Void>> handleRedisConflictNotAllowException(RedisInvalidSubscriptionException e) {
         log.debug(e.toString());
+        ErrorEntity error = new ErrorEntity(e.getMessage());
+
         return ResponseEntity.status(HttpStatus.CONFLICT)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(new ErrorEntity(e.getMessage()));
+                             .body(AuthResult.error(error));
     }
 
     /**
@@ -110,7 +113,7 @@ public class AuthControllerAdvice {
         UnAuthorizationException.class,
         OAuthRequestFailException.class
     })
-    public ResponseEntity<ErrorEntity> handleLoginFailException(AuthException e) {
+    public ResponseEntity<AuthResult<Void>> handleLoginFailException(AuthException e) {
         log.debug(e.toString());
 
         String msg = messageSource.getMessage(e.getExceptionCode(), null, LocaleContextHolder.getLocale());
@@ -118,7 +121,7 @@ public class AuthControllerAdvice {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(error);
+                             .body(AuthResult.error(error));
     }
 
 }

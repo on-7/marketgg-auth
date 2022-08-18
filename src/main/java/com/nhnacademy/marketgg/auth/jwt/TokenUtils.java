@@ -36,9 +36,9 @@ import org.springframework.web.client.RestTemplate;
 /**
  * JWT 토큰을 생성하고 필요한 정보를 제공하는 클래스입니다.
  *
+ * @author 윤동열
  * @version 1.0.0
  * @see <a href="jwt.io">JWT Description</a>
- * @author 윤동열
  */
 @Slf4j
 @Component
