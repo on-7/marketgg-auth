@@ -43,6 +43,7 @@ public class GoogleLoginController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpStatus status;
         GoogleProfile data;
 
         if (loginResponse.successLogin()) {
@@ -52,11 +53,13 @@ public class GoogleLoginController {
             headers.set(TokenUtils.JWT_EXPIRE, tokenResponse.getExpiredDate().toString());
 
             data = GoogleProfile.successGoogleLogin();  // Profile is null
+            status = HttpStatus.OK;
         } else {
             data = (GoogleProfile) loginResponse.getOauthProfile();
+            status = HttpStatus.UNAUTHORIZED;
         }
 
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.status(status)
                              .headers(headers)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(AuthResult.success(data));
