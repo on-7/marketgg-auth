@@ -74,12 +74,12 @@ class AuthControllerTest {
         LocalDateTime now = LocalDateTime.now();
 
         Authentication authentication = new UsernamePasswordAuthenticationToken("username", "password");
-        String token = createToken(authentication, new Date(), 60_000L);
+        String token = createToken(authentication, new Date());
         TokenResponse tokenResponse = new TokenResponse(token, now);
 
         given(authService.renewToken(token)).willReturn(tokenResponse);
 
-        mockMvc.perform(get("/refresh")
+        mockMvc.perform(get("/members/refresh")
                             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                .andExpect(status().isOk())
                .andExpect(header().string(HttpHeaders.AUTHORIZATION, "Bearer " + token));
@@ -90,7 +90,7 @@ class AuthControllerTest {
     void testRenewTokenFail() throws Exception {
         given(authService.renewToken("JWT-TOKEN")).willReturn(null);
 
-        mockMvc.perform(get("/refresh")
+        mockMvc.perform(get("/members/refresh")
                             .header(HttpHeaders.AUTHORIZATION, "Bearer JWT-TOKEN"))
                .andExpect(status().isUnauthorized());
     }
@@ -101,17 +101,17 @@ class AuthControllerTest {
         String token = "JWT-TOKEN";
         doNothing().when(authService).logout(token);
 
-        mockMvc.perform(get("/logout")
+        mockMvc.perform(get("/members/logout")
                             .header(HttpHeaders.AUTHORIZATION, "Bearer JWT-TOKEN"));
 
         verify(authService, times(1)).logout(token);
     }
 
-    private String createToken(Authentication authentication, Date issueDate, long expirationDate) {
+    private String createToken(Authentication authentication, Date issueDate) {
         ReflectionTestUtils.setField(tokenUtils, "key", Keys.hmacShaKeyFor(
             Decoders.BASE64URL.decode("test-keytest-keytest-keytest-keytest-keytest-key")));
 
-        return ReflectionTestUtils.invokeMethod(tokenUtils, "createToken", authentication, issueDate, expirationDate);
+        return ReflectionTestUtils.invokeMethod(tokenUtils, "createToken", authentication, issueDate, (long) 60_000);
     }
 
 }
