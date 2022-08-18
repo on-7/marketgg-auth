@@ -52,7 +52,8 @@ public class GoogleLoginController {
             headers.setBearerAuth(tokenResponse.getJwt());
             headers.set(TokenUtils.JWT_EXPIRE, tokenResponse.getExpiredDate().toString());
 
-            data = GoogleProfile.successGoogleLogin();  // Profile is null
+            // 로그인 성공 시 프로필 없이 JWT 만 응답으로 보내기 때문에 Profile 정보가 없다.
+            data = GoogleProfile.successGoogleLogin();
             status = HttpStatus.OK;
         } else {
             data = (GoogleProfile) loginResponse.getOauthProfile();
