@@ -91,7 +91,7 @@ class GoogleLoginControllerTest {
                    .contentType(APPLICATION_JSON)
                    .characterEncoding(StandardCharsets.UTF_8)
                    .content(jsonRequest))
-               .andExpect(status().isOk())
+               .andExpect(status().isUnauthorized())
                .andExpect(jsonPath("$.success", equalTo(true)))
                .andExpect(jsonPath("$.data.name", equalTo(name)))
                .andExpect(jsonPath("$.data.email", equalTo(email)));
