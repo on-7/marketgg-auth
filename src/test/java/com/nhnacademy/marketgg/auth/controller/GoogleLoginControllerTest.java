@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.dto.response.GoogleProfile;
+import com.nhnacademy.marketgg.auth.dto.response.OauthLoginResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.service.impl.GoogleLoginService;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -53,14 +55,14 @@ class GoogleLoginControllerTest {
         String token = "jwt";
         LocalDateTime now = LocalDateTime.now();
         TokenResponse tokenResponse = new TokenResponse(token, now);
-        GoogleProfile googleProfile = new GoogleProfile(true, tokenResponse);
+        OauthLoginResponse oauthLoginResponse = OauthLoginResponse.loginSuccess(tokenResponse);
         Map<String, String> request = Map.of("code", "code");
 
         String jsonRequest = mapper.writeValueAsString(request);
 
-        given(googleLoginService.requestProfile(request.get("code"))).willReturn(googleProfile);
+        given(googleLoginService.requestProfile(request.get("code"))).willReturn(oauthLoginResponse);
 
-        mockMvc.perform(post("/login/google")
+        mockMvc.perform(post("/members/login/google")
                    .contentType(APPLICATION_JSON)
                    .characterEncoding(StandardCharsets.UTF_8)
                    .content(jsonRequest))
@@ -74,18 +76,22 @@ class GoogleLoginControllerTest {
     void testOauthLoginFail() throws Exception {
         String email = "email@gmail.com";
         String name = "홍길동";
-        GoogleProfile googleProfile = new GoogleProfile(email, name);
+        GoogleProfile googleProfile = new GoogleProfile();
+        ReflectionTestUtils.setField(googleProfile, "email", email);
+        ReflectionTestUtils.setField(googleProfile, "name", name);
+
+        OauthLoginResponse loginResponse = OauthLoginResponse.doSignUp(googleProfile);
         Map<String, String> request = Map.of("code", "code");
 
         String jsonRequest = mapper.writeValueAsString(request);
 
-        given(googleLoginService.requestProfile(request.get("code"))).willReturn(googleProfile);
+        given(googleLoginService.requestProfile(request.get("code"))).willReturn(loginResponse);
 
-        mockMvc.perform(post("/login/google")
+        mockMvc.perform(post("/members/login/google")
                    .contentType(APPLICATION_JSON)
                    .characterEncoding(StandardCharsets.UTF_8)
                    .content(jsonRequest))
-               .andExpect(status().isOk())
+               .andExpect(status().isUnauthorized())
                .andExpect(jsonPath("$.success", equalTo(true)))
                .andExpect(jsonPath("$.data.name", equalTo(name)))
                .andExpect(jsonPath("$.data.email", equalTo(email)));

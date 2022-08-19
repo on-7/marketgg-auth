@@ -9,6 +9,7 @@ import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
 import com.nhnacademy.marketgg.auth.dto.response.SignUpResponse;
 import com.nhnacademy.marketgg.auth.dto.response.UseEmailResponse;
+import com.nhnacademy.marketgg.auth.dto.response.common.AuthResult;
 import com.nhnacademy.marketgg.auth.service.SignUpService;
 import javax.management.relation.RoleNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -17,16 +18,18 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 인증 관련 요청을 처리하는 Controller 입니다.
  *
- * @version 1.0.0
  * @author 김훈민
+ * @version 1.0.0
  */
 @Slf4j
 @RestController
+@RequestMapping("/members")
 @RequiredArgsConstructor
 public class SignUpController {
 
@@ -40,14 +43,14 @@ public class SignUpController {
      * @throws RoleNotFoundException - 역할을 부여받지 않거나, 읽을 수 없는 경우 예외 발생
      */
     @PostMapping("/signup")
-    public ResponseEntity<SignUpResponse> doSignup(@RequestBody final SignUpRequest signUpRequest)
+    public ResponseEntity<AuthResult<SignUpResponse>> doSignup(@RequestBody final SignUpRequest signUpRequest)
         throws RoleNotFoundException {
 
-        SignUpResponse signup = signUpService.signup(signUpRequest);
+        SignUpResponse data = signUpService.signup(signUpRequest);
 
         return ResponseEntity.status(CREATED)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(signup);
+                             .body(AuthResult.success(data));
     }
 
     /**
@@ -57,11 +60,12 @@ public class SignUpController {
      * @return 이메일로 로그인 요청 존재하는 이메일인지 성공/실패 여부가 담긴 ResponseEntity
      */
     @PostMapping("/check/email")
-    public ResponseEntity<ExistEmailResponse> checkEmail(
-        @RequestBody final EmailRequest emailRequest) {
+    public ResponseEntity<AuthResult<ExistEmailResponse>> checkEmail(@RequestBody final EmailRequest emailRequest) {
+        ExistEmailResponse data = signUpService.checkEmail(emailRequest);
+
         return ResponseEntity.status(OK)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(signUpService.checkEmail(emailRequest));
+                             .body(AuthResult.success(data));
     }
 
     /**
@@ -71,11 +75,12 @@ public class SignUpController {
      * @return 이메일로 로그인 요청 사용할 수 있는 이메일인지 성공/실패 여부가 담긴 ResponseEntity
      */
     @PostMapping("/use/email")
-    public ResponseEntity<UseEmailResponse> useEmail(
-        @RequestBody final EmailUseRequest emailUseRequest) {
+    public ResponseEntity<AuthResult<UseEmailResponse>> useEmail(@RequestBody final EmailUseRequest emailUseRequest) {
+        UseEmailResponse data = signUpService.useEmail(emailUseRequest);
+
         return ResponseEntity.status(OK)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(signUpService.useEmail(emailUseRequest));
+                             .body(AuthResult.success(data));
     }
 
 }

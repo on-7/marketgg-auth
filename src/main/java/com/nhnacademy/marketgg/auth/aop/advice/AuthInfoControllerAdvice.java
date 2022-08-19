@@ -1,8 +1,8 @@
-package com.nhnacademy.marketgg.auth.controller.advice;
+package com.nhnacademy.marketgg.auth.aop.advice;
 
-import static com.nhnacademy.marketgg.auth.controller.advice.ExceptionMessageCode.*;
+import static com.nhnacademy.marketgg.auth.aop.advice.ExceptionMessageCode.USER_NOT_FOUND;
 
-import com.nhnacademy.marketgg.auth.dto.response.common.CommonResponse;
+import com.nhnacademy.marketgg.auth.dto.response.common.AuthResult;
 import com.nhnacademy.marketgg.auth.dto.response.common.ErrorEntity;
 import com.nhnacademy.marketgg.auth.exception.AuthNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class AuthInfoControllerAdvice {
     @ExceptionHandler({
         AuthNotFoundException.class
     })
-    public ResponseEntity<CommonResponse> errorControl(Exception e) {
+    public ResponseEntity<AuthResult<Void>> errorControl(Exception e) {
         log.debug(e.toString());
 
         String msg = messageSource.getMessage(USER_NOT_FOUND.msg, null, LocaleContextHolder.getLocale());
@@ -44,7 +44,7 @@ public class AuthInfoControllerAdvice {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(error);
+                             .body(AuthResult.error(error));
     }
 
 }

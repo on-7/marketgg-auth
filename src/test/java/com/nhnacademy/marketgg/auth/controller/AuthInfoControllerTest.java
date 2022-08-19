@@ -67,7 +67,7 @@ class AuthInfoControllerTest {
         MemberResponse memberResponse = new MemberResponse(email, name, phoneNumber);
         given(authInfoService.findAuthByUuid(any())).willReturn(memberResponse);
 
-        mockMvc.perform(get("/info")
+        mockMvc.perform(get("/members/info")
                    .header(HttpHeaders.AUTHORIZATION, "Bearer jwt"))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.success", equalTo(true)))
@@ -89,7 +89,7 @@ class AuthInfoControllerTest {
 
         given(authInfoService.findMemberInfoByUuid(any())).willReturn(memberResponse);
 
-        mockMvc.perform(post("/info/person")
+        mockMvc.perform(post("/members/info/person")
                    .header(HttpHeaders.AUTHORIZATION, "Bearer jwt")
                    .characterEncoding(StandardCharsets.UTF_8)
                    .contentType(APPLICATION_JSON)
@@ -116,7 +116,7 @@ class AuthInfoControllerTest {
 
         given(authInfoService.findMemberNameList(anyList())).willReturn(list);
 
-        mockMvc.perform(post("/info/names")
+        mockMvc.perform(post("/members/info/names")
                    .characterEncoding(StandardCharsets.UTF_8)
                    .contentType(MediaType.APPLICATION_JSON)
                    .content(uuidList))

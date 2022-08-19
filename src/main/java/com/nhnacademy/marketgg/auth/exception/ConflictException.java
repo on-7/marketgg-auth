@@ -1,6 +1,6 @@
 package com.nhnacademy.marketgg.auth.exception;
 
-import com.nhnacademy.marketgg.auth.controller.advice.ExceptionMessageCode;
+import com.nhnacademy.marketgg.auth.aop.advice.ExceptionMessageCode;
 
 /**
  * 409 예외처리를 위한 추상클래스입니다.

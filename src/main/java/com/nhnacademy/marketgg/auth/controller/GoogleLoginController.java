@@ -1,8 +1,9 @@
 package com.nhnacademy.marketgg.auth.controller;
 
 import com.nhnacademy.marketgg.auth.dto.response.GoogleProfile;
-import com.nhnacademy.marketgg.auth.dto.response.common.CommonResponse;
-import com.nhnacademy.marketgg.auth.dto.response.common.SingleResponse;
+import com.nhnacademy.marketgg.auth.dto.response.OauthLoginResponse;
+import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
+import com.nhnacademy.marketgg.auth.dto.response.common.AuthResult;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.impl.GoogleLoginService;
 import java.util.Map;
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
+@RequestMapping("/members")
 @RequiredArgsConstructor
 public class GoogleLoginController {
 
@@ -35,24 +38,32 @@ public class GoogleLoginController {
      * @return 프로필 정보 또는 JWT
      */
     @PostMapping("/login/google")
-    public ResponseEntity<CommonResponse> oauthLogin(@RequestBody Map<String, String> request) {
-        GoogleProfile googleProfile = googleLoginService.requestProfile(request.get("code"));
+    public ResponseEntity<AuthResult<GoogleProfile>> oauthLogin(@RequestBody Map<String, String> request) {
+        OauthLoginResponse loginResponse = googleLoginService.requestProfile(request.get("code"));
 
-        if (googleProfile.isSuccess()) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpStatus status;
+        GoogleProfile data;
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setBearerAuth(googleProfile.getTokenResponse().getJwt());
-            headers.set(TokenUtils.JWT_EXPIRE, googleProfile.getTokenResponse().getExpiredDate().toString());
+        if (loginResponse.successLogin()) {
+            TokenResponse tokenResponse = loginResponse.getTokenResponse();
 
-            return ResponseEntity.status(HttpStatus.OK)
-                                 .headers(headers)
-                                 .body(new SingleResponse<>("Login Success"));
+            headers.setBearerAuth(tokenResponse.getJwt());
+            headers.set(TokenUtils.JWT_EXPIRE, tokenResponse.getExpiredDate().toString());
+
+            // 로그인 성공 시 프로필 없이 JWT 만 응답으로 보내기 때문에 Profile 정보가 없다.
+            data = GoogleProfile.successGoogleLogin();
+            status = HttpStatus.OK;
+        } else {
+            data = (GoogleProfile) loginResponse.getOauthProfile();
+            status = HttpStatus.UNAUTHORIZED;
         }
 
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.status(status)
+                             .headers(headers)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(new SingleResponse<>(googleProfile));
+                             .body(AuthResult.success(data));
     }
 
 }

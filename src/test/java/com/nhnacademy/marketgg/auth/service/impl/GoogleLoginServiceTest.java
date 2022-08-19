@@ -11,6 +11,7 @@ import static org.mockito.Mockito.times;
 
 import com.nhnacademy.marketgg.auth.adapter.GoogleAdapter;
 import com.nhnacademy.marketgg.auth.dto.response.GoogleProfile;
+import com.nhnacademy.marketgg.auth.dto.response.OauthLoginResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.entity.Role;
@@ -32,6 +33,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class GoogleLoginServiceTest {
@@ -59,7 +61,13 @@ class GoogleLoginServiceTest {
     void testRequestProfile() {
         String code = "code";
         OAuthToken oAuthToken = new OAuthToken();
-        GoogleProfile googleProfile = new GoogleProfile("email@gmail.com", "홍길동");
+
+        String email = "email@gmail.com";
+        String name = "홍길동";
+        GoogleProfile googleProfile = new GoogleProfile();
+        ReflectionTestUtils.setField(googleProfile, "email", email);
+        ReflectionTestUtils.setField(googleProfile, "name", name);
+
         Auth auth = mock(Auth.class);
         String jwt = "jwt";
         LocalDateTime now = LocalDateTime.now();
@@ -75,11 +83,10 @@ class GoogleLoginServiceTest {
         given(tokenUtils.saveRefreshToken(any(redisTemplate.getClass()), any(Authentication.class)))
             .willReturn(tokenResponse);
 
-        GoogleProfile googleProfile1 = (GoogleProfile) googleLoginService.requestProfile(code);
+        OauthLoginResponse loginResponse = googleLoginService.requestProfile(code);
 
-        assertThat(googleProfile1).isNotNull();
-        assertThat(googleProfile1.getEmail()).isNull();
-        assertThat(googleProfile1.getName()).isNull();
+        assertThat(loginResponse).isNotNull();
+        assertThat(loginResponse.getOauthProfile()).isNull();
 
         then(googleAdapter).should(times(1)).requestToken(anyString(), any());
         then(googleAdapter).should(times(1)).requestProfile(any(URI.class), any());

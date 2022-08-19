@@ -11,9 +11,7 @@ import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
-import com.nhnacademy.marketgg.auth.dto.response.common.CommonResponse;
-import com.nhnacademy.marketgg.auth.dto.response.common.ListResponse;
-import com.nhnacademy.marketgg.auth.dto.response.common.SingleResponse;
+import com.nhnacademy.marketgg.auth.dto.response.common.AuthResult;
 import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthInfoService;
@@ -38,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequestMapping("/info")
+@RequestMapping("/members/info")
 @RequiredArgsConstructor
 public class AuthInfoController {
 
@@ -54,7 +52,7 @@ public class AuthInfoController {
      * @author 김훈민
      */
     @PutMapping
-    public ResponseEntity<Void> update(@Token String token,
+    public ResponseEntity<AuthResult<String>> update(@Token String token,
                                        @RequestBody final AuthUpdateRequest authUpdateRequest) {
 
         TokenResponse update = authInfoService.update(token, authUpdateRequest);
@@ -67,7 +65,7 @@ public class AuthInfoController {
 
         return ResponseEntity.status(OK)
                              .headers(httpHeaders)
-                             .build();
+                             .body(AuthResult.success("Update Success"));
     }
 
     /**
@@ -79,14 +77,15 @@ public class AuthInfoController {
      * @author 김훈민
      */
     @DeleteMapping
-    public ResponseEntity<Void> withdraw(@Token String token,
-                                         @RequestBody final AuthWithDrawRequest authWithDrawRequest) {
+    public ResponseEntity<AuthResult<String>> withdraw(@Token String token,
+                                                       @RequestBody final AuthWithDrawRequest authWithDrawRequest) {
 
         authInfoService.withdraw(token, authWithDrawRequest);
         authService.logout(token);
 
         return ResponseEntity.status(OK)
-                             .build();
+                             .contentType(APPLICATION_JSON)
+                             .body(AuthResult.success("Withdraw Success"));
     }
 
     /**
@@ -98,13 +97,13 @@ public class AuthInfoController {
      * @author 윤동열
      */
     @GetMapping
-    public ResponseEntity<CommonResponse> getAuthInfo(@Token String token) throws UnAuthorizationException {
-        MemberResponse auth = authInfoService.findAuthByUuid(token);
-        SingleResponse<MemberResponse> memberResponseSingleResponse = new SingleResponse<>(auth);
-        log.info("MemberResponse = {}", auth);
+    public ResponseEntity<AuthResult<MemberResponse>> getAuthInfo(@Token String token) throws UnAuthorizationException {
+        MemberResponse data = authInfoService.findAuthByUuid(token);
+        log.info("MemberResponse = {}", data);
+
         return ResponseEntity.status(OK)
                              .contentType(APPLICATION_JSON)
-                             .body(memberResponseSingleResponse);
+                             .body(AuthResult.success(data));
     }
 
     /**
@@ -115,12 +114,13 @@ public class AuthInfoController {
      * @author 윤동열
      */
     @PostMapping("/person")
-    public ResponseEntity<CommonResponse> getMemberInfo(@RequestBody MemberInfoRequest memberInfoRequest) {
-        MemberInfoResponse memberInfoByUuid = authInfoService.findMemberInfoByUuid(memberInfoRequest.getUuid());
+    public ResponseEntity<AuthResult<MemberInfoResponse>> getMemberInfo(
+        @RequestBody MemberInfoRequest memberInfoRequest) {
+        MemberInfoResponse data = authInfoService.findMemberInfoByUuid(memberInfoRequest.getUuid());
 
         return ResponseEntity.status(OK)
                              .contentType(APPLICATION_JSON)
-                             .body(new SingleResponse<>(memberInfoByUuid));
+                             .body(AuthResult.success(data));
     }
 
     /**
@@ -131,12 +131,12 @@ public class AuthInfoController {
      * @author 윤동열
      */
     @PostMapping("/names")
-    public ResponseEntity<CommonResponse> getMemberList(@RequestBody List<String> uuids) {
-        List<MemberNameResponse> memberNameList = authInfoService.findMemberNameList(uuids);
+    public ResponseEntity<AuthResult<List<MemberNameResponse>>> getMemberList(@RequestBody List<String> uuids) {
+        List<MemberNameResponse> data = authInfoService.findMemberNameList(uuids);
 
         return ResponseEntity.status(OK)
                              .contentType(APPLICATION_JSON)
-                             .body(new ListResponse<>(memberNameList));
+                             .body(AuthResult.success(data));
     }
 
 }

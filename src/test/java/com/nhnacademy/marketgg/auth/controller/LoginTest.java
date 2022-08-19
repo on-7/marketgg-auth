@@ -69,7 +69,7 @@ class LoginTest {
 
         String requestJson = mapper.writeValueAsString(loginRequest);
 
-        mockMvc.perform(post("/login")
+        mockMvc.perform(post("/members/login")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(requestJson))
                .andExpect(status().isOk())
@@ -85,7 +85,7 @@ class LoginTest {
 
         String requestJson = mapper.writeValueAsString(loginRequest);
 
-        mockMvc.perform(post("/login")
+        mockMvc.perform(post("/members/login")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(requestJson))
                .andExpect(status().isUnauthorized())
