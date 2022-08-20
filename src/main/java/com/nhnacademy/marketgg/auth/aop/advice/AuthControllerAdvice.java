@@ -12,6 +12,7 @@ import com.nhnacademy.marketgg.auth.exception.InvalidLoginRequestException;
 import com.nhnacademy.marketgg.auth.exception.LoginFailException;
 import com.nhnacademy.marketgg.auth.exception.OAuthRequestFailException;
 import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
+import com.nhnacademy.marketgg.auth.exception.WithdrawMemberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -71,8 +72,7 @@ public class AuthControllerAdvice {
     public ResponseEntity<AuthResult<Void>> handleConflictNotAllowException(ConflictException e) {
         log.debug(e.toString());
 
-        String msg = messageSource.getMessage(e.getExceptionCode(), null, LocaleContextHolder.getLocale());
-        ErrorEntity error = new ErrorEntity(msg);
+        ErrorEntity error = this.getErrorEntity(e);
 
         return ResponseEntity.status(HttpStatus.CONFLICT)
                              .contentType(MediaType.APPLICATION_JSON)
@@ -115,12 +115,37 @@ public class AuthControllerAdvice {
     public ResponseEntity<AuthResult<Void>> handleLoginFailException(AuthException e) {
         log.debug(e.toString());
 
-        String msg = messageSource.getMessage(e.getExceptionCode(), null, LocaleContextHolder.getLocale());
-        ErrorEntity error = new ErrorEntity(msg);
+        ErrorEntity error = this.getErrorEntity(e);
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(AuthResult.error(error));
+    }
+
+    /**
+     * 탈퇴한 회원에 대한 예외를 처리합니다.
+     */
+    @ExceptionHandler({
+        WithdrawMemberException.class
+    })
+    public ResponseEntity<AuthResult<Void>> handleWithdrawMemberException(WithdrawMemberException e) {
+        log.info(e.toString());
+
+        ErrorEntity error = this.getErrorEntity(e);
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(AuthResult.error(error));
+    }
+
+    private ErrorEntity getErrorEntity(AuthException e) {
+        String msg = messageSource.getMessage(e.getExceptionCode(), null, LocaleContextHolder.getLocale());
+        return new ErrorEntity(msg);
+    }
+
+    private ErrorEntity getErrorEntity(ConflictException e) {
+        String msg = messageSource.getMessage(e.getExceptionCode(), null, LocaleContextHolder.getLocale());
+        return new ErrorEntity(msg);
     }
 
 }

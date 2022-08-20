@@ -1,12 +1,14 @@
 package com.nhnacademy.marketgg.auth.repository;
 
-import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
-import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
+import com.nhnacademy.marketgg.auth.constant.Provider;
+import com.nhnacademy.marketgg.auth.dto.request.signup.EmailRequest;
+import com.nhnacademy.marketgg.auth.dto.request.signup.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -83,6 +85,19 @@ class AuthRepositoryTest {
         assertThat(membersByUuid).hasSize(10);
     }
 
+    @DisplayName("소셜로그인 ")
+    @Test
+    void testFindByEmailAndProvider() {
+        Auth auth = new Auth(getSignUpRequest(100));
+        Auth savedAuth = authRepository.save(auth);
+        Auth findAuth = authRepository.findByEmailAndProvider(auth.getEmail(), Provider.GOOGLE)
+                                      .orElseThrow();
+
+        Assertions.assertAll(
+            () -> assertThat(findAuth.getEmail()).isEqualTo(savedAuth.getEmail()),
+            () -> assertThat(findAuth.getProvider()).isEqualTo(savedAuth.getProvider()));
+    }
+
     private SignUpRequest getSignUpRequest(int i) {
         SignUpRequest signUpRequest = new SignUpRequest();
 
@@ -90,7 +105,7 @@ class AuthRepositoryTest {
         ReflectionTestUtils.setField(signUpRequest, "password",UUID.randomUUID().toString());
         ReflectionTestUtils.setField(signUpRequest, "name", "name" + i);
         ReflectionTestUtils.setField(signUpRequest, "phoneNumber", "01012341234");
-        ReflectionTestUtils.setField(signUpRequest, "provider", i %2 == 0 ?"GOOGLE" : "SELF");
+        ReflectionTestUtils.setField(signUpRequest, "provider", i % 2 == 0 ?"GOOGLE" : "SELF");
 
         return signUpRequest;
     }

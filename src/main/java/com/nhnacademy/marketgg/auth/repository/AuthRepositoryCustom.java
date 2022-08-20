@@ -14,4 +14,6 @@ public interface AuthRepositoryCustom {
 
     List<MemberNameResponse> findMembersByUuid(List<String> uuids);
 
+    boolean isExistNotWithdraw(String uuid);
+
 }

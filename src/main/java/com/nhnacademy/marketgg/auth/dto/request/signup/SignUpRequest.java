@@ -1,4 +1,4 @@
-package com.nhnacademy.marketgg.auth.dto.request;
+package com.nhnacademy.marketgg.auth.dto.request.signup;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;

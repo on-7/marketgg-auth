@@ -1,6 +1,7 @@
-package com.nhnacademy.marketgg.auth.dto.response;
+package com.nhnacademy.marketgg.auth.dto.response.login.oauth.google;
 
 import com.nhnacademy.marketgg.auth.constant.Provider;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.OauthProfile;
 import lombok.ToString;
 
 @ToString

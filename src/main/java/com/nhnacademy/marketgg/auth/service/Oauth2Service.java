@@ -1,6 +1,6 @@
 package com.nhnacademy.marketgg.auth.service;
 
-import com.nhnacademy.marketgg.auth.dto.response.OauthLoginResponse;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.OauthLoginResponse;
 
 /**
  * 소셜 로그인 비즈니스 로직을 처리합니다.

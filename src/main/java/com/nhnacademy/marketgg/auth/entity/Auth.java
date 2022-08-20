@@ -3,7 +3,8 @@ package com.nhnacademy.marketgg.auth.entity;
 import com.nhnacademy.marketgg.auth.constant.Provider;
 import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
-import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
+import com.nhnacademy.marketgg.auth.dto.request.signup.SignUpRequest;
+import com.nhnacademy.marketgg.auth.exception.WithdrawMemberException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -151,7 +152,11 @@ public class Auth {
     }
 
     public boolean isMember() {
-        return Objects.nonNull(this.deletedAt);
+        if(Objects.nonNull(this.deletedAt)){
+            throw new WithdrawMemberException();
+        }
+
+        return true;
     }
 
 }

@@ -10,9 +10,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
 import com.nhnacademy.marketgg.auth.adapter.GoogleAdapter;
-import com.nhnacademy.marketgg.auth.dto.response.GoogleProfile;
-import com.nhnacademy.marketgg.auth.dto.response.OauthLoginResponse;
-import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
+import com.nhnacademy.marketgg.auth.constant.Provider;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.google.GoogleProfile;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.OauthLoginResponse;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.entity.Role;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
@@ -78,7 +79,7 @@ class GoogleLoginServiceTest {
             .willReturn(ResponseEntity.of(Optional.of(oAuthToken)));
         given(googleAdapter.requestProfile(any(URI.class), any()))
             .willReturn(ResponseEntity.of(Optional.of(googleProfile)));
-        given(authRepository.findByEmail(googleProfile.getEmail())).willReturn(Optional.of(auth));
+        given(authRepository.findByEmailAndProvider(googleProfile.getEmail(), Provider.GOOGLE)).willReturn(Optional.of(auth));
         given(roleRepository.findRolesByAuthId(auth.getId())).willReturn(List.of(new Role(ROLE_USER)));
         given(tokenUtils.saveRefreshToken(any(redisTemplate.getClass()), any(Authentication.class)))
             .willReturn(tokenResponse);

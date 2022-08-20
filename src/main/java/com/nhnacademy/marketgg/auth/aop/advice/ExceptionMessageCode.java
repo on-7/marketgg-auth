@@ -18,7 +18,8 @@ public enum ExceptionMessageCode {
     SECURE_MANAGER("secureManager.msg"),
     OAUTH_REQUEST_FAIL("oauthRequestFail.msg"),
     UNAUTHORIZATION("unAuthorization.msg"),
-    INVALID_REQUEST("invalidRequest.msg");
+    INVALID_REQUEST("invalidRequest.msg"),
+    WITHDRAW_MEMBER("withdrawMember");
 
     public final String msg;
 

@@ -28,4 +28,13 @@ public class AuthRepositoryImpl extends QuerydslRepositorySupport implements Aut
             .fetch();
     }
 
+    @Override
+    public boolean isExistNotWithdraw(String uuid) {
+        QAuth auth = QAuth.auth;
+
+        return from(auth).where(auth.uuid.eq(uuid)
+                                         .and(auth.deletedAt.isNull()))
+                         .fetchOne() != null;
+    }
+
 }

@@ -2,7 +2,7 @@ package com.nhnacademy.marketgg.auth.jwt;
 
 import static java.util.stream.Collectors.toList;
 
-import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;

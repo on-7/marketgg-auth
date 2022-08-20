@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * Auth DB 접근을 위한 Repository
+ * Auth DB 접근을 위한 Repository.
  */
 public interface AuthRepository extends JpaRepository<Auth, Long>, AuthRepositoryCustom {
 

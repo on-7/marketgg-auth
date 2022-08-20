@@ -38,6 +38,7 @@ public class DefaultUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
         Auth auth = authRepository.findByEmail(email)
+                                  .filter(Auth::isMember)
                                   .orElseThrow(() -> new AuthNotFoundException(email));
 
         List<Role> roles = roleRepository.findRolesByAuthId(auth.getId());
