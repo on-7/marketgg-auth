@@ -3,7 +3,7 @@ package com.nhnacademy.marketgg.auth.service.impl;
 import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
-import com.nhnacademy.marketgg.auth.repository.AuthRepository;
+import com.nhnacademy.marketgg.auth.repository.auth.AuthRepository;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import java.util.Objects;
 import java.util.Optional;
@@ -34,8 +34,7 @@ public class DefaultAuthService implements AuthService {
 
         redisTemplate.opsForHash().delete(uuid, TokenUtils.REFRESH_TOKEN);
 
-        long tokenExpireTime = tokenUtils.getExpireDate(token) - System.currentTimeMillis();
-        redisTemplate.opsForValue().set(token, true, tokenExpireTime, TimeUnit.MILLISECONDS);
+        tokenUtils.setBlackList(redisTemplate, token);
     }
 
     @Override

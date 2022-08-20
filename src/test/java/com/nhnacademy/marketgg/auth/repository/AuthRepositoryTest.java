@@ -5,6 +5,7 @@ import com.nhnacademy.marketgg.auth.dto.request.signup.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.signup.SignUpRequest;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
+import com.nhnacademy.marketgg.auth.repository.auth.AuthRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

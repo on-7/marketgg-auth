@@ -1,4 +1,4 @@
-package com.nhnacademy.marketgg.auth.repository;
+package com.nhnacademy.marketgg.auth.repository.auth;
 
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
