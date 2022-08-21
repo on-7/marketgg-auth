@@ -10,6 +10,7 @@ import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 윤동열
  * @version 1.0.0
  */
+@Slf4j
 @RestController
 @RequestMapping("/members")
 @RequiredArgsConstructor
@@ -71,6 +73,17 @@ public class AuthController {
 
         return ResponseEntity.status(OK)
                              .body(AuthResult.success("Logout Success"));
+    }
+
+    @GetMapping("/test")
+    public String log() {
+
+        log.debug("DEBUG");
+        log.info("INFO");
+        log.warn("WARN");
+        log.error("ERROR");
+
+        return "success";
     }
 
 }
