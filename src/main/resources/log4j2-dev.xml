@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration scan="true" scanPeriod="60 seconds">
+
     <Properties>
         <Property name="fileName" value="auth.%d{yyyy-MM-dd}"/>
         <Property name="filePath" value="${sys:user.home}/marketgg-auth-logs" />
-        <Property name="consoleLayout">
-            %highlight{[%-5level]} %d{yyyy-MM-dd HH:mm:ss} [%thread] [%C.%M: %L] - %msg%n
-        </Property>
         <Property name="fileLayout">
             %-5level %d{yyyy-MM-dd HH:mm:ss} [%thread] [%C.%M: %L] - %msg%n
         </Property>
@@ -29,41 +27,17 @@
             </Policies>
             <DefaultRolloverStrategy max="30" fileIndex="min"/>
         </RollingFile>
-
-        <!-- 에러의 경우 파일에 로그 처리 -->
-        <!-- <Appender name="error" class="ch.qos.logback.core.rolling.RollingFileAppender"> -->
-        <!--     <filter class="ch.qos.logback.classic.filter.LevelFilter"> -->
-        <!--         <level>error</level> -->
-        <!--         <onMatch>ACCEPT</onMatch> -->
-        <!--         <onMismatch>DENY</onMismatch> -->
-        <!--     </filter> -->
-
-        <!--     <file>${log_path}/${err_log_fileName}.log</file> -->
-
-        <!--     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"> -->
-        <!--         <pattern>${log_pattern}</pattern> -->
-        <!--     </encoder> -->
-
-        <!--     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy"> -->
-        <!--         <fileNamePattern>${log_path}/${err_log_fileName}.%d{yyyy-MM-dd}_%i.log</fileNamePattern> -->
-        <!--         <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP"> -->
-        <!--             <maxFileSize>10MB</maxFileSize> -->
-        <!--         </timeBasedFileNamingAndTriggeringPolicy> -->
-        <!--         <maxHistory>30</maxHistory> -->
-        <!--     </rollingPolicy> -->
-        <!-- </Appender> -->
     </Appenders>
 
     <Loggers>
-        <!-- root레벨 설정 -->
-        <root level="debug">
+        <root level="WARN">
             <appender-ref ref="console"/>
         </root>
 
-        <!-- 특정패키지 로깅레벨 설정 -->
         <logger name="com.nhnacademy.marketgg.auth" level="DEBUG" additivity="false">
             <appender-ref ref="console"/>
             <appender-ref ref="file"/>
         </logger>
     </Loggers>
+
 </Configuration>

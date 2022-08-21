@@ -10,8 +10,7 @@ gg:
 
   jwt:
     secret-url: https://api-keymanager.cloud.toast.com/keymanager/v1.0/appkey/mcXcTmrnbRezlila/secrets/2e2391a7260646499390dc43b38a3cd0
-    # secret-url: rxDUteYfw0VD1anLQFz1RIStgA1xZxsqJPRWRQ2u2IcOljgm68ab8l7AQAnekJI
-    expire-time: 1800000            # 30 mintues
+    expire-time: 1800000            # 30 minutes
     refresh-expire-time: 604800000  # 7 days
 
   mail:
@@ -63,23 +62,7 @@ spring:
       on-profile: local-file-logging
 
 logging:
-  level:
-    org:
-      springframework: INFO
-
-    com:
-      nhnacademy:
-        marketgg:
-          auth: DEBUG
-
-  file:
-    name: "${user.home}/Desktop/marketgg-logs/${spring.application.name}.%d{${LOG_DATEFORMAT_PATTERN:yyyy-MM-dd}}"
-
-#  logback:
-#    rollingpolicy:
-#      max-file-size: 10MB
-#      max-history: 30
-#      file-name-pattern: "${LOG_FILE}.%i.log"
+  config: classpath:log4j2-local.xml
 
 ---
 
@@ -90,11 +73,6 @@ spring:
 
 logging:
   config: classpath:log4j2-dev.xml
-  level:
-    root: debug
-  file:
-    path: ${user.home}/marketgg-logs/${spring.application.name}
-    name: auth
 
 ---
 
@@ -163,7 +141,9 @@ spring:
     username: on7
     password: ?nk9Wa#^Bg)on71!*,^2=d
 
-decorator:
-  datasource:
-    p6spy:
-      enable-logging: false
+  jpa:
+    properties:
+      decorator:
+        datasource:
+          p6spy:
+            enable-logging: false
