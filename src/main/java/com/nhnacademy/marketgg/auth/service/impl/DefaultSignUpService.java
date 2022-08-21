@@ -52,10 +52,15 @@ public class DefaultSignUpService implements SignUpService {
     @Transactional
     @Override
     public SignUpResponse signup(final SignUpRequest signUpRequest) throws RoleNotFoundException {
+        if (authRepository.existsByEmail(signUpRequest.getEmail())) {
+            throw new EmailOverlapException(signUpRequest.getEmail());
+        }
+
         log.info("request = {}", signUpRequest);
         String referrerUuid = null;
-        // 추천인 이메일이 있는경우
+
         if (hasReferer(signUpRequest.getReferrerEmail())) {
+            // 추천인 이메일이 있는경우
             Auth referrerAuth = authRepository.findByEmail(signUpRequest.getReferrerEmail())
                                               .orElseThrow(() -> new AuthNotFoundException(
                                                   signUpRequest.getReferrerEmail()));
@@ -63,22 +68,17 @@ public class DefaultSignUpService implements SignUpService {
             referrerUuid = referrerAuth.getUuid();
         }
 
-        // 추천인 이메일이 없는 경우.
         signUpRequest.encodingPassword(passwordEncoder);
-        Auth auth = new Auth(signUpRequest);
-        Auth savedAuth = authRepository.save(auth);
-        Long authNo = savedAuth.getId();
+        Auth savedAuth = authRepository.save(new Auth(signUpRequest));
         Role role = roleRepository.findByName(Roles.ROLE_USER)
                                   .orElseThrow(
                                       () -> new RoleNotFoundException("해당 권한은 존재 하지 않습니다."));
-        AuthRole.Pk pk = new AuthRole.Pk(authNo, role.getId());
-        AuthRole authRole = new AuthRole(pk, savedAuth, role);
-        authRoleRepository.save(authRole);
-        String uuid = savedAuth.getUuid();
-        return new SignUpResponse(uuid, referrerUuid);
+        authRoleRepository.save(new AuthRole(new AuthRole.Pk(savedAuth.getId(), role.getId()), savedAuth, role));
+
+        return new SignUpResponse(savedAuth.getUuid(), referrerUuid);
     }
 
-    private boolean hasReferer(String email) {
+    private boolean hasReferer(final String email) {
         return email != null && !email.isBlank();
     }
 
