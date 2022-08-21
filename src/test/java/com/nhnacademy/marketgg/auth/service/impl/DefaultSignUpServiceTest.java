@@ -1,37 +1,29 @@
 package com.nhnacademy.marketgg.auth.service.impl;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
 import com.nhnacademy.marketgg.auth.constant.Roles;
 import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
+import com.nhnacademy.marketgg.auth.dto.request.EmailUseRequest;
 import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
-import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.entity.AuthRole;
 import com.nhnacademy.marketgg.auth.entity.Role;
+import com.nhnacademy.marketgg.auth.exception.AuthNotFoundException;
 import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
-import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.repository.AuthRepository;
 import com.nhnacademy.marketgg.auth.repository.AuthRoleRepository;
 import com.nhnacademy.marketgg.auth.repository.RoleRepository;
 import com.nhnacademy.marketgg.auth.util.MailUtils;
 import com.nhnacademy.marketgg.auth.util.RedisUtils;
-import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import javax.management.relation.RoleNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,12 +32,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -116,6 +102,56 @@ class DefaultSignUpServiceTest {
     }
 
     @Test
+    @DisplayName("추천인 이메일 존재하지 않을때 에러 처리")
+    void testReferrerEmailNotFoundException() {
+        SignUpRequest testSignUpRequest = new SignUpRequest();
+
+        ReflectionTestUtils.setField(testSignUpRequest, "email", "test@test.com");
+        ReflectionTestUtils.setField(testSignUpRequest, "password", "1234");
+        ReflectionTestUtils.setField(testSignUpRequest, "name", "testName");
+        ReflectionTestUtils.setField(testSignUpRequest, "phoneNumber", "01087654321");
+        ReflectionTestUtils.setField(testSignUpRequest, "referrerEmail", "referrerEmail@referrerEmail.com");
+
+        given(authRepository.existsByEmail(testSignUpRequest.getEmail())).willReturn(false);
+
+        assertThatThrownBy(() -> defaultSignUpService.signup(testSignUpRequest))
+            .isInstanceOf(AuthNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("없는 권한으로 회원가입시 에러 처리")
+    void testRoleNotFoundException() {
+        SignUpRequest testSignUpRequest = new SignUpRequest();
+
+        ReflectionTestUtils.setField(testSignUpRequest, "email", "test@test.com");
+        ReflectionTestUtils.setField(testSignUpRequest, "password", "1234");
+        ReflectionTestUtils.setField(testSignUpRequest, "name", "testName");
+        ReflectionTestUtils.setField(testSignUpRequest, "phoneNumber", "01087654321");
+
+        given(authRepository.existsByEmail(testSignUpRequest.getEmail())).willReturn(false);
+        given(authRepository.save(any())).willReturn(new Auth(testSignUpRequest));
+
+        assertThatThrownBy(() -> defaultSignUpService.signup(testSignUpRequest))
+            .isInstanceOf(RoleNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("회원가입하는 회원의 이메일 중복 에러처리")
+    void testSignupEmailOverlapException() {
+        SignUpRequest testSignUpRequest = new SignUpRequest();
+
+        ReflectionTestUtils.setField(testSignUpRequest, "email", "test@test.com");
+        ReflectionTestUtils.setField(testSignUpRequest, "password", "1234");
+        ReflectionTestUtils.setField(testSignUpRequest, "name", "testName");
+        ReflectionTestUtils.setField(testSignUpRequest, "phoneNumber", "01087654321");
+
+        given(authRepository.existsByEmail(testSignUpRequest.getEmail())).willReturn(true);
+
+        assertThatThrownBy(() -> defaultSignUpService.signup(testSignUpRequest))
+            .isInstanceOf(EmailOverlapException.class);
+    }
+
+    @Test
     @DisplayName("회원 이메일 중복체크 사용가능")
     void testExistsEmail() {
         given(authRepository.existsByEmail(any())).willReturn(false);
@@ -136,7 +172,7 @@ class DefaultSignUpServiceTest {
     @Test
     @DisplayName("회원 중복 이메일 예외처리")
     void testExistsEmailThrownByEmailOverlapException() {
-        given(authRepository.existsByEmail(any(String.class))).willReturn(true);
+        given(authRepository.existsByEmail(anyString())).willReturn(true);
 
         EmailRequest testEmailRequest = new EmailRequest();
 
@@ -145,9 +181,51 @@ class DefaultSignUpServiceTest {
 
 
         assertThatThrownBy(() -> defaultSignUpService.checkEmail(testEmailRequest))
-                .isInstanceOf(EmailOverlapException.class);
+            .isInstanceOf(EmailOverlapException.class);
 
         verify(authRepository, times(1)).existsByEmail(any());
+    }
+
+    @Test
+    @DisplayName("추천인 이메일이 있고, 존재하지 않는 이메일 경우 정상 처리")
+    void testCheckEmail() {
+        EmailRequest testEmailRequest = new EmailRequest();
+
+        ReflectionTestUtils.setField(testEmailRequest, "email", "test@test.com");
+        ReflectionTestUtils.setField(testEmailRequest, "isReferrer", true);
+
+        given(authRepository.existsByEmail(anyString())).willReturn(true);
+
+        defaultSignUpService.checkEmail(testEmailRequest);
+
+        verify(authRepository, times(1)).existsByEmail(any());
+    }
+
+    @Test
+    @DisplayName("회원 이메일 사용가능")
+    void testUseEmailResponse() {
+        EmailUseRequest emailUseRequest = new EmailUseRequest();
+        ReflectionTestUtils.setField(emailUseRequest, "email", "overlap@email.com");
+
+        given(redisUtils.hasKey(emailUseRequest.getEmail())).willReturn(true);
+        doNothing().when(redisUtils).deleteAuth(anyString());
+
+        defaultSignUpService.useEmail(emailUseRequest);
+
+        verify(redisUtils, times(1)).deleteAuth(anyString());
+    }
+
+    @Test
+    @DisplayName("사용하려는 이메일 중복 에러처리")
+    void testUseEmailThrownByEmailOverlapException() {
+        EmailUseRequest emailUseRequest = new EmailUseRequest();
+        ReflectionTestUtils.setField(emailUseRequest, "email", "overlap@email.com");
+
+        given(authRepository.existsByEmail(emailUseRequest.getEmail())).willReturn(true);
+
+        assertThatThrownBy(() -> defaultSignUpService.useEmail(emailUseRequest))
+            .isInstanceOf(EmailOverlapException.class);
+
     }
 
 }
