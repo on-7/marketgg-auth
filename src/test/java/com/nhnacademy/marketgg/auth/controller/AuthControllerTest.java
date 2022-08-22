@@ -79,7 +79,7 @@ class AuthControllerTest {
 
         given(authService.renewToken(token)).willReturn(tokenResponse);
 
-        mockMvc.perform(get("/members/refresh")
+        mockMvc.perform(get("/members/token/refresh")
                             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                .andExpect(status().isOk())
                .andExpect(header().string(HttpHeaders.AUTHORIZATION, "Bearer " + token));
@@ -90,7 +90,7 @@ class AuthControllerTest {
     void testRenewTokenFail() throws Exception {
         given(authService.renewToken("JWT-TOKEN")).willReturn(null);
 
-        mockMvc.perform(get("/members/refresh")
+        mockMvc.perform(get("/members/token/refresh")
                             .header(HttpHeaders.AUTHORIZATION, "Bearer JWT-TOKEN"))
                .andExpect(status().isUnauthorized());
     }
