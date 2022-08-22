@@ -57,30 +57,25 @@ public class DefaultSignUpService implements SignUpService {
         }
 
         log.info("request = {}", signUpRequest);
-        String referrerUuid = null;
-
-        if (hasReferer(signUpRequest.getReferrerEmail())) {
-            // 추천인 이메일이 있는경우
-            Auth referrerAuth = authRepository.findByEmail(signUpRequest.getReferrerEmail())
-                                              .orElseThrow(() -> new AuthNotFoundException(
-                                                  signUpRequest.getReferrerEmail()));
-
-            referrerUuid = referrerAuth.getUuid();
-        }
 
         signUpRequest.encodingPassword(passwordEncoder);
-        Auth savedAuth = authRepository.save(new Auth(signUpRequest));
+        Auth signupAuth = authRepository.save(new Auth(signUpRequest));
         Role role = roleRepository.findByName(Roles.ROLE_USER)
                                   .orElseThrow(
                                       () -> new RoleNotFoundException("해당 권한은 존재 하지 않습니다."));
-        authRoleRepository.save(new AuthRole(new AuthRole.Pk(savedAuth.getId(), role.getId()), savedAuth, role));
+        authRoleRepository.save(new AuthRole(new AuthRole.Pk(signupAuth.getId(), role.getId()), signupAuth, role));
 
-        return new SignUpResponse(savedAuth.getUuid(), referrerUuid);
+        // 추천인 이메일이 있는경우
+        if (authRepository.existsByEmail(signUpRequest.getReferrerEmail())) {
+            new SignUpResponse(signupAuth.getUuid(), authRepository.findByEmail(signUpRequest.getReferrerEmail())
+                                                                   .orElseThrow(() -> new AuthNotFoundException(
+                                                                       signUpRequest.getReferrerEmail()))
+                                                                   .getUuid());
+        }
+
+        return new SignUpResponse(signupAuth.getUuid(), null);
     }
 
-    private boolean hasReferer(final String email) {
-        return email != null && !email.isBlank();
-    }
 
     /**
      * 입력한 이메일이 중복되지 않으면 Redis 에 key 값에 Email 을 보관합니다.

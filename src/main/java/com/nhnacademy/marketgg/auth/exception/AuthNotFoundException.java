@@ -8,8 +8,4 @@ public class AuthNotFoundException extends IllegalArgumentException {
         super(email + " " + MESSAGE);
     }
 
-    public AuthNotFoundException() {
-        super(MESSAGE);
-    }
-
 }

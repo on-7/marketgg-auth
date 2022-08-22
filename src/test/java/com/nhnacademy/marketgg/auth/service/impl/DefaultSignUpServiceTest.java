@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -16,7 +17,6 @@ import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.entity.AuthRole;
 import com.nhnacademy.marketgg.auth.entity.Role;
-import com.nhnacademy.marketgg.auth.exception.AuthNotFoundException;
 import com.nhnacademy.marketgg.auth.exception.EmailOverlapException;
 import com.nhnacademy.marketgg.auth.repository.AuthRepository;
 import com.nhnacademy.marketgg.auth.repository.AuthRoleRepository;
@@ -65,8 +65,9 @@ class DefaultSignUpServiceTest {
     @Mock
     PasswordEncoder passwordEncoder;
 
+
     @Test
-    @DisplayName("회원가입 테스트")
+    @DisplayName("회원가입 테스트 추천인 X")
     void testSignup() throws RoleNotFoundException {
         SignUpRequest testSignUpRequest = new SignUpRequest();
 
@@ -76,19 +77,14 @@ class DefaultSignUpServiceTest {
         ReflectionTestUtils.setField(testSignUpRequest, "phoneNumber", "01087654321");
 
         Auth auth = new Auth(testSignUpRequest);
-
         given(authRepository.save(any(Auth.class))).willReturn(auth);
 
         Long authNo = auth.getId();
-
         Role role = new Role(Roles.ROLE_USER);
-
         ReflectionTestUtils.setField(role, "id", 0L);
-
         given(roleRepository.findByName(Roles.ROLE_USER)).willReturn(Optional.of(role));
 
         AuthRole.Pk pk = new AuthRole.Pk(authNo, role.getId());
-
         AuthRole authRole = new AuthRole(pk, auth, role);
 
         given(authRoleRepository.save(any(AuthRole.class))).willReturn(authRole);
@@ -102,8 +98,29 @@ class DefaultSignUpServiceTest {
     }
 
     @Test
-    @DisplayName("추천인 이메일 존재하지 않을때 에러 처리")
-    void testReferrerEmailNotFoundException() {
+    @DisplayName("회원가입 테스트 추천인 O")
+    void testSignupReferrer() throws RoleNotFoundException {
+
+        SignUpRequest ReferrerSignupRequest = new SignUpRequest();
+
+        ReflectionTestUtils.setField(ReferrerSignupRequest, "email", "test2@test.com");
+        ReflectionTestUtils.setField(ReferrerSignupRequest, "password", "12345");
+        ReflectionTestUtils.setField(ReferrerSignupRequest, "name", "testName3");
+        ReflectionTestUtils.setField(ReferrerSignupRequest, "phoneNumber", "010876543212");
+
+        Auth referrerAuth = new Auth(ReferrerSignupRequest);
+        lenient().when(authRepository.save(any(Auth.class))).thenReturn(referrerAuth);
+
+        Long referrerNo = referrerAuth.getId();
+        Role referrerRole = new Role(Roles.ROLE_USER);
+        ReflectionTestUtils.setField(referrerRole, "id", 0L);
+        given(roleRepository.findByName(Roles.ROLE_USER)).willReturn(Optional.of(referrerRole));
+
+        AuthRole.Pk referrerPk = new AuthRole.Pk(referrerNo, referrerRole.getId());
+        AuthRole referrerAuthRole = new AuthRole(referrerPk, referrerAuth, referrerRole);
+
+        lenient().when(authRoleRepository.save(any(AuthRole.class))).thenReturn(referrerAuthRole);
+
         SignUpRequest testSignUpRequest = new SignUpRequest();
 
         ReflectionTestUtils.setField(testSignUpRequest, "email", "test@test.com");
@@ -114,8 +131,27 @@ class DefaultSignUpServiceTest {
 
         given(authRepository.existsByEmail(testSignUpRequest.getEmail())).willReturn(false);
 
-        assertThatThrownBy(() -> defaultSignUpService.signup(testSignUpRequest))
-            .isInstanceOf(AuthNotFoundException.class);
+        Auth auth = new Auth(testSignUpRequest);
+        given(authRepository.save(any(Auth.class))).willReturn(auth);
+
+        Long authNo = auth.getId();
+        Role role = new Role(Roles.ROLE_USER);
+        ReflectionTestUtils.setField(role, "id", 0L);
+        given(roleRepository.findByName(Roles.ROLE_USER)).willReturn(Optional.of(role));
+
+        AuthRole.Pk pk = new AuthRole.Pk(authNo, role.getId());
+        AuthRole authRole = new AuthRole(pk, auth, role);
+
+        given(authRoleRepository.save(any(AuthRole.class))).willReturn(authRole);
+        given(authRepository.existsByEmail(testSignUpRequest.getReferrerEmail())).willReturn(true);
+        given(authRepository.findByEmail(testSignUpRequest.getReferrerEmail())).willReturn(Optional.of(referrerAuth));
+
+        defaultSignUpService.signup(testSignUpRequest);
+
+        verify(authRepository, times(1)).save(any(auth.getClass()));
+        // getDeclaringClass() 메서드는 이 클래스의 선언 클래스를 가져오는 데 사용됨.
+        verify(roleRepository, times(1)).findByName(any(Roles.ROLE_USER.getDeclaringClass()));
+        verify(authRoleRepository, times(1)).save(any(authRole.getClass()));
     }
 
     @Test

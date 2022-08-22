@@ -24,9 +24,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
+@ActiveProfiles({
+    "local"
+})
 @Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -60,6 +65,7 @@ class LoginTest {
         signUpService.signup(signUpRequest);
     }
 
+    @Transactional
     @Test
     @DisplayName("로그인")
     void testLogin() throws Exception {
@@ -76,6 +82,7 @@ class LoginTest {
                .andExpect(header().exists(HttpHeaders.AUTHORIZATION));
     }
 
+    @Transactional
     @Test
     @DisplayName("로그인실패")
     void testLoginFail() throws Exception {

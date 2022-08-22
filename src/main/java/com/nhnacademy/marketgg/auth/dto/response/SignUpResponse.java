@@ -13,5 +13,9 @@ public class SignUpResponse {
     private final String uuid;
     private final String referrerUuid;
 
+    public SignUpResponse(String uuid) {
+        this.uuid = uuid;
+        this.referrerUuid = null;
+    }
 }
 
