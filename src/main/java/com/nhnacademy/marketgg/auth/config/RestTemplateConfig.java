@@ -43,10 +43,10 @@ public class RestTemplateConfig {
      * @author 이제훈
      */
     @Bean
-    CloseableHttpClient httpClient(final @Value("${gg.keystore.type}") String keystoreType,
-                                   final @Value("${gg.keystore.path}") String keystorePath,
-                                   final @Value("${gg.keystore.password}") String keystorePassword,
-                                   final @Value("${gg.protocol}") String protocol) {
+    public CloseableHttpClient httpClient(final @Value("${gg.keystore.type}") String keystoreType,
+                                          final @Value("${gg.keystore.path}") String keystorePath,
+                                          final @Value("${gg.keystore.password}") String keystorePassword,
+                                          final @Value("${gg.protocol}") String protocol) {
 
         SSLContext sslContext;
 
@@ -88,7 +88,7 @@ public class RestTemplateConfig {
      * @author 이제훈
      */
     @Bean
-    HttpComponentsClientHttpRequestFactory requestFactory(final HttpClient httpClient) {
+    public HttpComponentsClientHttpRequestFactory requestFactory(final HttpClient httpClient) {
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
 
         requestFactory.setReadTimeout(5_000);

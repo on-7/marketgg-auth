@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration scan="true" scanPeriod="60 seconds">
+
+    <Properties>
+        <Property name="fileName" value="auth.%d{yyyy-MM-dd}"/>
+        <Property name="filePath" value="${sys:user.home}/marketgg-auth-logs" />
+        <Property name="consoleLayout">
+            %highlight{[%-5level]} %d{yyyy-MM-dd HH:mm:ss} [%thread] [%C.%M: %L] - %msg%n
+        </Property>
+        <Property name="fileLayout">
+            %-5level %d{yyyy-MM-dd HH:mm:ss} [%thread] [%C.%M: %L] - %msg%n
+        </Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <patternLayout>
+                <pattern>${consoleLayout}</pattern>
+            </patternLayout>
+        </Console>
+
+        <RollingFile name="file" fileName="${filePath}/${fileName}.log"
+                     filepattern="${filePath}/${fileName}T%d{HH:mm}_%i.log">
+            <PatternLayout>
+                <pattern>${fileLayout}</pattern>
+            </PatternLayout>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="200KB"/>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30" fileIndex="min"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <root level="WARN">
+            <appender-ref ref="console"/>
+        </root>
+
+        <logger name="com.nhnacademy.marketgg.auth" level="WARN" additivity="false">
+            <appender-ref ref="console"/>
+            <appender-ref ref="file"/>
+        </logger>
+    </Loggers>
+
+</Configuration>
