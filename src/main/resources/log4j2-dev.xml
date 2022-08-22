@@ -4,6 +4,9 @@
     <Properties>
         <Property name="fileName" value="auth.%d{yyyy-MM-dd}"/>
         <Property name="filePath" value="${sys:user.home}/marketgg-auth-logs" />
+        <Property name="consoleLayout">
+            %highlight{[%-5level]} %d{yyyy-MM-dd HH:mm:ss} [%thread] [%C.%M: %L] - %msg%n
+        </Property>
         <Property name="fileLayout">
             %-5level %d{yyyy-MM-dd HH:mm:ss} [%thread] [%C.%M: %L] - %msg%n
         </Property>
@@ -34,7 +37,7 @@
             <appender-ref ref="console"/>
         </root>
 
-        <logger name="com.nhnacademy.marketgg.auth" level="DEBUG" additivity="false">
+        <logger name="com.nhnacademy.marketgg.auth" level="WARN" additivity="false">
             <appender-ref ref="console"/>
             <appender-ref ref="file"/>
         </logger>
