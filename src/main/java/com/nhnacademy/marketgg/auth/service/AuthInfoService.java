@@ -1,12 +1,12 @@
 package com.nhnacademy.marketgg.auth.service;
 
-import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
-import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
+import com.nhnacademy.marketgg.auth.dto.request.MemberUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
 import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -48,20 +48,20 @@ public interface AuthInfoService {
     /**
      * 사용자 정보를 업데이트합니다.
      *
-     * @param token             -  JWT
-     * @param authUpdateRequest - 사용자 업데이트 정보
+     * @param token               -  JWT
+     * @param memberUpdateRequest - 사용자 업데이트 정보
      * @return - 새로운 JWT
      * @author 김훈민
      */
-    TokenResponse update(final String token, final AuthUpdateRequest authUpdateRequest);
+    TokenResponse update(final String token, final MemberUpdateRequest memberUpdateRequest);
 
     /**
      * 회원탈퇴합니다.
      *
-     * @param token               - JWT
-     * @param authWithDrawRequest - 탈퇴한 사용자 정보
+     * @param token      - JWT
+     * @param withdrawAt - 삭제 시간 입니다.
      * @author 김훈민
      */
-    void withdraw(final String token, final AuthWithDrawRequest authWithDrawRequest);
+    void withdraw(final String token, final LocalDateTime withdrawAt);
 
 }

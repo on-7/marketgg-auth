@@ -1,8 +1,7 @@
 package com.nhnacademy.marketgg.auth.entity;
 
 import com.nhnacademy.marketgg.auth.constant.Provider;
-import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
-import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
+import com.nhnacademy.marketgg.auth.dto.request.MemberUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.signup.SignUpRequest;
 import com.nhnacademy.marketgg.auth.exception.WithdrawMemberException;
 import java.time.LocalDate;
@@ -92,7 +91,8 @@ public class Auth {
         this.phoneNumber = signUpRequest.getPhoneNumber();
         this.passwordUpdatedAt = LocalDate.now();
         this.provider =
-            checkProvider(signUpRequest.getProvider()) ? Provider.valueOf(signUpRequest.getProvider()) : Provider.SELF;
+                checkProvider(signUpRequest.getProvider()) ? Provider.valueOf(signUpRequest.getProvider()) :
+                        Provider.SELF;
         this.createdAt = LocalDateTime.now();
     }
 
@@ -108,19 +108,18 @@ public class Auth {
     /**
      * 인증 갱신과 관련된 요청을 받아 인증 정보를 갱신하는 메서드입니다.
      *
-     * @param authUpdateRequest - 인증 정보 갱신 요청 객체
+     * @param memberUpdateRequest - 인증 정보 갱신 요청 객체
      */
-    public void updateAuth(final AuthUpdateRequest authUpdateRequest) {
+    public void updateAuth(final MemberUpdateRequest memberUpdateRequest) {
         this.uuid = UUID.randomUUID().toString();
-        this.email = authUpdateRequest.getEmail();
-        this.password = authUpdateRequest.getPassword();
-        this.name = authUpdateRequest.getName();
-        this.phoneNumber = authUpdateRequest.getPhoneNumber();
-        this.passwordUpdatedAt = getUpdateDate(authUpdateRequest.getPassword());
+        this.password = memberUpdateRequest.getPassword();
+        this.name = memberUpdateRequest.getName();
+        this.phoneNumber = memberUpdateRequest.getPhoneNumber();
+        this.passwordUpdatedAt = getUpdateDate(memberUpdateRequest.getPassword());
     }
 
-    public void deleteAuth(final AuthWithDrawRequest authWithDrawRequest) {
-        this.deletedAt = authWithDrawRequest.getDeletedAt();
+    public void deleteAuth(final LocalDateTime withdrawAt) {
+        this.deletedAt = withdrawAt;
     }
 
     /**
@@ -152,7 +151,7 @@ public class Auth {
     }
 
     public boolean isMember() {
-        if(Objects.nonNull(this.deletedAt)){
+        if (Objects.nonNull(this.deletedAt)) {
             throw new WithdrawMemberException();
         }
 

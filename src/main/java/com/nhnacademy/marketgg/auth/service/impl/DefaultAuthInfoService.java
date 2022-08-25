@@ -1,7 +1,6 @@
 package com.nhnacademy.marketgg.auth.service.impl;
 
-import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
-import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
+import com.nhnacademy.marketgg.auth.dto.request.MemberUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
@@ -12,6 +11,7 @@ import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.repository.auth.AuthRepository;
 import com.nhnacademy.marketgg.auth.repository.role.RoleRepository;
 import com.nhnacademy.marketgg.auth.service.AuthInfoService;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -74,13 +74,12 @@ public class DefaultAuthInfoService implements AuthInfoService {
      */
     @Transactional
     @Override
-    public TokenResponse update(final String token, final AuthUpdateRequest authUpdateRequest) {
-
+    public TokenResponse update(final String token, final MemberUpdateRequest memberUpdateRequest) {
         String uuid = tokenUtils.getUuidFromToken(token);
         Auth updatedAuth = authRepository.findByUuid(uuid)
                                          .orElseThrow(AuthNotFoundException::new);
 
-        updatedAuth.updateAuth(authUpdateRequest);
+        updatedAuth.updateAuth(memberUpdateRequest);
         redisTemplate.opsForHash()
                      .delete(updatedAuth.getUuid(), TokenUtils.REFRESH_TOKEN);
         List<SimpleGrantedAuthority> roles = roleRepository.findRolesByAuthId(updatedAuth.getId())
@@ -101,14 +100,14 @@ public class DefaultAuthInfoService implements AuthInfoService {
      */
     @Transactional
     @Override
-    public void withdraw(String token, final AuthWithDrawRequest authWithDrawRequest) {
-        // TODO: 회원 탈퇴 시 JWT 블랙리스트 처리
+    public void withdraw(String token, final LocalDateTime withdrawAt) {
+
         String uuid = tokenUtils.getUuidFromToken(token);
 
         Auth deletedAuth = authRepository.findByUuid(uuid)
                                          .orElseThrow(AuthNotFoundException::new);
 
-        deletedAuth.deleteAuth(authWithDrawRequest);
+        deletedAuth.deleteAuth(withdrawAt);
     }
 
 }

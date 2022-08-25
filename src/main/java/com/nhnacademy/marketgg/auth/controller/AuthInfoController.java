@@ -4,8 +4,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import com.nhnacademy.marketgg.auth.annotation.Token;
-import com.nhnacademy.marketgg.auth.dto.request.AuthUpdateRequest;
-import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
+import com.nhnacademy.marketgg.auth.dto.request.MemberUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.MemberInfoRequest;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
@@ -16,7 +15,9 @@ import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthInfoService;
 import com.nhnacademy.marketgg.auth.service.AuthService;
+import java.time.LocalDateTime;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -47,15 +48,15 @@ public class AuthInfoController {
      * 회원정보 수정을 위한 컨트롤러 메서드 입니다.
      *
      * @param token             - JWT
-     * @param authUpdateRequest - 수정할 회원 정보를 담고있는 객체 입니다.
+     * @param memberUpdateRequest - 수정할 회원 정보를 담고있는 객체 입니다.
      * @return - 상태코드를 리턴합니다.
      * @author 김훈민
      */
     @PutMapping
     public ResponseEntity<AuthResult<String>> update(@Token String token,
-                                       @RequestBody final AuthUpdateRequest authUpdateRequest) {
+                                                     @Valid @RequestBody final MemberUpdateRequest memberUpdateRequest) {
 
-        TokenResponse update = authInfoService.update(token, authUpdateRequest);
+        TokenResponse update = authInfoService.update(token, memberUpdateRequest);
 
         authService.logout(token);
 
@@ -71,16 +72,16 @@ public class AuthInfoController {
     /**
      * 회원정보 삭제를 위한 컨트롤러 메서드 입니다.
      *
-     * @param token               - JWT
-     * @param authWithDrawRequest - 삭제될 날짜를 담은 객체입니다.
+     * @param token      - JWT
+     * @param withdrawAt - Shop 에서 보낸 삭제 시간 입니다.
      * @return - 상태코드를 리턴합니다.
      * @author 김훈민
      */
     @DeleteMapping
     public ResponseEntity<AuthResult<String>> withdraw(@Token String token,
-                                                       @RequestBody final AuthWithDrawRequest authWithDrawRequest) {
+                                                       @RequestBody final LocalDateTime withdrawAt) {
 
-        authInfoService.withdraw(token, authWithDrawRequest);
+        authInfoService.withdraw(token, withdrawAt);
         authService.logout(token);
 
         return ResponseEntity.status(OK)
