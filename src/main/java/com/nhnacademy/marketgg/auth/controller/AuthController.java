@@ -6,9 +6,11 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import com.nhnacademy.marketgg.auth.annotation.Token;
 import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
 import com.nhnacademy.marketgg.auth.dto.response.common.AuthResult;
+import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import java.util.Objects;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -35,15 +37,23 @@ public class AuthController {
     /**
      * JWT 를 갱신 요청합니다.
      *
-     * @param token - 검증된 JWT
+     * @param request - 사용자 요청 정보
      * @return 요청 결과를 반환합니다.
      */
     @GetMapping("/token/refresh")
-    public ResponseEntity<AuthResult<String>> renewToken(@Token String token) {
+    public ResponseEntity<AuthResult<String>> renewToken(HttpServletRequest request) {
+        String jwt = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (Objects.isNull(jwt)) {
+            throw new UnAuthorizationException();
+        }
+
+        if (jwt.startsWith(TokenUtils.BEARER)) {
+            jwt = jwt.substring(TokenUtils.BEARER_LENGTH);
+        }
 
         HttpStatus httpStatus = OK;
 
-        TokenResponse newToken = authService.renewToken(token);
+        TokenResponse newToken = authService.renewToken(jwt);
 
         if (Objects.isNull(newToken)) {
             httpStatus = UNAUTHORIZED;
