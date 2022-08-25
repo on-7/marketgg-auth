@@ -1,6 +1,6 @@
 package com.nhnacademy.marketgg.auth.service;
 
-import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
 
 /**
  * 인증 관련 비즈니스 로직을 처리하는 클래스입니다.

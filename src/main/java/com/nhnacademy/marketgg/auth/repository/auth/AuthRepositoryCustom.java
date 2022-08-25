@@ -1,4 +1,4 @@
-package com.nhnacademy.marketgg.auth.repository;
+package com.nhnacademy.marketgg.auth.repository.auth;
 
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import java.util.List;
@@ -13,5 +13,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 public interface AuthRepositoryCustom {
 
     List<MemberNameResponse> findMembersByUuid(List<String> uuids);
+
+    boolean isExistNotWithdraw(String uuid);
 
 }

@@ -1,4 +1,4 @@
-package com.nhnacademy.marketgg.auth.repository;
+package com.nhnacademy.marketgg.auth.repository.auth;
 
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
@@ -26,6 +26,15 @@ public class AuthRepositoryImpl extends QuerydslRepositorySupport implements Aut
             .where(auth.uuid.in(uuids))
             .select(Projections.constructor(MemberNameResponse.class, auth.uuid, auth.name))
             .fetch();
+    }
+
+    @Override
+    public boolean isExistNotWithdraw(String uuid) {
+        QAuth auth = QAuth.auth;
+
+        return from(auth).where(auth.uuid.eq(uuid)
+                                         .and(auth.deletedAt.isNull()))
+                         .fetchOne() != null;
     }
 
 }

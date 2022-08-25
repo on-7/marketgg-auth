@@ -4,7 +4,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import com.nhnacademy.marketgg.auth.annotation.Token;
-import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
 import com.nhnacademy.marketgg.auth.dto.response.common.AuthResult;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;

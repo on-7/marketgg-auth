@@ -8,9 +8,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.constant.Roles;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
-import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
+import com.nhnacademy.marketgg.auth.dto.request.signup.SignUpRequest;
 import com.nhnacademy.marketgg.auth.entity.Role;
-import com.nhnacademy.marketgg.auth.repository.RoleRepository;
+import com.nhnacademy.marketgg.auth.repository.role.RoleRepository;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import com.nhnacademy.marketgg.auth.service.SignUpService;
 import java.util.List;

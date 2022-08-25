@@ -4,10 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.nhnacademy.marketgg.auth.constant.Provider;
 import com.nhnacademy.marketgg.auth.constant.Roles;
-import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
+import com.nhnacademy.marketgg.auth.dto.request.signup.SignUpRequest;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.entity.AuthRole;
 import com.nhnacademy.marketgg.auth.entity.Role;
+import com.nhnacademy.marketgg.auth.repository.auth.AuthRepository;
+import com.nhnacademy.marketgg.auth.repository.authrole.AuthRoleRepository;
+import com.nhnacademy.marketgg.auth.repository.role.RoleRepository;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

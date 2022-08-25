@@ -1,12 +1,12 @@
 package com.nhnacademy.marketgg.auth.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.lenient;
@@ -16,10 +16,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
-import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
+import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
-import com.nhnacademy.marketgg.auth.repository.AuthRepository;
+import com.nhnacademy.marketgg.auth.repository.auth.AuthRepository;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.DisplayName;
@@ -32,7 +34,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -51,6 +52,9 @@ class DefaultAuthServiceTest {
     @Mock
     TokenUtils tokenUtils;
 
+    @Mock
+    AuthRepository authRepository;
+
     @Test
     @DisplayName("로그아웃")
     void testLogout() {
@@ -66,16 +70,16 @@ class DefaultAuthServiceTest {
         given(redisTemplate.opsForHash()).willReturn(mockHash);
         given(mockHash.delete(uuid, TokenUtils.REFRESH_TOKEN)).willReturn(0L);
 
-        given(tokenUtils.getExpireDate(jwt)).willReturn(System.currentTimeMillis() + 1000L);
+        lenient().when(tokenUtils.getExpireDate(jwt)).thenReturn(System.currentTimeMillis() + 1000L);
 
         ValueOperations<String, Object> mockValue = mock(ValueOperations.class);
-        given(redisTemplate.opsForValue()).willReturn(mockValue);
-        doNothing().when(mockValue).set(anyString(), anyBoolean(), anyLong(), any(TimeUnit.class));
+        lenient().when(redisTemplate.opsForValue()).thenReturn(mockValue);
+        lenient().doNothing().when(mockValue).set(anyString(), anyBoolean(), anyLong(), any(TimeUnit.class));
 
         authService.logout(jwt);
 
-        verify(mockHash).delete(uuid, TokenUtils.REFRESH_TOKEN);
-        verify(mockValue).set(anyString(), anyBoolean(), anyLong(), any(TimeUnit.class));
+        then(mockHash).should(times(1)).delete(uuid, TokenUtils.REFRESH_TOKEN);
+        then(tokenUtils).should(times(1)).setBlackList(any(RedisTemplate.class), anyString());
     }
 
     @Test
@@ -94,8 +98,8 @@ class DefaultAuthServiceTest {
         given(mockHash.delete(uuid, TokenUtils.REFRESH_TOKEN)).willReturn(0L);
 
         ValueOperations<String, Object> mockValue = mock(ValueOperations.class);
-        given(redisTemplate.opsForValue()).willReturn(mockValue);
-        willDoNothing().given(mockValue).set(any(), anyBoolean(), anyLong(), any(TimeUnit.class));
+        lenient().when(redisTemplate.opsForValue()).thenReturn(mockValue);
+        lenient().doNothing().when(mockValue).set(any(), anyBoolean(), anyLong(), any(TimeUnit.class));
 
         authService.logout(jwt);
 
@@ -108,8 +112,11 @@ class DefaultAuthServiceTest {
         String uuid = UUID.randomUUID().toString();
         String jwt = "jwt";
         String refreshToken = "refreshToken";
+        Auth auth = mock(Auth.class);
 
         given(tokenUtils.getUuidFromToken(jwt)).willReturn(uuid);
+        given(authRepository.findByUuid(anyString())).willReturn(Optional.of(auth));
+        given(auth.isMember()).willReturn(true);
 
         HashOperations<String, Object, Object> mockHash
             = mock(HashOperations.class);
@@ -119,7 +126,7 @@ class DefaultAuthServiceTest {
         given(tokenUtils.isInvalidToken(refreshToken)).willReturn(false);
         given(tokenUtils.getUuidFromToken(refreshToken)).willReturn(uuid);
 
-        when(mockHash.delete(uuid, TokenUtils.REFRESH_TOKEN)).thenReturn(0L);
+        given(mockHash.delete(uuid, TokenUtils.REFRESH_TOKEN)).willReturn(0L);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(uuid, "");
 
@@ -151,7 +158,7 @@ class DefaultAuthServiceTest {
         given(redisTemplate.opsForHash()).willReturn(mockHash);
         given(mockHash.get(uuid, TokenUtils.REFRESH_TOKEN)).willReturn(refreshToken);
 
-        given(tokenUtils.isInvalidToken(refreshToken)).willReturn(true);
+        lenient().when(tokenUtils.isInvalidToken(refreshToken)).thenReturn(true);
 
         TokenResponse tokenResponse = authService.renewToken(jwt);
 

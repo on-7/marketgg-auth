@@ -1,4 +1,4 @@
-package com.nhnacademy.marketgg.auth.repository;
+package com.nhnacademy.marketgg.auth.repository.role;
 
 import com.nhnacademy.marketgg.auth.entity.Role;
 import java.util.List;

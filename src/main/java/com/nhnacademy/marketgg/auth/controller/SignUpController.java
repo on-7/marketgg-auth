@@ -3,12 +3,12 @@ package com.nhnacademy.marketgg.auth.controller;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
-import com.nhnacademy.marketgg.auth.dto.request.EmailRequest;
-import com.nhnacademy.marketgg.auth.dto.request.EmailUseRequest;
-import com.nhnacademy.marketgg.auth.dto.request.SignUpRequest;
-import com.nhnacademy.marketgg.auth.dto.response.ExistEmailResponse;
-import com.nhnacademy.marketgg.auth.dto.response.SignUpResponse;
-import com.nhnacademy.marketgg.auth.dto.response.UseEmailResponse;
+import com.nhnacademy.marketgg.auth.dto.request.signup.EmailRequest;
+import com.nhnacademy.marketgg.auth.dto.request.signup.EmailUseRequest;
+import com.nhnacademy.marketgg.auth.dto.request.signup.SignUpRequest;
+import com.nhnacademy.marketgg.auth.dto.response.signup.ExistEmailResponse;
+import com.nhnacademy.marketgg.auth.dto.response.signup.SignUpResponse;
+import com.nhnacademy.marketgg.auth.dto.response.signup.UseEmailResponse;
 import com.nhnacademy.marketgg.auth.dto.response.common.AuthResult;
 import com.nhnacademy.marketgg.auth.service.SignUpService;
 import javax.management.relation.RoleNotFoundException;

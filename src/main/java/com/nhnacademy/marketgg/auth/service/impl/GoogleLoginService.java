@@ -3,19 +3,19 @@ package com.nhnacademy.marketgg.auth.service.impl;
 import static java.util.stream.Collectors.toList;
 
 import com.nhnacademy.marketgg.auth.adapter.GoogleAdapter;
-import com.nhnacademy.marketgg.auth.dto.response.GoogleProfile;
-import com.nhnacademy.marketgg.auth.dto.response.OauthLoginResponse;
-import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
+import com.nhnacademy.marketgg.auth.constant.Provider;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.google.GoogleProfile;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.OauthLoginResponse;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.exception.LoginFailException;
 import com.nhnacademy.marketgg.auth.exception.OAuthRequestFailException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.oauth2.OAuthToken;
-import com.nhnacademy.marketgg.auth.repository.AuthRepository;
-import com.nhnacademy.marketgg.auth.repository.RoleRepository;
+import com.nhnacademy.marketgg.auth.repository.auth.AuthRepository;
+import com.nhnacademy.marketgg.auth.repository.role.RoleRepository;
 import com.nhnacademy.marketgg.auth.service.Oauth2Service;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,13 +70,15 @@ public class GoogleLoginService implements Oauth2Service {
         GoogleProfile googleProfile = this.requestGoogleProfile(tokenResponse);
         log.info("Google Profile = {}", googleProfile);
 
-        Auth auth = authRepository.findByEmail(googleProfile.getEmail())
-                                  .orElse(null);
+        Optional<Auth> opAuth = authRepository.findByEmailAndProvider(googleProfile.getEmail(), Provider.GOOGLE)
+                                  .filter(Auth::isMember);
 
-        if (Objects.isNull(auth)) {
+        if (opAuth.isEmpty()) {
             // DB 에 회원 정보가 없을 시 로그인 시도한 프로필을 바탕으로 회원가입 진행
             return OauthLoginResponse.doSignUp(googleProfile);
         }
+
+        Auth auth = opAuth.get();
 
         List<SimpleGrantedAuthority> roles = roleRepository.findRolesByAuthId(auth.getId())
                                                            .stream()

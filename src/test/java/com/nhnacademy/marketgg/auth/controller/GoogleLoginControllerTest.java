@@ -10,9 +10,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.marketgg.auth.dto.response.GoogleProfile;
-import com.nhnacademy.marketgg.auth.dto.response.OauthLoginResponse;
-import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.google.GoogleProfile;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.OauthLoginResponse;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
 import com.nhnacademy.marketgg.auth.service.impl.GoogleLoginService;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;

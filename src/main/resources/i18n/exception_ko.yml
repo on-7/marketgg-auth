@@ -24,3 +24,6 @@ unAuthorization:
 
 invalidRequest:
   msg: 잘못된 요청입니다.
+
+withdrawMember:
+  msg: 탈퇴한 회원입니다.

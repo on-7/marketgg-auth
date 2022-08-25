@@ -2,7 +2,7 @@ package com.nhnacademy.marketgg.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
-import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
 import com.nhnacademy.marketgg.auth.exception.InvalidLoginRequestException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import java.io.IOException;

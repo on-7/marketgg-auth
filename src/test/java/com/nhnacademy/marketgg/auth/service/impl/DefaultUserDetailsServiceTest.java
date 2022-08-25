@@ -1,33 +1,31 @@
 package com.nhnacademy.marketgg.auth.service.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.exception.AuthNotFoundException;
 import com.nhnacademy.marketgg.auth.jwt.CustomUser;
-import com.nhnacademy.marketgg.auth.repository.AuthRepository;
-import com.nhnacademy.marketgg.auth.repository.RoleRepository;
-import org.assertj.core.api.Assertions;
+import com.nhnacademy.marketgg.auth.repository.auth.AuthRepository;
+import com.nhnacademy.marketgg.auth.repository.role.RoleRepository;
+import java.util.ArrayList;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.ArrayList;
-import java.util.Optional;
 import org.springframework.test.context.ActiveProfiles;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ActiveProfiles({
-    "local"
+        "local"
 })
 @SpringBootTest
 class DefaultUserDetailsServiceTest {
@@ -44,13 +42,15 @@ class DefaultUserDetailsServiceTest {
     @DisplayName("Email 로 회원 찾기")
     @Test
     void testLoadUserByUsername() {
-        when(authRepository.findByEmail(anyString())).thenReturn(Optional.of(mock(Auth.class)));
-        when(roleRepository.findRolesByAuthId(anyLong())).thenReturn(new ArrayList<>());
+        Auth mockAuth = mock(Auth.class);
+        given(mockAuth.isMember()).willReturn(true);
+        given(authRepository.findByEmail(anyString())).willReturn(Optional.of(mockAuth));
+        given(roleRepository.findRolesByAuthId(anyLong())).willReturn(new ArrayList<>());
 
         UserDetails userDetails = defaultUserDetailsService.loadUserByUsername("email");
 
-        verify(authRepository, times(1)).findByEmail(anyString());
-        verify(roleRepository, times(1)).findRolesByAuthId(anyLong());
+        then(authRepository).should(times(1)).findByEmail(anyString());
+        then(roleRepository).should(times(1)).findRolesByAuthId(anyLong());
 
         assertThat(userDetails).isNotNull()
                                .isInstanceOf(CustomUser.class);
@@ -61,13 +61,13 @@ class DefaultUserDetailsServiceTest {
     void testLoadUserByUsername_fail() {
         String email = "email";
 
-        when(authRepository.findByEmail(email))
-                .thenThrow(new AuthNotFoundException(email));
-        Mockito.when(roleRepository.findRolesByAuthId(anyLong()))
-               .thenReturn(new ArrayList<>());
+        given(authRepository.findByEmail(email))
+                .willThrow(new AuthNotFoundException(email));
+        given(roleRepository.findRolesByAuthId(anyLong()))
+                .willReturn(new ArrayList<>());
 
-        Assertions.assertThatThrownBy(() -> defaultUserDetailsService.loadUserByUsername(email))
-                  .isInstanceOf(AuthNotFoundException.class);
+        assertThatThrownBy(() -> defaultUserDetailsService.loadUserByUsername(email))
+                .isInstanceOf(AuthNotFoundException.class);
     }
 
 }

@@ -4,8 +4,8 @@ import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.entity.Role;
 import com.nhnacademy.marketgg.auth.exception.AuthNotFoundException;
 import com.nhnacademy.marketgg.auth.jwt.CustomUser;
-import com.nhnacademy.marketgg.auth.repository.AuthRepository;
-import com.nhnacademy.marketgg.auth.repository.RoleRepository;
+import com.nhnacademy.marketgg.auth.repository.auth.AuthRepository;
+import com.nhnacademy.marketgg.auth.repository.role.RoleRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,6 +38,7 @@ public class DefaultUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
         Auth auth = authRepository.findByEmail(email)
+                                  .filter(Auth::isMember)
                                   .orElseThrow(() -> new AuthNotFoundException(email));
 
         List<Role> roles = roleRepository.findRolesByAuthId(auth.getId());

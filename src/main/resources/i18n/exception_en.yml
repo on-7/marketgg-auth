@@ -24,3 +24,6 @@ unAuthorization:
 
 invalidRequest:
   msg: Invalid Request.
+
+withdrawMember:
+  msg: Member who left.

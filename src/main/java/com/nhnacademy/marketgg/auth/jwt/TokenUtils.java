@@ -2,7 +2,7 @@ package com.nhnacademy.marketgg.auth.jwt;
 
 import static java.util.stream.Collectors.toList;
 
-import com.nhnacademy.marketgg.auth.dto.response.TokenResponse;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -227,6 +228,11 @@ public class TokenUtils {
                                                    .withNano(0);
 
         return new TokenResponse(newJwt, tokenExpire);
+    }
+
+    public void setBlackList(RedisTemplate<String, Object> redisTemplate, String jwt) {
+        long tokenExpireTime = getExpireDate(jwt) - System.currentTimeMillis();
+        redisTemplate.opsForValue().set(jwt, true, tokenExpireTime, TimeUnit.MILLISECONDS);
     }
 
     private String getJwtSecret(String jwtSecretUrl) {

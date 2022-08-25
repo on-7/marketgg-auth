@@ -1,4 +1,4 @@
-package com.nhnacademy.marketgg.auth.dto.response;
+package com.nhnacademy.marketgg.auth.dto.response.login.oauth;
 
 import java.time.LocalDateTime;
 import lombok.Getter;
