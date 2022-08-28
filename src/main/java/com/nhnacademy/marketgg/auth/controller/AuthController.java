@@ -4,8 +4,8 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import com.nhnacademy.marketgg.auth.annotation.Token;
-import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
 import com.nhnacademy.marketgg.auth.dto.response.common.AuthResult;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
 import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthService;
@@ -83,17 +83,6 @@ public class AuthController {
 
         return ResponseEntity.status(OK)
                              .body(AuthResult.success("Logout Success"));
-    }
-
-    @GetMapping("/test")
-    public String log() {
-
-        log.debug("DEBUG");
-        log.info("INFO");
-        log.warn("WARN");
-        log.error("ERROR");
-
-        return "success";
     }
 
 }

@@ -33,29 +33,3 @@ jobs:
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml
-
-      - name: Run SonarQube
-        run: mvn sonar:sonar -Dsonar.projectKey=${{ secrets.SONARQUBE_PROJECT_KEY }}
-                             -Dsonar.host.url=${{ secrets.SONARQUBE_HOST }}
-                             -Dsonar.login=${{ secrets.SONARQUBE_TOKEN }}
-
-      - name: SCP Files
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          source: "target/*.jar"
-          target: "~/"
-          rm: false
-
-      - name: SSH Remote Commands
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script_stop: true
-          script: "./marketgg-auth/restart.sh"
