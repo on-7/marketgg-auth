@@ -4,6 +4,7 @@ import com.nhnacademy.marketgg.auth.annotation.Token;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import java.lang.reflect.Parameter;
 import java.util.Objects;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -40,15 +41,14 @@ public class TokenAspect {
     @Around("execution(* com.nhnacademy.marketgg.auth.controller.*.*(.., @com.nhnacademy.marketgg.auth.annotation.Token (*), ..))")
     public Object parseToken(ProceedingJoinPoint pjp) throws Throwable {
         log.info("Method: {}", pjp.getSignature().getName());
+
         ServletRequestAttributes requestAttributes
-                = Objects.requireNonNull((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
+            = Objects.requireNonNull((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
+        HttpServletRequest request = requestAttributes.getRequest();
 
-        String token = requestAttributes.getRequest().getHeader(HttpHeaders.AUTHORIZATION);
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (Objects.isNull(token)
-                || !token.startsWith(TokenUtils.BEARER)
-                || tokenUtils.isInvalidToken(token)) {
-
+        if (Objects.isNull(token) || !token.startsWith(TokenUtils.BEARER) || tokenUtils.isInvalidToken(token)) {
             throw new IllegalArgumentException();
         }
 

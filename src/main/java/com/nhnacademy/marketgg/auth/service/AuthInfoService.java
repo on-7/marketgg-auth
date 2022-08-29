@@ -4,7 +4,7 @@ import com.nhnacademy.marketgg.auth.dto.request.MemberUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
-import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
+import com.nhnacademy.marketgg.auth.dto.response.UuidTokenResponse;
 import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,7 +53,7 @@ public interface AuthInfoService {
      * @return - 새로운 JWT
      * @author 김훈민
      */
-    TokenResponse update(final String token, final MemberUpdateRequest memberUpdateRequest);
+    UuidTokenResponse update(final String token, final MemberUpdateRequest memberUpdateRequest);
 
     /**
      * 회원탈퇴합니다.

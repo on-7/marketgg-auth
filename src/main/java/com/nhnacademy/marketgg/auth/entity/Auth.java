@@ -22,6 +22,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * 회원의 정보를 저장합니다.
@@ -91,8 +92,8 @@ public class Auth {
         this.phoneNumber = signUpRequest.getPhoneNumber();
         this.passwordUpdatedAt = LocalDate.now();
         this.provider =
-                checkProvider(signUpRequest.getProvider()) ? Provider.valueOf(signUpRequest.getProvider()) :
-                        Provider.SELF;
+            checkProvider(signUpRequest.getProvider()) ? Provider.valueOf(signUpRequest.getProvider()) :
+                Provider.SELF;
         this.createdAt = LocalDateTime.now();
     }
 
@@ -109,13 +110,17 @@ public class Auth {
      * 인증 갱신과 관련된 요청을 받아 인증 정보를 갱신하는 메서드입니다.
      *
      * @param memberUpdateRequest - 인증 정보 갱신 요청 객체
+     * @param passwordEncoder
      */
-    public void updateAuth(final MemberUpdateRequest memberUpdateRequest) {
-        this.uuid = UUID.randomUUID().toString();
+    public String updateAuth(final MemberUpdateRequest memberUpdateRequest, PasswordEncoder passwordEncoder) {
+        String updatedUuid = UUID.randomUUID().toString();
+        this.uuid = updatedUuid;
         this.password = memberUpdateRequest.getPassword();
         this.name = memberUpdateRequest.getName();
         this.phoneNumber = memberUpdateRequest.getPhoneNumber();
-        this.passwordUpdatedAt = getUpdateDate(memberUpdateRequest.getPassword());
+        this.passwordUpdatedAt = getUpdateDate(memberUpdateRequest.getPassword(), passwordEncoder);
+
+        return updatedUuid;
     }
 
     public void deleteAuth(final LocalDateTime withdrawAt) {
@@ -128,8 +133,8 @@ public class Auth {
      * @param updatedPassword - 수정된 비밀번호 입니다.
      * @return LocalDate - 비밀번호가 수정된 날짜를 기점으로 갱신합니다.
      */
-    private LocalDate getUpdateDate(final String updatedPassword) {
-        if (isUpdatePassword(updatedPassword)) {
+    private LocalDate getUpdateDate(final String updatedPassword, PasswordEncoder passwordEncoder) {
+        if (isUpdatePassword(updatedPassword, passwordEncoder)) {
             return this.passwordUpdatedAt;
         }
 
@@ -142,8 +147,8 @@ public class Auth {
      * @param updatedPassword - 수정된 비밀번호 입니다.
      * @return boolean - Null 이 아니고, 기존 비밀번호랑 같으면 false 를 반환.
      */
-    private boolean isUpdatePassword(final String updatedPassword) {
-        return Objects.isNull(updatedPassword) || Objects.equals(this.password, updatedPassword);
+    private boolean isUpdatePassword(final String updatedPassword, PasswordEncoder passwordEncoder) {
+        return Objects.isNull(updatedPassword) || passwordEncoder.matches(this.password, updatedPassword);
     }
 
     public void updateUuid(final String uuid) {

@@ -4,7 +4,7 @@ import com.nhnacademy.marketgg.auth.dto.request.MemberUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
-import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
+import com.nhnacademy.marketgg.auth.dto.response.UuidTokenResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.exception.AuthNotFoundException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,8 @@ public class DefaultAuthInfoService implements AuthInfoService {
     private final TokenUtils tokenUtils;
     private final RoleRepository roleRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * {@inheritDoc}
@@ -74,25 +77,25 @@ public class DefaultAuthInfoService implements AuthInfoService {
      */
     @Transactional
     @Override
-    public TokenResponse update(final String token, final MemberUpdateRequest memberUpdateRequest) {
+    public UuidTokenResponse update(final String token, final MemberUpdateRequest memberUpdateRequest) {
         String uuid = tokenUtils.getUuidFromToken(token);
         Auth updatedAuth = authRepository.findByUuid(uuid)
                                          .orElseThrow(AuthNotFoundException::new);
+        memberUpdateRequest.encodingPassword(passwordEncoder);
 
-        updatedAuth.updateAuth(memberUpdateRequest);
+        String updatedUuid = updatedAuth.updateAuth(memberUpdateRequest, passwordEncoder);
         redisTemplate.opsForHash()
-                     .delete(updatedAuth.getUuid(), TokenUtils.REFRESH_TOKEN);
+                     .delete(uuid, TokenUtils.REFRESH_TOKEN);
         List<SimpleGrantedAuthority> roles = roleRepository.findRolesByAuthId(updatedAuth.getId())
                                                            .stream()
                                                            .map(r -> new SimpleGrantedAuthority(
-                                                                   r.getName().name()))
+                                                               r.getName().name()))
                                                            .collect(
-                                                                   Collectors.toUnmodifiableList());
+                                                               Collectors.toUnmodifiableList());
 
-        UsernamePasswordAuthenticationToken auth =
-                new UsernamePasswordAuthenticationToken(updatedAuth.getUuid(), "", roles);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(updatedUuid, "", roles);
 
-        return tokenUtils.saveRefreshToken(redisTemplate, auth);
+        return new UuidTokenResponse(tokenUtils.saveRefreshToken(redisTemplate, auth), updatedUuid);
     }
 
     /**
