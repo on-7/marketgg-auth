@@ -33,9 +33,14 @@
     </Appenders>
 
     <Loggers>
-        <root level="INFO">
+        <root level="WARN">
             <appender-ref ref="console"/>
         </root>
+
+        <logger name="com.nhnacademy.marketgg.auth" level="WARN" additivity="false">
+            <appender-ref ref="console"/>
+            <appender-ref ref="file"/>
+        </logger>
     </Loggers>
 
 </Configuration>
