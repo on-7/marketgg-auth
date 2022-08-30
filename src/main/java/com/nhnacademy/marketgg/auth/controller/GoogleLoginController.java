@@ -6,6 +6,11 @@ import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
 import com.nhnacademy.marketgg.auth.dto.response.login.oauth.google.GoogleProfile;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.impl.GoogleLoginService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +42,12 @@ public class GoogleLoginController {
      * @param request - 구글에 요청을 보낼 때 필요한 정보들.
      * @return 프로필 정보 또는 JWT
      */
+    @Operation(summary = "구글 로그인 요청",
+        description = "소셜 로그인 처리",
+        parameters = @Parameter(description = "소셜 로그인 시 필요한 코드 정보", required = true),
+        responses = @ApiResponse(responseCode = "200",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = AuthResult.class))))
     @PostMapping("/login/google")
     public ResponseEntity<AuthResult<GoogleProfile>> oauthLogin(@RequestBody Map<String, String> request) {
         OauthLoginResponse loginResponse = googleLoginService.requestProfile(request.get("code"));
