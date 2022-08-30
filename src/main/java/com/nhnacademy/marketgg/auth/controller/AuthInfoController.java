@@ -4,6 +4,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import com.nhnacademy.marketgg.auth.annotation.Token;
+import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.request.MemberInfoRequest;
 import com.nhnacademy.marketgg.auth.dto.request.MemberUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
@@ -15,7 +16,6 @@ import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthInfoService;
 import com.nhnacademy.marketgg.auth.service.AuthService;
-import java.time.LocalDateTime;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -54,8 +54,7 @@ public class AuthInfoController {
      */
     @PutMapping
     public ResponseEntity<AuthResult<UuidTokenResponse>> update(@Token String token,
-                                                                @Valid @RequestBody
-                                                                final MemberUpdateRequest memberUpdateRequest) {
+                                                                @Valid @RequestBody final MemberUpdateRequest memberUpdateRequest) {
 
         UuidTokenResponse update = authInfoService.update(token, memberUpdateRequest);
 
@@ -80,7 +79,7 @@ public class AuthInfoController {
      */
     @DeleteMapping
     public ResponseEntity<AuthResult<String>> withdraw(@Token String token,
-                                                       @RequestBody final LocalDateTime withdrawAt) {
+                                                       @Valid @RequestBody final AuthWithDrawRequest withdrawAt) {
 
         authInfoService.withdraw(token, withdrawAt);
         authService.logout(token);

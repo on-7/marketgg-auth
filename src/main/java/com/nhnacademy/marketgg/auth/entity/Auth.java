@@ -1,8 +1,10 @@
 package com.nhnacademy.marketgg.auth.entity;
 
 import com.nhnacademy.marketgg.auth.constant.Provider;
+import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.request.MemberUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.signup.SignUpRequest;
+import com.nhnacademy.marketgg.auth.exception.AuthNotFoundException;
 import com.nhnacademy.marketgg.auth.exception.WithdrawMemberException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -123,8 +125,14 @@ public class Auth {
         return updatedUuid;
     }
 
-    public void deleteAuth(final LocalDateTime withdrawAt) {
-        this.deletedAt = withdrawAt;
+    public void deleteAuth(final AuthWithDrawRequest withdrawAt, PasswordEncoder passwordEncoder) {
+        if (this.email.equals(withdrawAt.getEmail())
+            && passwordEncoder.matches(this.password, withdrawAt.getPassword())) {
+
+            this.deletedAt = withdrawAt.getWithdrawAt();
+        } else {
+            throw new AuthNotFoundException();
+        }
     }
 
     /**

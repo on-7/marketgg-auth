@@ -1,5 +1,6 @@
 package com.nhnacademy.marketgg.auth.service.impl;
 
+import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.request.MemberUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
@@ -11,10 +12,10 @@ import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.repository.auth.AuthRepository;
 import com.nhnacademy.marketgg.auth.repository.role.RoleRepository;
 import com.nhnacademy.marketgg.auth.service.AuthInfoService;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * 회원 정보에 대한 비즈니스 로직을 처리하는 기본 구현체입니다.
  */
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -103,14 +105,15 @@ public class DefaultAuthInfoService implements AuthInfoService {
      */
     @Transactional
     @Override
-    public void withdraw(String token, final LocalDateTime withdrawAt) {
-
+    public void withdraw(final String token, final AuthWithDrawRequest withdrawAuth) {
         String uuid = tokenUtils.getUuidFromToken(token);
 
         Auth deletedAuth = authRepository.findByUuid(uuid)
                                          .orElseThrow(AuthNotFoundException::new);
 
-        deletedAuth.deleteAuth(withdrawAt);
+        withdrawAuth.encodingPassword(passwordEncoder);
+
+        deletedAuth.deleteAuth(withdrawAuth, passwordEncoder);
     }
 
 }

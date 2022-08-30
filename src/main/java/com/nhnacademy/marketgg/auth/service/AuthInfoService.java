@@ -1,5 +1,6 @@
 package com.nhnacademy.marketgg.auth.service;
 
+import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.request.MemberUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
@@ -62,6 +63,6 @@ public interface AuthInfoService {
      * @param withdrawAt - 삭제 시간 입니다.
      * @author 김훈민
      */
-    void withdraw(final String token, final LocalDateTime withdrawAt);
+    void withdraw(final String token, final AuthWithDrawRequest withdrawAt);
 
 }
