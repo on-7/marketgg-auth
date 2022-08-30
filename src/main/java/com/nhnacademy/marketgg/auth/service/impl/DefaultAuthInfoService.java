@@ -83,9 +83,9 @@ public class DefaultAuthInfoService implements AuthInfoService {
         String uuid = tokenUtils.getUuidFromToken(token);
         Auth updatedAuth = authRepository.findByUuid(uuid)
                                          .orElseThrow(AuthNotFoundException::new);
-        memberUpdateRequest.encodingPassword(passwordEncoder);
 
         String updatedUuid = updatedAuth.updateAuth(memberUpdateRequest, passwordEncoder);
+
         redisTemplate.opsForHash()
                      .delete(uuid, TokenUtils.REFRESH_TOKEN);
         List<SimpleGrantedAuthority> roles = roleRepository.findRolesByAuthId(updatedAuth.getId())
@@ -110,9 +110,6 @@ public class DefaultAuthInfoService implements AuthInfoService {
 
         Auth deletedAuth = authRepository.findByUuid(uuid)
                                          .orElseThrow(AuthNotFoundException::new);
-
-        withdrawAuth.encodingPassword(passwordEncoder);
-
         deletedAuth.deleteAuth(withdrawAuth, passwordEncoder);
     }
 

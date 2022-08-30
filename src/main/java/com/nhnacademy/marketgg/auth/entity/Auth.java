@@ -117,17 +117,17 @@ public class Auth {
     public String updateAuth(final MemberUpdateRequest memberUpdateRequest, PasswordEncoder passwordEncoder) {
         String updatedUuid = UUID.randomUUID().toString();
         this.uuid = updatedUuid;
-        this.password = memberUpdateRequest.getPassword();
         this.name = memberUpdateRequest.getName();
         this.phoneNumber = memberUpdateRequest.getPhoneNumber();
         this.passwordUpdatedAt = getUpdateDate(memberUpdateRequest.getPassword(), passwordEncoder);
+        this.password = passwordEncoder.encode(memberUpdateRequest.getPassword());
 
         return updatedUuid;
     }
 
     public void deleteAuth(final AuthWithDrawRequest withdrawAt, PasswordEncoder passwordEncoder) {
         if (this.email.equals(withdrawAt.getEmail())
-            && passwordEncoder.matches(this.password, withdrawAt.getPassword())) {
+            && passwordEncoder.matches(withdrawAt.getPassword(), this.password)) {
 
             this.deletedAt = withdrawAt.getWithdrawAt();
         } else {
@@ -156,7 +156,7 @@ public class Auth {
      * @return boolean - Null 이 아니고, 기존 비밀번호랑 같으면 false 를 반환.
      */
     private boolean isUpdatePassword(final String updatedPassword, PasswordEncoder passwordEncoder) {
-        return Objects.isNull(updatedPassword) || passwordEncoder.matches(this.password, updatedPassword);
+        return Objects.isNull(updatedPassword) || passwordEncoder.matches(updatedPassword, this.password);
     }
 
     public void updateUuid(final String uuid) {
