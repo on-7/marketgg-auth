@@ -3,6 +3,7 @@ package com.nhnacademy.marketgg.auth.repository;
 import com.nhnacademy.marketgg.auth.constant.Provider;
 import com.nhnacademy.marketgg.auth.dto.request.signup.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.signup.SignUpRequest;
+import com.nhnacademy.marketgg.auth.dto.response.AdminMemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.repository.auth.AuthRepository;
@@ -15,6 +16,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -97,6 +101,22 @@ class AuthRepositoryTest {
         Assertions.assertAll(
             () -> assertThat(findAuth.getEmail()).isEqualTo(savedAuth.getEmail()),
             () -> assertThat(findAuth.getProvider()).isEqualTo(savedAuth.getProvider()));
+    }
+
+    @Test
+    void testFindMembers() {
+        List<SignUpRequest> requests = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            requests.add(getSignUpRequest(i));
+        }
+
+        requests.forEach(request -> authRepository.save(new Auth(request)));
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<AdminMemberResponse> members = authRepository.findMembers(pageable);
+
+        assertThat(members).hasSize(10);
     }
 
     private SignUpRequest getSignUpRequest(int i) {

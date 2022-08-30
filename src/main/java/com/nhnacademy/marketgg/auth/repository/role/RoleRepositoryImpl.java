@@ -1,5 +1,6 @@
 package com.nhnacademy.marketgg.auth.repository.role;
 
+import com.nhnacademy.marketgg.auth.constant.Roles;
 import com.nhnacademy.marketgg.auth.entity.QAuthRole;
 import com.nhnacademy.marketgg.auth.entity.QRole;
 import com.nhnacademy.marketgg.auth.entity.Role;
@@ -27,6 +28,17 @@ public class RoleRepositoryImpl extends QuerydslRepositorySupport implements Rol
                 .innerJoin(authRole).on(role.id.eq(authRole.id.roleId))
                 .where(authRole.id.authId.eq(id))
                 .fetch();
+    }
+
+    @Override
+    public List<Roles> findRoleNameByAuthId(Long id) {
+
+        QAuthRole authRole = QAuthRole.authRole;
+
+        return from(authRole).innerJoin(authRole.role)
+                         .where(authRole.auth.id.eq(id))
+                         .select(authRole.role.name)
+                         .fetch();
     }
 
 }

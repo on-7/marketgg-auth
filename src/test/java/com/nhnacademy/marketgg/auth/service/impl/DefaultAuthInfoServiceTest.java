@@ -1,15 +1,18 @@
 package com.nhnacademy.marketgg.auth.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
+import com.nhnacademy.marketgg.auth.dto.response.AdminMemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
+import com.nhnacademy.marketgg.auth.dto.response.common.PageEntity;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.repository.auth.AuthRepository;
@@ -25,6 +28,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 
 @ExtendWith(MockitoExtension.class)
@@ -105,6 +112,18 @@ class DefaultAuthInfoServiceTest {
         List<MemberNameResponse> memberNameList = authInfoService.findMemberNameList(uuids);
 
         Assertions.assertThat(memberNameList).hasSize(5);
+    }
+
+    @Test
+    @DisplayName("회원 목록 조회")
+    void testFindAdminMembers() {
+        PageImpl<AdminMemberResponse> adminMemberResponses = new PageImpl<>(new ArrayList<>());
+
+        given(authRepository.findMembers(any(Pageable.class))).willReturn(adminMemberResponses);
+
+        PageEntity<AdminMemberResponse> adminMembers = authInfoService.findAdminMembers(PageRequest.of(0, 10));
+
+        assertThat(adminMembers).isNotNull();
     }
 
 }
