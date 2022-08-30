@@ -46,7 +46,7 @@ public class AuthRepositoryImpl extends QuerydslRepositorySupport implements Aut
                                                                                           auth.createdAt))
                                                                                       .orderBy(auth.createdAt.desc())
                                                                                       .offset(pageable.getOffset())
-                                                                                      .limit(pageable.getPageSize())
+                                                                                      .limit(pageable.getPageSize() + 5)
                                                                                       .fetchResults();
         return new PageImpl<>(result.getResults(), pageable, result.getTotal());
     }
