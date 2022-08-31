@@ -10,7 +10,7 @@
 
 # Project Architecture
 
-![marketgg-architecture-v1-0-2](https://user-images.githubusercontent.com/38161720/183286626-494edf2f-2a6c-4207-b70f-57d85b838704.png)
+![marketgg-architecture-v1-0-2](https://user-images.githubusercontent.com/83569822/187658420-b8ef3768-6fba-48bd-870c-22348fbbbd25.png)
 
 
 # Features
