@@ -43,7 +43,7 @@ public class GoogleLoginController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpStatus status;
+
         GoogleProfile data;
 
         if (loginResponse.successLogin()) {
@@ -54,13 +54,13 @@ public class GoogleLoginController {
 
             // 로그인 성공 시 프로필 없이 JWT 만 응답으로 보내기 때문에 Profile 정보가 없다.
             data = GoogleProfile.successGoogleLogin();
-            status = HttpStatus.OK;
+
         } else {
             data = (GoogleProfile) loginResponse.getOauthProfile();
-            status = HttpStatus.UNAUTHORIZED;
+
         }
 
-        return ResponseEntity.status(status)
+        return ResponseEntity.status(HttpStatus.OK)
                              .headers(headers)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(AuthResult.success(data));
