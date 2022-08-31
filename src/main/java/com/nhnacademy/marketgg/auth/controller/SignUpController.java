@@ -6,10 +6,10 @@ import static org.springframework.http.HttpStatus.OK;
 import com.nhnacademy.marketgg.auth.dto.request.signup.EmailRequest;
 import com.nhnacademy.marketgg.auth.dto.request.signup.EmailUseRequest;
 import com.nhnacademy.marketgg.auth.dto.request.signup.SignUpRequest;
+import com.nhnacademy.marketgg.auth.dto.response.common.AuthResult;
 import com.nhnacademy.marketgg.auth.dto.response.signup.ExistEmailResponse;
 import com.nhnacademy.marketgg.auth.dto.response.signup.SignUpResponse;
 import com.nhnacademy.marketgg.auth.dto.response.signup.UseEmailResponse;
-import com.nhnacademy.marketgg.auth.dto.response.common.AuthResult;
 import com.nhnacademy.marketgg.auth.service.SignUpService;
 import javax.management.relation.RoleNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ public class SignUpController {
      */
     @PostMapping("/signup")
     public ResponseEntity<AuthResult<SignUpResponse>> doSignup(@RequestBody final SignUpRequest signUpRequest)
-        throws RoleNotFoundException {
+            throws RoleNotFoundException {
 
         SignUpResponse data = signUpService.signup(signUpRequest);
 

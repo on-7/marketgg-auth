@@ -93,8 +93,8 @@ public class RedisConfig {
 
     private String[] getRedisInfo(String infoUrl) {
         ResponseEntity<Map<String, Map<String, String>>> exchange =
-            restTemplate.exchange(infoUrl, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-            });
+                restTemplate.exchange(infoUrl, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                });
 
         String connectInfo = Optional.ofNullable(exchange.getBody())
                                      .orElseThrow(IllegalArgumentException::new)
@@ -112,8 +112,8 @@ public class RedisConfig {
 
     private String getRedisPassword(String passwordUrl) {
         ResponseEntity<Map<String, Map<String, String>>> exchange =
-            restTemplate.exchange(passwordUrl, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-            });
+                restTemplate.exchange(passwordUrl, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                });
 
         return Optional.ofNullable(exchange.getBody())
                        .orElseThrow(IllegalArgumentException::new)

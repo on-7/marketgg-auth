@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             LoginRequest loginRequest = mapper.readValue(request.getInputStream(), LoginRequest.class);
 
             UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
+                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
 
             return getAuthenticationManager().authenticate(token);
 
@@ -84,7 +84,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authResult)
-        throws IOException, ServletException {
+            throws IOException, ServletException {
 
         TokenResponse tokenResponse = tokenUtils.saveRefreshToken(redisTemplate, authResult);
 

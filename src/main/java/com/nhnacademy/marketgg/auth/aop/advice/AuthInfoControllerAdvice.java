@@ -34,7 +34,7 @@ public class AuthInfoControllerAdvice {
      * @return - 클라이언트 오류 코드를 반환합니다.
      */
     @ExceptionHandler({
-        AuthNotFoundException.class
+            AuthNotFoundException.class
     })
     public ResponseEntity<AuthResult<Void>> errorControl(Exception e) {
         log.debug(e.toString());

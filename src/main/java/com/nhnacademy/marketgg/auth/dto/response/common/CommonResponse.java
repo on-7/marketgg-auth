@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public  class CommonResponse {
+public class CommonResponse {
 
     protected final boolean success;
 

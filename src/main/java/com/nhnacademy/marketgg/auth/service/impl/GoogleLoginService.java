@@ -4,9 +4,9 @@ import static java.util.stream.Collectors.toList;
 
 import com.nhnacademy.marketgg.auth.adapter.GoogleAdapter;
 import com.nhnacademy.marketgg.auth.constant.Provider;
-import com.nhnacademy.marketgg.auth.dto.response.login.oauth.google.GoogleProfile;
 import com.nhnacademy.marketgg.auth.dto.response.login.oauth.OauthLoginResponse;
 import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.google.GoogleProfile;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.exception.LoginFailException;
 import com.nhnacademy.marketgg.auth.exception.OAuthRequestFailException;
@@ -71,7 +71,7 @@ public class GoogleLoginService implements Oauth2Service {
         log.info("Google Profile = {}", googleProfile);
 
         Optional<Auth> opAuth = authRepository.findByEmailAndProvider(googleProfile.getEmail(), Provider.GOOGLE)
-                                  .filter(Auth::isMember);
+                                              .filter(Auth::isMember);
 
         if (opAuth.isEmpty()) {
             // DB 에 회원 정보가 없을 시 로그인 시도한 프로필을 바탕으로 회원가입 진행
@@ -105,7 +105,7 @@ public class GoogleLoginService implements Oauth2Service {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         HttpEntity<MultiValueMap<String, String>> tokenRequest
-            = new HttpEntity<>(map, headers);
+                = new HttpEntity<>(map, headers);
 
         return Optional.ofNullable(googleAdapter.requestToken(GOOGLE_TOKEN_REQUEST_URL, tokenRequest).getBody())
                        .orElseThrow(LoginFailException::new);

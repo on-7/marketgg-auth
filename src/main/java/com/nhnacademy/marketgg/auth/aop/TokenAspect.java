@@ -41,13 +41,13 @@ public class TokenAspect {
     public Object parseToken(ProceedingJoinPoint pjp) throws Throwable {
         log.info("Method: {}", pjp.getSignature().getName());
         ServletRequestAttributes requestAttributes
-            = Objects.requireNonNull((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
+                = Objects.requireNonNull((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
 
         String token = requestAttributes.getRequest().getHeader(HttpHeaders.AUTHORIZATION);
 
         if (Objects.isNull(token)
-            || !token.startsWith(TokenUtils.BEARER)
-            || tokenUtils.isInvalidToken(token)) {
+                || !token.startsWith(TokenUtils.BEARER)
+                || tokenUtils.isInvalidToken(token)) {
 
             throw new IllegalArgumentException();
         }

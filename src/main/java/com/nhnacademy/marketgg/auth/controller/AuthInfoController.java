@@ -4,13 +4,13 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import com.nhnacademy.marketgg.auth.annotation.Token;
-import com.nhnacademy.marketgg.auth.dto.request.MemberUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.MemberInfoRequest;
+import com.nhnacademy.marketgg.auth.dto.request.MemberUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
-import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
 import com.nhnacademy.marketgg.auth.dto.response.common.AuthResult;
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
 import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthInfoService;
@@ -47,14 +47,15 @@ public class AuthInfoController {
     /**
      * 회원정보 수정을 위한 컨트롤러 메서드 입니다.
      *
-     * @param token             - JWT
+     * @param token               - JWT
      * @param memberUpdateRequest - 수정할 회원 정보를 담고있는 객체 입니다.
      * @return - 상태코드를 리턴합니다.
      * @author 김훈민
      */
     @PutMapping
     public ResponseEntity<AuthResult<String>> update(@Token String token,
-                                                     @Valid @RequestBody final MemberUpdateRequest memberUpdateRequest) {
+                                                     @Valid @RequestBody
+                                                     final MemberUpdateRequest memberUpdateRequest) {
 
         TokenResponse update = authInfoService.update(token, memberUpdateRequest);
 
@@ -116,7 +117,7 @@ public class AuthInfoController {
      */
     @PostMapping("/person")
     public ResponseEntity<AuthResult<MemberInfoResponse>> getMemberInfo(
-        @RequestBody MemberInfoRequest memberInfoRequest) {
+            @RequestBody MemberInfoRequest memberInfoRequest) {
         MemberInfoResponse data = authInfoService.findMemberInfoByUuid(memberInfoRequest.getUuid());
 
         return ResponseEntity.status(OK)

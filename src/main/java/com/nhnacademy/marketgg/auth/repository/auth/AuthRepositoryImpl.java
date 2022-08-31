@@ -23,9 +23,9 @@ public class AuthRepositoryImpl extends QuerydslRepositorySupport implements Aut
         QAuth auth = QAuth.auth;
 
         return from(auth)
-            .where(auth.uuid.in(uuids))
-            .select(Projections.constructor(MemberNameResponse.class, auth.uuid, auth.name))
-            .fetch();
+                .where(auth.uuid.in(uuids))
+                .select(Projections.constructor(MemberNameResponse.class, auth.uuid, auth.name))
+                .fetch();
     }
 
     @Override

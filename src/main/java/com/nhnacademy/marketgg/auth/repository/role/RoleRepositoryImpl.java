@@ -24,9 +24,9 @@ public class RoleRepositoryImpl extends QuerydslRepositorySupport implements Rol
         QAuthRole authRole = QAuthRole.authRole;
 
         return from(role)
-            .innerJoin(authRole).on(role.id.eq(authRole.id.roleId))
-            .where(authRole.id.authId.eq(id))
-            .fetch();
+                .innerJoin(authRole).on(role.id.eq(authRole.id.roleId))
+                .where(authRole.id.authId.eq(id))
+                .fetch();
     }
 
 }

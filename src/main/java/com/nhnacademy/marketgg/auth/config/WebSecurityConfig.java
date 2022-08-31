@@ -86,8 +86,8 @@ public class WebSecurityConfig {
 
     private JwtAuthenticationFilter getJwtAuthenticationFilter() throws Exception {
         JwtAuthenticationFilter jwtAuthenticationFilter =
-            new JwtAuthenticationFilter(authenticationManager(null),
-                mapper, tokenUtils, redisTemplate);
+                new JwtAuthenticationFilter(authenticationManager(null),
+                                            mapper, tokenUtils, redisTemplate);
 
         jwtAuthenticationFilter.setFilterProcessesUrl("/members/login");
 

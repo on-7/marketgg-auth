@@ -22,19 +22,19 @@ public class SwaggerConfig {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
-            .apiInfo(apiInfo())
-            .select()
-            .apis(RequestHandlerSelectors.basePackage("com.nhnacademy.marketgg.auth.controller"))
-            .paths(PathSelectors.any())
-            .build();
+                .apiInfo(apiInfo())
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.nhnacademy.marketgg.auth.controller"))
+                .paths(PathSelectors.any())
+                .build();
     }
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-            .title("Spring Boot Open Api Test with Swagger")
-            .description("설명 부분")
-            .version("1.0.0")
-            .build();
+                .title("Spring Boot Open Api Test with Swagger")
+                .description("설명 부분")
+                .version("1.0.0")
+                .build();
     }
 
 }

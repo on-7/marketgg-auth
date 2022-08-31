@@ -7,7 +7,6 @@ import com.nhnacademy.marketgg.auth.repository.auth.AuthRepository;
 import com.nhnacademy.marketgg.auth.service.AuthService;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
@@ -44,7 +43,7 @@ public class DefaultAuthService implements AuthService {
         Optional<Auth> auth = authRepository.findByUuid(uuid).filter(Auth::isMember);
 
         String refreshToken =
-            (String) redisTemplate.opsForHash().get(uuid, TokenUtils.REFRESH_TOKEN);
+                (String) redisTemplate.opsForHash().get(uuid, TokenUtils.REFRESH_TOKEN);
 
         if (auth.isEmpty() || this.isInvalidToken(uuid, refreshToken)) {
             return null;
@@ -53,15 +52,15 @@ public class DefaultAuthService implements AuthService {
         redisTemplate.opsForHash().delete(uuid, TokenUtils.REFRESH_TOKEN);
 
         Authentication authentication =
-            tokenUtils.getAuthenticationFromExpiredToken(token, uuid);
+                tokenUtils.getAuthenticationFromExpiredToken(token, uuid);
 
         return tokenUtils.saveRefreshToken(redisTemplate, authentication);
     }
 
     private boolean isInvalidToken(String uuid, String refreshToken) {
         return Objects.isNull(refreshToken)
-            || tokenUtils.isInvalidToken(refreshToken)
-            || !Objects.equals(uuid, tokenUtils.getUuidFromToken(refreshToken));
+                || tokenUtils.isInvalidToken(refreshToken)
+                || !Objects.equals(uuid, tokenUtils.getUuidFromToken(refreshToken));
     }
 
 }

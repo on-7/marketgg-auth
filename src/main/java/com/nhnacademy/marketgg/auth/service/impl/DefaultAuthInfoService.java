@@ -85,12 +85,12 @@ public class DefaultAuthInfoService implements AuthInfoService {
         List<SimpleGrantedAuthority> roles = roleRepository.findRolesByAuthId(updatedAuth.getId())
                                                            .stream()
                                                            .map(r -> new SimpleGrantedAuthority(
-                                                               r.getName().name()))
+                                                                   r.getName().name()))
                                                            .collect(
-                                                               Collectors.toUnmodifiableList());
+                                                                   Collectors.toUnmodifiableList());
 
         UsernamePasswordAuthenticationToken auth =
-            new UsernamePasswordAuthenticationToken(updatedAuth.getUuid(), "", roles);
+                new UsernamePasswordAuthenticationToken(updatedAuth.getUuid(), "", roles);
 
         return tokenUtils.saveRefreshToken(redisTemplate, auth);
     }

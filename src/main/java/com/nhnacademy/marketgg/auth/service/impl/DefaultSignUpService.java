@@ -62,14 +62,14 @@ public class DefaultSignUpService implements SignUpService {
         Auth signupAuth = authRepository.save(new Auth(signUpRequest));
         Role role = roleRepository.findByName(Roles.ROLE_USER)
                                   .orElseThrow(
-                                      () -> new RoleNotFoundException("해당 권한은 존재 하지 않습니다."));
+                                          () -> new RoleNotFoundException("해당 권한은 존재 하지 않습니다."));
         authRoleRepository.save(new AuthRole(new AuthRole.Pk(signupAuth.getId(), role.getId()), signupAuth, role));
 
         // 추천인 이메일이 있는경우
         if (authRepository.existsByEmail(signUpRequest.getReferrerEmail())) {
             new SignUpResponse(signupAuth.getUuid(), authRepository.findByEmail(signUpRequest.getReferrerEmail())
                                                                    .orElseThrow(() -> new AuthNotFoundException(
-                                                                       signUpRequest.getReferrerEmail()))
+                                                                           signUpRequest.getReferrerEmail()))
                                                                    .getUuid());
         }
 

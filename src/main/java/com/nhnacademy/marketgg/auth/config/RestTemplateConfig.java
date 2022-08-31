@@ -71,7 +71,7 @@ public class RestTemplateConfig {
         }
 
         SSLConnectionSocketFactory socketFactory
-            = new SSLConnectionSocketFactory(Optional.ofNullable(sslContext).orElseThrow());
+                = new SSLConnectionSocketFactory(Optional.ofNullable(sslContext).orElseThrow());
 
         return HttpClients.custom()
                           .setSSLSocketFactory(socketFactory)

@@ -66,8 +66,8 @@ public class AuthControllerAdvice {
      * @see <a href="https://developer.mozilla.org/ko/docs/Web/HTTP/Status/409">Http Conflict 2</a>
      */
     @ExceptionHandler(value = {
-        EmailOverlapException.class,
-        AuthWithdrawOverlapException.class
+            EmailOverlapException.class,
+            AuthWithdrawOverlapException.class
     })
     public ResponseEntity<AuthResult<Void>> handleConflictNotAllowException(ConflictException e) {
         log.debug(e.toString());
@@ -89,7 +89,7 @@ public class AuthControllerAdvice {
      * @see <a href="https://developer.mozilla.org/ko/docs/Web/HTTP/Status/409">Http Conflict 2</a>
      */
     @ExceptionHandler(value = {
-        RedisInvalidSubscriptionException.class
+            RedisInvalidSubscriptionException.class
     })
     public ResponseEntity<AuthResult<Void>> handleRedisConflictNotAllowException(RedisInvalidSubscriptionException e) {
         log.debug(e.toString());
@@ -107,10 +107,10 @@ public class AuthControllerAdvice {
      * @author 윤동열
      */
     @ExceptionHandler(value = {
-        LoginFailException.class,
-        InvalidLoginRequestException.class,
-        UnAuthorizationException.class,
-        OAuthRequestFailException.class
+            LoginFailException.class,
+            InvalidLoginRequestException.class,
+            UnAuthorizationException.class,
+            OAuthRequestFailException.class
     })
     public ResponseEntity<AuthResult<Void>> handleLoginFailException(AuthException e) {
         log.debug(e.toString());
@@ -126,7 +126,7 @@ public class AuthControllerAdvice {
      * 탈퇴한 회원에 대한 예외를 처리합니다.
      */
     @ExceptionHandler({
-        WithdrawMemberException.class
+            WithdrawMemberException.class
     })
     public ResponseEntity<AuthResult<Void>> handleWithdrawMemberException(WithdrawMemberException e) {
         log.info(e.toString());

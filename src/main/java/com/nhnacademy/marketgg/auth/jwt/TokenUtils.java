@@ -113,10 +113,10 @@ public class TokenUtils {
         return Jwts.builder()
                    .setSubject(authentication.getName())
                    .claim(AUTHORITIES,
-                       authentication.getAuthorities()
-                                     .stream()
-                                     .map(GrantedAuthority::getAuthority)
-                                     .collect(toList()))
+                          authentication.getAuthorities()
+                                        .stream()
+                                        .map(GrantedAuthority::getAuthority)
+                                        .collect(toList()))
                    .setIssuedAt(issueDate)
                    .setExpiration(new Date(issueDate.getTime() + expirationDate))
                    .signWith(key)
@@ -216,12 +216,12 @@ public class TokenUtils {
         redisTemplate.opsForHash()
                      .put(authentication.getName(), TokenUtils.REFRESH_TOKEN, refreshToken);
         redisTemplate.expireAt(authentication.getName(),
-            new Date(issueDate.getTime() + this.getRefreshTokenExpirationDate()));
+                               new Date(issueDate.getTime() + this.getRefreshTokenExpirationDate()));
 
         String newJwt = this.generateJwt(authentication, issueDate);
 
         Date tokenExpireDate =
-            new Date(issueDate.getTime() + this.getTokenExpirationDate());
+                new Date(issueDate.getTime() + this.getTokenExpirationDate());
         LocalDateTime tokenExpire = tokenExpireDate.toInstant()
                                                    .atZone(ZoneId.systemDefault())
                                                    .toLocalDateTime()
@@ -237,8 +237,8 @@ public class TokenUtils {
 
     private String getJwtSecret(String jwtSecretUrl) {
         ResponseEntity<Map<String, Map<String, String>>> response =
-            restTemplate.exchange(jwtSecretUrl, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-            });
+                restTemplate.exchange(jwtSecretUrl, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                });
 
         return Optional.ofNullable(response.getBody())
                        .orElseThrow(IllegalArgumentException::new)

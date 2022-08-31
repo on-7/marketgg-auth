@@ -58,13 +58,13 @@ public class MailUtils {
             message.setSubject("[Market GG] 인증코드 전송");
 
             message.setContent(
-                "<h1>[이메일 인증]</h1> <p>아래 버튼을 클릭하시면 이메일 인증이 완료됩니다.</p> " +
-                    "<form action=\"https://\"" + toHost + ":\"" + toPort +
-                    "/auth/use/email/use?use=true\" method=\"post\">\n" +
-                    "<input type=\"hidden\"" + "id=\"email\" value=\"" + email + "\">" +
-                    "    <button type=\"submit\">인증하기</button>\n" +
-                    "</form>"
-                , "text/html;charset=euc-kr"
+                    "<h1>[이메일 인증]</h1> <p>아래 버튼을 클릭하시면 이메일 인증이 완료됩니다.</p> " +
+                            "<form action=\"https://\"" + toHost + ":\"" + toPort +
+                            "/auth/use/email/use?use=true\" method=\"post\">\n" +
+                            "<input type=\"hidden\"" + "id=\"email\" value=\"" + email + "\">" +
+                            "    <button type=\"submit\">인증하기</button>\n" +
+                            "</form>"
+                    , "text/html;charset=euc-kr"
             );
 
             Transport.send(message);
