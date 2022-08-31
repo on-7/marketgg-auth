@@ -116,7 +116,7 @@ class AuthRepositoryTest {
 
         Page<AdminMemberResponse> members = authRepository.findMembers(pageable);
 
-        assertThat(members).hasSize(15);
+        assertThat(members).hasSize(20);
     }
 
     private SignUpRequest getSignUpRequest(int i) {

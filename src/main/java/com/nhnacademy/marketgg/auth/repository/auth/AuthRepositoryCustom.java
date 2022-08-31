@@ -2,7 +2,6 @@ package com.nhnacademy.marketgg.auth.repository.auth;
 
 import com.nhnacademy.marketgg.auth.dto.response.AdminMemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
-import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

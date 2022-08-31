@@ -38,16 +38,17 @@ public class AuthRepositoryImpl extends QuerydslRepositorySupport implements Aut
         QAuth auth = QAuth.auth;
 
         QueryResults<AdminMemberResponse> result = from(auth).where(auth.deletedAt.isNull())
-                                                                                      .select(Projections.constructor(
-                                                                                          AdminMemberResponse.class,
-                                                                                          auth.id, auth.uuid,
-                                                                                          auth.email, auth.name,
-                                                                                          auth.phoneNumber,
-                                                                                          auth.createdAt))
-                                                                                      .orderBy(auth.createdAt.desc())
-                                                                                      .offset(pageable.getOffset())
-                                                                                      .limit(pageable.getPageSize() + 5)
-                                                                                      .fetchResults();
+                                                             .select(Projections.constructor(
+                                                                 AdminMemberResponse.class,
+                                                                 auth.id, auth.uuid,
+                                                                 auth.email, auth.name,
+                                                                 auth.phoneNumber,
+                                                                 auth.createdAt))
+                                                             .orderBy(auth.createdAt.desc())
+                                                             .offset(pageable.getOffset())
+                                                             .limit(pageable.getPageSize() + 10L)
+                                                             .fetchResults();
+
         return new PageImpl<>(result.getResults(), pageable, result.getTotal());
     }
 
