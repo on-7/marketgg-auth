@@ -156,7 +156,7 @@ public class AuthInfoController {
      */
     @GetMapping("/list")
     public ResponseEntity<AuthResult<PageEntity<AdminMemberResponse>>> retrieveMembers(
-        @Token String token, @RequestParam(value = "page", defaultValue = "0") final Integer page)
+        @Token String token, @RequestParam(value = "page", defaultValue = "1") final Integer page)
         throws JsonProcessingException {
 
         if (!authInfoService.isAdmin(token)) {
