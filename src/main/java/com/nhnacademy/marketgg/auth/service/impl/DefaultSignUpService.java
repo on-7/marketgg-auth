@@ -67,7 +67,7 @@ public class DefaultSignUpService implements SignUpService {
 
         // 추천인 이메일이 있는경우
         if (authRepository.existsByEmail(signUpRequest.getReferrerEmail())) {
-            new SignUpResponse(signupAuth.getUuid(), authRepository.findByEmail(signUpRequest.getReferrerEmail())
+            return new SignUpResponse(signupAuth.getUuid(), authRepository.findByEmail(signUpRequest.getReferrerEmail())
                                                                    .orElseThrow(() -> new AuthNotFoundException(
                                                                            signUpRequest.getReferrerEmail()))
                                                                    .getUuid());

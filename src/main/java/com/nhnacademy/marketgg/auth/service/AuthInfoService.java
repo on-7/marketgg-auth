@@ -1,14 +1,22 @@
 package com.nhnacademy.marketgg.auth.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.marketgg.auth.constant.Roles;
+import com.nhnacademy.marketgg.auth.dto.Payload;
 import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.request.MemberUpdateRequest;
+import com.nhnacademy.marketgg.auth.dto.response.AdminMemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.UuidTokenResponse;
+import com.nhnacademy.marketgg.auth.dto.response.common.PageEntity;
 import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
-import java.time.LocalDateTime;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 /**
  * 사용자 정보 요청 관련 비즈니스 로직을 처리합니다.
@@ -36,6 +44,12 @@ public interface AuthInfoService {
      */
     MemberInfoResponse findMemberInfoByUuid(final String uuid);
 
+    /**
+     * 사용자 목록 전체 조회.
+     *
+     * @return 사용자 정보
+     */
+    PageEntity<AdminMemberResponse> findAdminMembers(Pageable pageable);
 
     /**
      * UUID 목록에 해당하는 회원 목록을 조회합니다.
@@ -64,5 +78,22 @@ public interface AuthInfoService {
      * @author 김훈민
      */
     void withdraw(final String token, final AuthWithDrawRequest withdrawAt);
+
+    /**
+     * JWT 토큰으로 ADMIN 권한을 확인합니다.
+     *
+     * @param token - JWT
+     * @return 관리자 권한 여부
+     * @throws JsonProcessingException JSON 직렬화 시 발생 가능
+     */
+    default boolean isAdmin(String token) throws JsonProcessingException {
+        String[] jwtSection = token.split("\\.");
+        String jwtPayload = jwtSection[1];
+
+        byte[] decode = Base64.getDecoder().decode(jwtPayload);
+        Payload payload = new ObjectMapper().readValue(new String(decode, StandardCharsets.UTF_8), Payload.class);
+
+        return payload.getAuthorities().contains(Roles.ROLE_ADMIN.name());
+    }
 
 }

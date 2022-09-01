@@ -1,7 +1,10 @@
 package com.nhnacademy.marketgg.auth.repository.auth;
 
+import com.nhnacademy.marketgg.auth.dto.response.AdminMemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.NoRepositoryBean;
 
 /**
@@ -13,6 +16,8 @@ import org.springframework.data.repository.NoRepositoryBean;
 public interface AuthRepositoryCustom {
 
     List<MemberNameResponse> findMembersByUuid(List<String> uuids);
+
+    Page<AdminMemberResponse> findMembers(Pageable pageable);
 
     boolean isExistNotWithdraw(String uuid);
 

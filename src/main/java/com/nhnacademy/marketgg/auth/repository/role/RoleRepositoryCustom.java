@@ -1,5 +1,6 @@
 package com.nhnacademy.marketgg.auth.repository.role;
 
+import com.nhnacademy.marketgg.auth.constant.Roles;
 import com.nhnacademy.marketgg.auth.entity.Role;
 import java.util.List;
 
@@ -9,5 +10,7 @@ import java.util.List;
 public interface RoleRepositoryCustom {
 
     List<Role> findRolesByAuthId(Long id);
+
+    List<Roles> findRoleNameByAuthId(Long id);
 
 }
