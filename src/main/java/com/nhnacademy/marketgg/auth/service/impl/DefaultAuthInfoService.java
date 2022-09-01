@@ -1,11 +1,15 @@
 package com.nhnacademy.marketgg.auth.service.impl;
 
+import static java.util.stream.Collectors.toUnmodifiableList;
+
 import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.request.MemberUpdateRequest;
+import com.nhnacademy.marketgg.auth.dto.response.AdminMemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberInfoResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberNameResponse;
 import com.nhnacademy.marketgg.auth.dto.response.MemberResponse;
 import com.nhnacademy.marketgg.auth.dto.response.UuidTokenResponse;
+import com.nhnacademy.marketgg.auth.dto.response.common.PageEntity;
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.exception.AuthNotFoundException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
@@ -13,9 +17,10 @@ import com.nhnacademy.marketgg.auth.repository.auth.AuthRepository;
 import com.nhnacademy.marketgg.auth.repository.role.RoleRepository;
 import com.nhnacademy.marketgg.auth.service.AuthInfoService;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -74,6 +79,14 @@ public class DefaultAuthInfoService implements AuthInfoService {
         return authRepository.findMembersByUuid(uuids);
     }
 
+    @Override
+    public PageEntity<AdminMemberResponse> findAdminMembers(Pageable pageable) {
+        Page<AdminMemberResponse> members = authRepository.findMembers(pageable);
+        members.getContent().forEach(m -> m.setRoles(roleRepository.findRoleNameByAuthId(m.getId())));
+
+        return new PageEntity<>(members.getNumber(), members.getSize(), members.getTotalPages(), members.getContent());
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -93,7 +106,7 @@ public class DefaultAuthInfoService implements AuthInfoService {
                                                            .map(r -> new SimpleGrantedAuthority(
                                                                r.getName().name()))
                                                            .collect(
-                                                               Collectors.toUnmodifiableList());
+                                                               toUnmodifiableList());
 
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(updatedUuid, "", roles);
 
