@@ -10,6 +10,7 @@ import com.nhnacademy.marketgg.auth.dto.response.login.oauth.google.GoogleProfil
 import com.nhnacademy.marketgg.auth.entity.Auth;
 import com.nhnacademy.marketgg.auth.exception.LoginFailException;
 import com.nhnacademy.marketgg.auth.exception.OAuthRequestFailException;
+import com.nhnacademy.marketgg.auth.exception.WithdrawMemberException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.oauth2.OAuthToken;
 import com.nhnacademy.marketgg.auth.repository.auth.AuthRepository;
@@ -70,8 +71,7 @@ public class GoogleLoginService implements Oauth2Service {
         GoogleProfile googleProfile = this.requestGoogleProfile(tokenResponse);
         log.info("Google Profile = {}", googleProfile);
 
-        Optional<Auth> opAuth = authRepository.findByEmailAndProvider(googleProfile.getEmail(), Provider.GOOGLE)
-                                              .filter(Auth::isMember);
+        Optional<Auth> opAuth = authRepository.findByEmailAndProvider(googleProfile.getEmail(), Provider.GOOGLE);
 
         if (opAuth.isEmpty()) {
             // DB 에 회원 정보가 없을 시 로그인 시도한 프로필을 바탕으로 회원가입 진행
@@ -79,6 +79,9 @@ public class GoogleLoginService implements Oauth2Service {
         }
 
         Auth auth = opAuth.get();
+        if (auth.isWithdraw()) {
+            throw new WithdrawMemberException();
+        }
 
         List<SimpleGrantedAuthority> roles = roleRepository.findRolesByAuthId(auth.getId())
                                                            .stream()

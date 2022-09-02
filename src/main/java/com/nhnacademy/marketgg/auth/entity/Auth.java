@@ -5,7 +5,6 @@ import com.nhnacademy.marketgg.auth.dto.request.AuthWithDrawRequest;
 import com.nhnacademy.marketgg.auth.dto.request.MemberUpdateRequest;
 import com.nhnacademy.marketgg.auth.dto.request.signup.SignUpRequest;
 import com.nhnacademy.marketgg.auth.exception.AuthNotFoundException;
-import com.nhnacademy.marketgg.auth.exception.WithdrawMemberException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -163,12 +162,8 @@ public class Auth {
         this.uuid = uuid;
     }
 
-    public boolean isMember() {
-        if (Objects.nonNull(this.deletedAt)) {
-            throw new WithdrawMemberException();
-        }
-
-        return true;
+    public boolean isWithdraw() {
+        return Objects.nonNull(deletedAt);
     }
 
 }

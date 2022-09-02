@@ -7,13 +7,10 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.nhnacademy.marketgg.auth.config.WebSecurityConfig;
 import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
@@ -116,7 +113,7 @@ class DefaultAuthServiceTest {
 
         given(tokenUtils.getUuidFromToken(jwt)).willReturn(uuid);
         given(authRepository.findByUuid(anyString())).willReturn(Optional.of(auth));
-        given(auth.isMember()).willReturn(true);
+        given(auth.isWithdraw()).willReturn(true);
 
         HashOperations<String, Object, Object> mockHash
             = mock(HashOperations.class);
