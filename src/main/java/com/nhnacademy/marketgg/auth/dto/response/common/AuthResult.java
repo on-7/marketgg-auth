@@ -1,5 +1,7 @@
 package com.nhnacademy.marketgg.auth.dto.response.common;
 
+import com.nhnacademy.marketgg.auth.dto.response.login.oauth.OauthLoginResponse;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -16,8 +18,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class AuthResult<T> {
 
+    @Schema(title = "응답 성공 여부", description = "API 요청 시 응답 결과의 성공 반환 여부를 판단하는 flag 값입니다.", example = "true")
     private final boolean success;
 
+    @Schema(title = "응답 결과 데이터", description = "API 요청에 대한 응답 결과 데이터입니다.",
+        anyOf = { OauthLoginResponse.class })
     private final T data;
 
     private final ErrorEntity error;

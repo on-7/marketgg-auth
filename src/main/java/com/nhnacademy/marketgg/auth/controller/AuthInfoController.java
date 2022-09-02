@@ -19,6 +19,11 @@ import com.nhnacademy.marketgg.auth.exception.UnAuthorizationException;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import com.nhnacademy.marketgg.auth.service.AuthInfoService;
 import com.nhnacademy.marketgg.auth.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -98,11 +103,18 @@ public class AuthInfoController {
 
     /**
      * JWT 토큰을 이용하여 사용자 정보를 응답합니다.
+     * <p>
      *
      * @param memberInfoRequest - 요청하려는 사용자 정보
      * @return - 사용자 정보
      * @author 윤동열
      */
+    @Operation(summary = "UUID 로 사용자의 정보를 전달한다.",
+        description = "사용자의 정보를 전달한다.",
+        parameters = @Parameter(description = "회원의 UUID", required = true),
+        responses = @ApiResponse(responseCode = "200",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = AuthResult.class))))
     @PostMapping("/person")
     public ResponseEntity<AuthResult<MemberInfoResponse>> getMemberInfo(
         @RequestBody MemberInfoRequest memberInfoRequest) {
@@ -120,6 +132,12 @@ public class AuthInfoController {
      * @return 회원 목록
      * @author 윤동열
      */
+    @Operation(summary = "UUID 목록으로 사용자의 정보목록을 전달한다.",
+        description = "사용자의 정보를 전달한다.",
+        parameters = @Parameter(description = "회원의 UUID 목록", required = true),
+        responses = @ApiResponse(responseCode = "200",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = AuthResult.class))))
     @PostMapping("/names")
     public ResponseEntity<AuthResult<List<MemberNameResponse>>> getMemberList(@RequestBody List<String> uuids) {
         List<MemberNameResponse> data = authInfoService.findMemberNameList(uuids);
@@ -137,6 +155,12 @@ public class AuthInfoController {
      * @throws UnAuthorizationException - JWT 를 통해 인증할 수 없는 사용자일 경우 발생하는 예외
      * @author 윤동열
      */
+    @Operation(summary = "로그인 한 사용자의 정보를 전달한다.",
+        description = "로그인 한 사용자의 정보(이름, 이메일, 전화번호)를 전달한다.",
+        parameters = @Parameter(description = "로그인 한 사용자의 JWT 토큰", required = true),
+        responses = @ApiResponse(responseCode = "200",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = AuthResult.class))))
     @GetMapping
     public ResponseEntity<AuthResult<MemberResponse>> getAuthInfo(@Token String token) throws UnAuthorizationException {
         MemberResponse data = authInfoService.findAuthByUuid(token);
