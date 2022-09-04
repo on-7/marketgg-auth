@@ -40,7 +40,7 @@ public class DefaultAuthService implements AuthService {
     public TokenResponse renewToken(final String token) {
         String uuid = tokenUtils.getUuidFromToken(token);
 
-        Optional<Auth> auth = authRepository.findByUuid(uuid).filter(Auth::isMember);
+        Optional<Auth> auth = authRepository.findByUuid(uuid).filter(Auth::isWithdraw);
 
         String refreshToken =
                 (String) redisTemplate.opsForHash().get(uuid, TokenUtils.REFRESH_TOKEN);

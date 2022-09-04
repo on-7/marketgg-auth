@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.marketgg.auth.dto.request.LoginRequest;
 import com.nhnacademy.marketgg.auth.dto.response.login.oauth.TokenResponse;
 import com.nhnacademy.marketgg.auth.exception.InvalidLoginRequestException;
+import com.nhnacademy.marketgg.auth.jwt.CustomUser;
 import com.nhnacademy.marketgg.auth.jwt.TokenUtils;
 import java.io.IOException;
+import java.util.Objects;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +29,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  */
 @Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
+    private static final String WWW_AUTHENTICATE = "WWW-Authenticate";
+    private static final String WITHDRAW = "WITHDRAW";
 
     private final ObjectMapper mapper;
     private final TokenUtils tokenUtils;
@@ -52,6 +57,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException {
+
         try {
             log.info("start login");
             log.info("uri = {}", request.getRequestURI());
@@ -59,15 +65,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             LoginRequest loginRequest = mapper.readValue(request.getInputStream(), LoginRequest.class);
 
             UsernamePasswordAuthenticationToken token =
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
 
-            return getAuthenticationManager().authenticate(token);
+            Authentication authentication = getAuthenticationManager().authenticate(token);
+            CustomUser principal = (CustomUser) authentication.getPrincipal();
+            if (principal.isWithdraw()) {
+                response.setHeader(WWW_AUTHENTICATE, WITHDRAW);
+            }
 
+            return authentication;
         } catch (IOException e) {
             log.error("잘못된 로그인 요청");
             throw new InvalidLoginRequestException("잘못된 로그인 요청입니다");
         }
-
     }
 
     /**
@@ -84,7 +94,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authResult)
-            throws IOException, ServletException {
+        throws IOException, ServletException {
+        String withdrawHeader = response.getHeader(WWW_AUTHENTICATE);
+        if (Objects.nonNull(withdrawHeader) && Objects.equals(withdrawHeader, WITHDRAW)) {
+            return;
+        }
 
         TokenResponse tokenResponse = tokenUtils.saveRefreshToken(redisTemplate, authResult);
 
@@ -105,7 +119,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                               AuthenticationException failed) throws IOException, ServletException {
 
-        log.error("로그인 실패", failed);
+        log.error("로그인 실패: {}", failed.toString());
         getFailureHandler().onAuthenticationFailure(request, response, failed);
     }
 

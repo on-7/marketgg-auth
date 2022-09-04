@@ -43,7 +43,7 @@ class DefaultUserDetailsServiceTest {
     @Test
     void testLoadUserByUsername() {
         Auth mockAuth = mock(Auth.class);
-        given(mockAuth.isMember()).willReturn(true);
+        given(mockAuth.isWithdraw()).willReturn(true);
         given(authRepository.findByEmail(anyString())).willReturn(Optional.of(mockAuth));
         given(roleRepository.findRolesByAuthId(anyLong())).willReturn(new ArrayList<>());
 

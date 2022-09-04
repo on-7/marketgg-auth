@@ -55,7 +55,6 @@ public class AuthInfoController {
     private final AuthService authService;
 
     /**
-     * <<<<<<< HEAD
      * 회원정보 수정을 위한 컨트롤러 메서드 입니다.
      *
      * @param token               - JWT
