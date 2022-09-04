@@ -38,12 +38,11 @@ public class DefaultUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
         Auth auth = authRepository.findByEmail(email)
-                                  .filter(Auth::isMember)
                                   .orElseThrow(() -> new AuthNotFoundException(email));
 
         List<Role> roles = roleRepository.findRolesByAuthId(auth.getId());
 
-        return new CustomUser(auth.getUuid(), auth.getPassword(), roles);
+        return new CustomUser(auth.getUuid(), auth.getPassword(), roles, auth.isWithdraw());
     }
 
 }

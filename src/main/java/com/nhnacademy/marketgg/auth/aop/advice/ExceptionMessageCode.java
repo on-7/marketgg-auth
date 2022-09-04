@@ -19,7 +19,8 @@ public enum ExceptionMessageCode {
     OAUTH_REQUEST_FAIL("oauthRequestFail.msg"),
     UNAUTHORIZATION("unAuthorization.msg"),
     INVALID_REQUEST("invalidRequest.msg"),
-    WITHDRAW_MEMBER("withdrawMember");
+    WITHDRAW_MEMBER("withdrawMember"),
+    WRONG_PASSWORD("wrong password");
 
     public final String msg;
 

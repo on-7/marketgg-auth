@@ -133,7 +133,8 @@ public class AuthControllerAdvice {
 
         ErrorEntity error = this.getErrorEntity(e);
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        return ResponseEntity.status(HttpStatus.GONE)
+                             .header("WWW-Authenticate", "WITHDRAW")
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(AuthResult.error(error));
     }
