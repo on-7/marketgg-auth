@@ -113,7 +113,7 @@ class DefaultAuthServiceTest {
 
         given(tokenUtils.getUuidFromToken(jwt)).willReturn(uuid);
         given(authRepository.findByUuid(anyString())).willReturn(Optional.of(auth));
-        given(auth.isWithdraw()).willReturn(true);
+        given(auth.isWithdraw()).willReturn(false);
 
         HashOperations<String, Object, Object> mockHash
             = mock(HashOperations.class);
@@ -134,8 +134,8 @@ class DefaultAuthServiceTest {
 
         TokenResponse tokenResponse = authService.renewToken(jwt);
 
-        verify(mockHash, times(1)).get(uuid, TokenUtils.REFRESH_TOKEN);
         verify(mockHash, times(1)).delete(uuid, TokenUtils.REFRESH_TOKEN);
+        verify(mockHash, times(1)).get(uuid, TokenUtils.REFRESH_TOKEN);
 
         assertThat(tokenResponse.getJwt()).isEqualTo(jwt);
         assertThat(tokenResponse.getExpiredDate().toString()).hasToString(now.toString());
